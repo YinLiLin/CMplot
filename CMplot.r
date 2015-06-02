@@ -1,6 +1,7 @@
 # R-CMplot
 CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band=1,cir.band=1,H=1,out="b",cex=c(0.5,1),r=1,outward=TRUE,line = TRUE, amplify = TRUE, cir.labels=TRUE,amplify.col=c("red","green")){
   if(out=="b") out=c("c","m")
+  plotXY=TRUE
   Pmap=Pmap[,-1]
   taxa=colnames(Pmap)[-c(1,2)]
   cir.band=cir.band/5
@@ -9,13 +10,18 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
   index=c(1:100)
   PmapN=Pmap[Pmap[,1] %in% index,]
   PmapXY=Pmap[!(Pmap[,1] %in% index)&Pmap[,1]!=0,]
+  if(length(PmapXY)==0) plotXY=FALSE
   PmapN=matrix(as.numeric(as.matrix(PmapN)),nrow(PmapN))
-  PmapXY=as.matrix(PmapXY)
+  if(plotXY==TRUE) PmapXY=as.matrix(PmapXY)
   orderP=PmapN[order(PmapN[,1],PmapN[,2]),]
-  orderPXY.=PmapXY[order(PmapXY[,1],PmapXY[,2]),]
+  if(plotXY==TRUE) orderPXY.=PmapXY[order(PmapXY[,1],PmapXY[,2]),]
+  if(plotXY==TRUE){
   chr=c(unique(orderP[,1]),"S")
+  }else{
+   chr=unique(orderP[,1])
+  }
   pvalueT=as.matrix(orderP[,-c(1:2)])
-  pvalueXY.=-log10(matrix(as.numeric(orderPXY.[,-c(1:2)]),nrow(orderPXY.)))
+  if(plotXY==TRUE) pvalueXY.=-log10(matrix(as.numeric(orderPXY.[,-c(1:2)]),nrow(orderPXY.)))
   #palette(heat.colors(1024)) #(heatmap)
   #T=floor(1024/max(pvalue))
   #plot(pvalue,pch=19,cex=0.6,col=(1024-floor(pvalue*T)))
@@ -51,33 +57,49 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
   pvalueT=do.call(cbind,NewP)
   logpvalueT=-log10(pvalueT)
   Num=Num+band
+  if(plotXY==TRUE){
   ticks=c(ticks,dim(pvalueT)[1]+band+dim(pvalueXY.)[1]/2)
   add=c(Num,rep(0,N*length(col)-Nchr))
   XYlim=(dim(pvalueT)[1]+band+1):((dim(pvalueT)[1]+band)+dim(pvalueXY.)[1])	
   TotalN1=dim(pvalueT)[1]
   TotalN2=dim(pvalueXY.)[1]
   TotalN=TotalN1+TotalN2+band
+  }else{
+  ticks=ticks
+  add=c(Num,rep(0,N*length(col)-Nchr))
+  TotalN1=dim(pvalueT)[1]
+  TotalN=TotalN1
+  }
    if("c" %in% out){
-  print("Starting Manhattan-Circle plot!",quote=F)
-  jpeg("Manhattan-Plot.circle.jpg", width = 2450,height=2450,res=300,quality = 100)
+  print("Starting Circular-Manhattan plot!",quote=F)
+  jpeg("Circular-Manhattan.jpg", width = 2450,height=2450,res=300,quality = 100)
   par(pty="s")
   RR=r+H*R+cir.band*R
   plot(NULL,xlim=c(-RR,RR),ylim=c(-RR,RR),axes=F,xlab="",ylab="")
   for(i in 1:R){
     pvalue=pvalueT[,i]
     logpvalue=logpvalueT[,i]
-    pvalueXYi.=pvalueXY.[,i]
+    if(plotXY==TRUE){
+	pvalueXYi.=pvalueXY.[,i]
     Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
     Cpvalue=H*logpvalue/Max
     CpvalueXY=H*pvalueXYi./Max
+	}else{
+    Max=ceiling(-log10(min(pvalue[pvalue!=0])))
+    Cpvalue=H*logpvalue/Max
+	}
 	if(outward==TRUE){
     X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(1:TotalN1)/TotalN)
     Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(1:TotalN1)/TotalN)
+    if(plotXY==TRUE){
     XX=(CpvalueXY+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*((TotalN1+band+1):TotalN)/TotalN)
     YY=(CpvalueXY+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*((TotalN1+band+1):TotalN)/TotalN)
+	points(XX,YY,pch=19,cex=cex[1],col="gray")
+	points(X,Y,pch=19,cex=cex[1],col=rep(rep(col,N),add))
+	}else{
     #plot(chrX,chrY,type="l",col="black",lwd=4)
     points(X,Y,pch=19,cex=cex[1],col=rep(rep(col,N),add))
-    points(XX,YY,pch=19,cex=cex[1],col="gray")
+	}
     significantline1=H*(-log10(0.01/max(dim(Pmap))))/Max
     significantline2=H*(-log10(1/max(dim(Pmap))))/Max
 	if(line==TRUE){
@@ -108,10 +130,14 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
 	if(outward==FALSE){
 	X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(1:TotalN1)/TotalN)
     Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(1:TotalN1)/TotalN)
+	if(plotXY==TRUE){
     XX=(-CpvalueXY+r+H*i+cir.band*(i-1))*sin(2*pi*((TotalN1+band+1):TotalN)/TotalN)
     YY=(-CpvalueXY+r+H*i+cir.band*(i-1))*cos(2*pi*((TotalN1+band+1):TotalN)/TotalN)
 	points(X,Y,pch=19,cex=cex[1],col=rep(rep(col,N),add))
     points(XX,YY,pch=19,cex=cex[1],col="gray")
+	}else{
+	points(X,Y,pch=19,cex=cex[1],col=rep(rep(col,N),add))
+	}
     significantline1=H*(-log10(0.01/max(dim(Pmap))))/Max
     significantline2=H*(-log10(1/max(dim(Pmap))))/Max
 	if(line==TRUE){
@@ -141,20 +167,27 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
 	}
   }
   dev.off()
-  print("Manhattan-Circle has been finished!",quote=F)
+  print("Circular-Manhattan has been finished!",quote=F)
 }  
 if("m" %in% out){
-  print("Starting Manhattan-Genomewise plot!",quote=F)
+  print("Starting Rectangular-Manhattan plot!",quote=F)
   for(i in 1:R){
-    jpeg(paste("Manhattan-Plot.",taxa[i],".jpg",sep=""), width = 4200,height=1500,res=300,quality = 100)
+  	print(paste("Plotting ",taxa[i],"...",sep=""),quote=F)
+    jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 4200,height=1500,res=300,quality = 100)
 	par(mar = c(3,6,5,3),xaxs="i")
     pvalue=pvalueT[,i]
     logpvalue=logpvalueT[,i]
-    pvalueXYi.=pvalueXY.[,i]
+    if(plotXY==TRUE){
+	pvalueXYi.=pvalueXY.[,i]
     Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
-    plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),xlab="",ylab=expression(-log[10](italic(p))),
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),xlab="",ylab=expression(-log[10](italic(p))),
+        cex.axis=1.5,cex.lab=2,font=2,axes=FALSE)
+	points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
+	}else{
+	Max=ceiling(-log10(min(pvalue[pvalue!=0])))
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),xlab="",ylab=expression(-log[10](italic(p))),
          cex.axis=1.5,cex.lab=2,font=2,axes=FALSE)
-    points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
+	}
     axis(1, at=ticks,cex.axis=1,font=2,labels=chr)
     axis(2,at=c(0:(Max+1)),cex.axis=1,font=2,labels=0:(Max+1))
 	if(line==TRUE){
@@ -172,9 +205,8 @@ if("m" %in% out){
     points(HX2,HY2,pch=pch,cex=cex[2]*1.5,col=amplify.col[2])
 	}
 	dev.off()
-	print(paste("Manhattan-",taxa[i],".plot has been finished!",sep=""),quote=F)
   }
   }
+  print("Rectangular-Manhattan has been finished!",quote=F)
   print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=F)
 }
-
