@@ -1,15 +1,33 @@
 # R-CMplot
-CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band=1,cir.band=1,H=1,out="b",cex=c(0.5,1),r=1,outward=TRUE,line = TRUE, amplify = TRUE, cir.labels=TRUE,amplify.col=c("red","green")){
+CMplot <- function(Pmap,
+col=c('red','black','green','blue','orange'),
+pch=19,
+band=1,
+cir.band=1,
+H=1,
+out="b",
+cex=c(0.5,1),
+r=1,
+outward=TRUE,
+line = TRUE, 
+amplify = TRUE,
+cir.chr=FALSE,
+chr.band=1,
+cir.labels=TRUE,
+amplify.col=c("red","green"))
+{
   if(out=="b") out=c("c","m")
   plotXY=TRUE
   Pmap=Pmap[,-1]
   taxa=colnames(Pmap)[-c(1,2)]
+  chr.band=chr.band/5
   cir.band=cir.band/5
   if(length(cex)!=2) cex[2]=cex[1]
   R=dim(Pmap)[2]-2
   index=c(1:100)
   PmapN=Pmap[Pmap[,1] %in% index,]
   PmapXY=Pmap[!(Pmap[,1] %in% index)&Pmap[,1]!=0,]
+  chrXY=unique(PmapXY[,1])
   if(length(PmapXY)==0) plotXY=FALSE
   PmapN=matrix(as.numeric(as.matrix(PmapN)),nrow(PmapN))
   if(plotXY==TRUE) PmapXY=as.matrix(PmapXY)
@@ -75,7 +93,7 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
   jpeg("Circular-Manhattan.jpg", width = 2450,height=2450,res=300,quality = 100)
   par(pty="s")
   RR=r+H*R+cir.band*R
-  plot(NULL,xlim=c(-RR,RR),ylim=c(-RR,RR),axes=F,xlab="",ylab="")
+  plot(NULL,xlim=c(-RR-4*chr.band,RR+4*chr.band),ylim=c(-RR-4*chr.band,RR+4*chr.band),axes=F,xlab="",ylab="")
   for(i in 1:R){
     pvalue=pvalueT[,i]
     logpvalue=logpvalueT[,i]
@@ -89,6 +107,55 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
     Cpvalue=H*logpvalue/Max
 	}
 	if(outward==TRUE){
+	if(cir.chr==TRUE){
+	XLine=(RR+chr.band)*sin(2*pi*(1:TotalN)/TotalN)
+	YLine=(RR+chr.band)*cos(2*pi*(1:TotalN)/TotalN)
+	lines(XLine,YLine,lwd=1.5)
+	a=0
+	if(plotXY==FALSE){
+	for(k in 1:length(chr)){
+	if(k==1){
+	X1chr=(RR)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	Y1chr=(RR)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	X2chr=(RR+chr.band)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	Y2chr=(RR+chr.band)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
+	}else{
+	a=a+sum(Pmap[,1]==chr[k-1])
+	X1chr=(RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	Y1chr=(RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	X2chr=(RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	Y2chr=(RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])		
+	}
+	}
+	}
+	if(plotXY==TRUE){
+	for(k in 1:(length(chr)-1)){
+	if(k==1){
+	X1chr=(RR)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	Y1chr=(RR)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	X2chr=(RR+chr.band)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	Y2chr=(RR+chr.band)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
+	}else{
+	a=a+sum(Pmap[,1]==chr[k-1])
+	X1chr=(RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	Y1chr=(RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	X2chr=(RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	Y2chr=(RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
+	}
+	}
+	k=length(chr)
+	a=a+sum(Pmap[,1]==chr[k-1])
+	X1chr=(RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+	Y1chr=(RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+	X2chr=(RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+	Y2chr=(RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="gray",border="gray")
+	}
+	}
     X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(1:TotalN1)/TotalN)
     Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(1:TotalN1)/TotalN)
     if(plotXY==TRUE){
@@ -118,6 +185,16 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
     points(HX1,HY1,pch=19,cex=cex[1]*1.5,col=amplify.col[1])
     points(HX2,HY2,pch=19,cex=cex[1]*1.5,col=amplify.col[2])
 	}
+	if(cir.chr==TRUE){
+	ticks1=1.07*(RR+chr.band)*sin(2*pi*ticks/TotalN)
+    ticks2=1.07*(RR+chr.band)*cos(2*pi*ticks/TotalN)
+	if(cir.labels==TRUE){
+    for(i in 1:length(ticks)){
+      angle=360*(1-ticks[i]/TotalN)
+      text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
+    }
+	}
+	}else{
 	ticks1=(0.9*r)*sin(2*pi*ticks/TotalN)
     ticks2=(0.9*r)*cos(2*pi*ticks/TotalN)
 	if(cir.labels==TRUE){
@@ -127,7 +204,57 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
     }
 	}
 	}
+	}
 	if(outward==FALSE){
+	if(cir.chr==TRUE){
+	XLine=(2*cir.band+RR+chr.band)*sin(2*pi*(1:TotalN)/TotalN)
+	YLine=(2*cir.band+RR+chr.band)*cos(2*pi*(1:TotalN)/TotalN)
+	lines(XLine,YLine,lwd=1.5)
+	a=0
+	if(plotXY==FALSE){
+	for(k in 1:length(chr)){
+	if(k==1){
+	X1chr=(2*cir.band+RR)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	Y1chr=(2*cir.band+RR)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
+	}else{
+	a=a+sum(Pmap[,1]==chr[k-1])
+	X1chr=(2*cir.band+RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	Y1chr=(2*cir.band+RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])		
+	}
+	}
+	}
+	if(plotXY==TRUE){
+	for(k in 1:(length(chr)-1)){
+	if(k==1){
+	X1chr=(2*cir.band+RR)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	Y1chr=(2*cir.band+RR)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
+	}else{
+	a=a+sum(Pmap[,1]==chr[k-1])
+	X1chr=(2*cir.band+RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	Y1chr=(2*cir.band+RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
+	}
+	}
+	k=length(chr)
+	a=a+sum(Pmap[,1]==chr[k-1])
+	X1chr=(2*cir.band+RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+	Y1chr=(2*cir.band+RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="gray",border="gray")
+	}
+	}
 	X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(1:TotalN1)/TotalN)
     Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(1:TotalN1)/TotalN)
 	if(plotXY==TRUE){
@@ -156,6 +283,16 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
     points(HX1,HY1,pch=19,cex=cex[1]*1.5,col=amplify.col[1])
     points(HX2,HY2,pch=19,cex=cex[1]*1.5,col=amplify.col[2])
 	}
+	if(cir.chr==TRUE){
+	ticks1=1.1*(2*cir.band+RR)*sin(2*pi*ticks/TotalN)
+    ticks2=1.1*(2*cir.band+RR)*cos(2*pi*ticks/TotalN)
+	if(cir.labels==TRUE){
+    for(i in 1:length(ticks)){
+      angle=360*(1-ticks[i]/TotalN)
+      text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
+	}
+	}
+	}else{
     ticks1=1.07*(RR-cir.band)*sin(2*pi*ticks/TotalN)
     ticks2=1.07*(RR-cir.band)*cos(2*pi*ticks/TotalN)
 	if(cir.labels==TRUE){
@@ -164,6 +301,7 @@ CMplot <- function(Pmap,col=c('red','black','green','blue','orange'),pch=19,band
       text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
     }
 	}	
+	}
 	}
   }
   dev.off()
@@ -206,7 +344,8 @@ if("m" %in% out){
 	}
 	dev.off()
   }
+	print("Rectangular-Manhattan has been finished!",quote=F)
   }
-  print("Rectangular-Manhattan has been finished!",quote=F)
   print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=F)
 }
+
