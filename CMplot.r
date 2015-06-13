@@ -32,7 +32,7 @@ amplify.col=c("red","green"))
   PmapN=Pmap[Pmap[,1] %in% index,]
   PmapXY=Pmap[!(Pmap[,1] %in% index)&Pmap[,1]!=0,]
   chrXY=unique(PmapXY[,1])
-  if(length(PmapXY)==0) plotXY=FALSE
+  if(dim(PmapXY)[1]==0) plotXY=FALSE
   PmapN=matrix(as.numeric(as.matrix(PmapN)),nrow(PmapN))
   if(plotXY==TRUE) PmapXY=as.matrix(PmapXY)
   orderP=PmapN[order(PmapN[,1],PmapN[,2]),]
