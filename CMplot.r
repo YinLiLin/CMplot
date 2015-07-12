@@ -101,7 +101,7 @@ fill="jpg"
   TotalN=TotalN1
   }
    if("c" %in% output){
-  print(paste("Circular-Plotting ",taxa[i],"...",sep=""),quote=F)
+  print("Starting Circular-Manhattan plot!",quote=F)
   if(fill=="jpg")	jpeg("Circular-Manhattan.jpg", width = 2450,height=2450,res=300,quality = 100)
   if(fill=="pdf")	pdf("Circular-Manhattan.pdf", width = 10,height=10)
   if(fill=="tiff")	tiff("Circular-Manhattan.tiff", width = 2450,height=2450,res=300)
@@ -109,7 +109,7 @@ fill="jpg"
   RR=r+H*R+cir.band*R
   plot(NULL,xlim=c(1.05*(-RR-4*chr.band),1.05*(RR+4*chr.band)),ylim=c(1.05*(-RR-4*chr.band),1.05*(RR+4*chr.band)),axes=F,xlab="",ylab="")
   for(i in 1:R){
-    print("Circular-plotting!",quote=F)
+    print(paste("Circular-Plotting ",taxa[i],"...",sep=""),quote=F)
     pvalue=pvalueT[,i]
     logpvalue=logpvalueT[,i]
     if(plotXY==TRUE){
