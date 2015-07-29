@@ -385,11 +385,11 @@ if("m" %in% output){
 	points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
 	}else{
 	if(is.null(ylim)){
-	Max=ceiling(-log10(min(pvalue[pvalue!=0])),-log10(threshold/max(dim(Pmap))))
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),xlab="",ylab=expression(-log[10](italic(p))),
+	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(threshold/max(dim(Pmap))))
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=expression(-log[10](italic(p))),
          cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab="Chromosome",main=paste("Manhattan plot of",taxa[i]))
 	}else{
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=ylim,xlab="",ylab=expression(-log[10](italic(p))),
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=expression(-log[10](italic(p))),
          cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab="Chromosome",main=paste("Manhattan plot of",taxa[i]))
 	}
 	}
