@@ -6,10 +6,13 @@ band=1,
 cir.band=1,
 H=1,
 ylim=NULL,
-cex.axis=1.5,
+cex.axis=1,
 output="b",
+multracks=FALSE,
 cex=c(0.5,1),
 r=1,
+xlab="Chromosome",
+ylab=expression(-log[10](italic(p))),
 outward=TRUE,
 threshold = 0.01, 
 threshold.col="red",
@@ -22,7 +25,8 @@ chr.band=1,
 chr.col=NULL,
 cir.labels=TRUE,
 plot0=FALSE,
-fill="jpg"
+fill="jpg",
+dpi=300
 )
 {
   if(output=="b") output=c("c","m")
@@ -102,9 +106,9 @@ fill="jpg"
   }
    if("c" %in% output){
   print("Starting Circular-Manhattan plot!",quote=F)
-  if(fill=="jpg")	jpeg("Circular-Manhattan.jpg", width = 2450,height=2450,res=300,quality = 100)
+  if(fill=="jpg")	jpeg("Circular-Manhattan.jpg", width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
   if(fill=="pdf")	pdf("Circular-Manhattan.pdf", width = 10,height=10)
-  if(fill=="tiff")	tiff("Circular-Manhattan.tiff", width = 2450,height=2450,res=300)
+  if(fill=="tiff")	tiff("Circular-Manhattan.tiff", width = 8*dpi,height=8*dpi,res=dpi)
   par(pty="s",xpd=TRUE)
   RR=r+H*R+cir.band*R
   plot(NULL,xlim=c(1.05*(-RR-4*chr.band),1.05*(RR+4*chr.band)),ylim=c(1.05*(-RR-4*chr.band),1.05*(RR+4*chr.band)),axes=F,xlab="",ylab="")
@@ -363,12 +367,13 @@ fill="jpg"
   print("Circular-Manhattan has been finished!",quote=F)
 }
 if("m" %in% output){
+if(multracks==FALSE){
   print("Starting Rectangular-Manhattan plot!",quote=F)
   for(i in 1:R){
   	print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
-    if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 4200,height=1500,res=300,quality = 100)
+    if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
     if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
-    if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = 4200,height=1500,res=300)
+    if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
 	par(mar = c(5,6,4,3),xaxs="i")
     pvalue=pvalueT[,i]
     logpvalue=logpvalueT[,i]
@@ -376,21 +381,21 @@ if("m" %in% output){
 	pvalueXYi.=pvalueXY.[,i]
     Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.),-log10(threshold/max(dim(Pmap))))
 	if(is.null(ylim)){
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=expression(-log[10](italic(p))),
-        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab="Chromosome",main=paste("Manhattan plot of",taxa[i]))
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
+        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 		}else{
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=ylim,ylab=expression(-log[10](italic(p))),
-        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab="Chromosome",main=paste("Manhattan plot of",taxa[i]))	
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=ylim,ylab=ylab,
+        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))	
 		}
 	points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
 	}else{
 	if(is.null(ylim)){
 	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(threshold/max(dim(Pmap))))
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=expression(-log[10](italic(p))),
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
          cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab="Chromosome",main=paste("Manhattan plot of",taxa[i]))
 	}else{
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=expression(-log[10](italic(p))),
-         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab="Chromosome",main=paste("Manhattan plot of",taxa[i]))
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
+         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 	}
 	}
     axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
@@ -415,6 +420,61 @@ if("m" %in% output){
 	dev.off()
   }
 	print("Rectangular-Manhattan has been finished!",quote=F)
+  }else{
+print("Starting Rectangular-Manhattan plot!",quote=F)
+print("Plotting in multiple tracks!",quote=F)
+    if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa,".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
+    if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa,".pdf",sep=""), width = 15,height=6*R)
+    if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa,".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
+	par(mfrow=c(R,1),mar = c(5,6,4,3),xaxs="i")
+  for(i in 1:R){
+    print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
+    pvalue=pvalueT[,i]
+    logpvalue=logpvalueT[,i]
+    if(plotXY==TRUE){
+	pvalueXYi.=pvalueXY.[,i]
+    Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.),-log10(threshold/max(dim(Pmap))))
+	if(is.null(ylim)){
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
+        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+		}else{
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=ylim,ylab=ylab,
+        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))	
+		}
+	points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
+	}else{
+	if(is.null(ylim)){
+	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(threshold/max(dim(Pmap))))
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
+         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+	}else{
+	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
+         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+	}
+	}
+    axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
+	if(is.null(ylim)){
+    axis(2,at=c(0:(Max+1)),cex.axis=cex.axis,font=2,labels=0:(Max+1))
+	}else{
+	axis(2,at=c(0:ylim[2]),cex.axis=cex.axis,font=2,labels=0:ylim[2])
+	}
+	if(!is.null(threshold)){
+	if(threshold!=0){
+	h=-log10(threshold/max(dim(Pmap)))
+	abline(h=h,col=threshold.col)
+	if(amplify == TRUE){
+    sgline1=-log10(threshold/max(dim(Pmap)))
+    HY1=logpvalue[which(logpvalue>=sgline1)]
+    HX1=which(logpvalue>=sgline1)
+	points(HX1,HY1,pch=pch,cex=cex[2],col="white")
+    points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=signal.col)
+	}
+	}
+	}
+  }
+  	dev.off()
+	print("Rectangular-Manhattan has been finished!",quote=F)
+  }
   }
   print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=F)
 }
