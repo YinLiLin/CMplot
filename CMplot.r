@@ -423,9 +423,9 @@ if(multracks==FALSE){
   }else{
 print("Starting Rectangular-Manhattan plot!",quote=F)
 print("Plotting in multiple tracks!",quote=F)
-    if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa,".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
+    if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa,".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
     if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa,".pdf",sep=""), width = 15,height=6*R)
-    if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa,".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
+    if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa,".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
 	par(mfrow=c(R,1),mar = c(5,6,4,3),xaxs="i")
   for(i in 1:R){
     print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
