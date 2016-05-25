@@ -1,13 +1,15 @@
 # R-CMplot
-CMplot <- function(Pmap,
-col=c('red','black','green','blue','orange'),
+CMplot <-
+function(
+Pmap,
+col=c("darkgreen","darkmagenta","navy","black","orange"),
 pch=19,
 band=1,
 cir.band=1,
 H=1,
 ylim=NULL,
 cex.axis=1,
-output="b",
+plot.type="b",
 multracks=FALSE,
 cex=c(0.5,1),
 r=1,
@@ -16,511 +18,818 @@ ylab=expression(-log[10](italic(p))),
 outward=TRUE,
 threshold = 0.01, 
 threshold.col="red",
+threshold.lwd=1,
+threshold.lty=2,
 amplify= TRUE,
 signal.cex = 1.5,
 signal.pch = 19,
 signal.col="red",
 cir.chr=TRUE,
-chr.band=1,
-chr.col=NULL,
-cir.labels=TRUE,
-plot0=FALSE,
+cir.chr.h=1,
+cir.chr.col="black",
+cir.chr.labels=NULL,
+cir.legend=TRUE,
+cir.legend.cex=0.5,
+cir.legend.col="grey45",
+LOG10=TRUE,
+conf.int=TRUE,
+conf.int.col="grey",
+plot0=TRUE,
 fill.output=TRUE,
 fill="jpg",
 dpi=300
 )
-{
-  if(output=="b") output=c("c","m")
-  plotXY=TRUE
-  Pmap=Pmap[order(Pmap[,1]),]
-  Pmap=Pmap[,-1]
-  taxa=colnames(Pmap)[-c(1,2)]
-  chr.band=chr.band/5
-  cir.band=cir.band/5
-  if(length(cex)!=2) cex[2]=cex[1]
-  if(length(cex)>2) stop("Less than two cexs are allowed!")
-  R=dim(Pmap)[2]-2
-  if(plot0==FALSE) index=c(1:100)
-  if(plot0==TRUE) index=c(0:100)
-  PmapN=Pmap[Pmap[,1] %in% index,]
-  PmapXY=Pmap[!(Pmap[,1] %in% index)&Pmap[,1]!=0,]
-  chrXY=unique(PmapXY[,1])
-  if(dim(PmapXY)[1]==0) plotXY=FALSE
-  PmapN=matrix(as.numeric(as.matrix(PmapN)),nrow(PmapN))
-  if(plotXY==TRUE) PmapXY=as.matrix(PmapXY)
-  orderP=PmapN[order(PmapN[,1],PmapN[,2]),]
-  if(plotXY==TRUE) orderPXY.=PmapXY[order(PmapXY[,1],PmapXY[,2]),]
-  if(plotXY==TRUE){
-  chr=c(unique(orderP[,1]),"S")
-  }else{
-   chr=unique(orderP[,1])
-  }
-  pvalueT=as.matrix(orderP[,-c(1:2)])
-  if(plotXY==TRUE) pvalueXY.=-log10(matrix(as.numeric(orderPXY.[,-c(1:2)]),nrow(orderPXY.)))
-  #palette(heat.colors(1024)) #(heatmap)
-  #T=floor(1024/max(pvalue))
-  #plot(pvalue,pch=19,cex=0.6,col=(1024-floor(pvalue*T)))
-  if(!missing(col)){
-    col=col
-  }else{
-    col=c('red','black','green','blue','orange')
-  }
-  Num=as.numeric(table(PmapN[,1]))
-  Nchr=length(Num)
-  N=ceiling(Nchr/length(col))
-  if(!missing(band)){
-    band=floor(band)
-    band=band*floor(dim(pvalueT)[1]/100)
-  }else{
-    band=floor(dim(pvalueT)[1]/100)
-  }
-  ticks=NULL
-  NewP=NULL
-  for(j in 1:R){
-    pvalue=pvalueT[,j]
-    for(i in 0:(Nchr-1)){
-      if (i==0){
-        pvalue=append(pvalue,rep(0,band),after=0)
-        ticks[i+1]=band+floor((Num[i+1])/2)
-      }else{
-        pvalue=append(pvalue,rep(0,band),after=sum(Num[1:i])+i*band)
-        ticks[i+1]=band*(i+1)+sum(Num[1:i])+floor((Num[i+1])/2)
-      }
-    }
-    NewP[[j]]=pvalue
-  }
-  pvalueT=do.call(cbind,NewP)
-  logpvalueT=-log10(pvalueT)
-  Num=Num+band
-  if(plotXY==TRUE){
-  ticks=c(ticks,dim(pvalueT)[1]+band+dim(pvalueXY.)[1]/2)
-  add=c(Num,rep(0,N*length(col)-Nchr))
-  XYlim=(dim(pvalueT)[1]+band+1):((dim(pvalueT)[1]+band)+dim(pvalueXY.)[1])	
-  TotalN1=dim(pvalueT)[1]
-  TotalN2=dim(pvalueXY.)[1]
-  TotalN=TotalN1+TotalN2+band
-  }else{
-  ticks=ticks
-  add=c(Num,rep(0,N*length(col)-Nchr))
-  TotalN1=dim(pvalueT)[1]
-  TotalN=TotalN1
-  }
-   if("c" %in% output){
-  print("Starting Circular-Manhattan plot!",quote=F)
-if(fill.output==TRUE){
-  if(fill=="jpg")	jpeg("Circular-Manhattan.jpg", width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
-  if(fill=="pdf")	pdf("Circular-Manhattan.pdf", width = 10,height=10)
-  if(fill=="tiff")	tiff("Circular-Manhattan.tiff", width = 8*dpi,height=8*dpi,res=dpi)
-  }
-  par(pty="s",xpd=TRUE)
-  RR=r+H*R+cir.band*R
-  plot(NULL,xlim=c(1.05*(-RR-4*chr.band),1.05*(RR+4*chr.band)),ylim=c(1.05*(-RR-4*chr.band),1.05*(RR+4*chr.band)),axes=F,xlab="",ylab="")
-  for(i in 1:R){
-    print(paste("Circular-Plotting ",taxa[i],"...",sep=""),quote=F)
-    pvalue=pvalueT[,i]
-    logpvalue=logpvalueT[,i]
-    if(plotXY==TRUE){
-	pvalueXYi.=pvalueXY.[,i]
-    Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
-    Cpvalue=H*logpvalue/Max
-    CpvalueXY=H*pvalueXYi./Max
-	}else{
-    Max=ceiling(-log10(min(pvalue[pvalue!=0])))
-    Cpvalue=H*logpvalue/Max
+{	
+	circle.plot <- function(r,type="l",lty=1,lwd=1,col="black",add=TRUE,n.point=1000)
+	{
+		curve(sqrt(r^2-x^2),xlim=c(-r,r),n=n.point,ylim=c(-r,r),type=type,lty=lty,col=col,lwd=lwd,add=add)
+		curve(-sqrt(r^2-x^2),xlim=c(-r,r),n=n.point,ylim=c(-r,r),type=type,lty=lty,col=col,lwd=lwd,add=TRUE)
 	}
-	if(outward==TRUE){
-	if(cir.chr==TRUE){
-	XLine=(RR+chr.band)*sin(2*pi*(1:TotalN)/TotalN)
-	YLine=(RR+chr.band)*cos(2*pi*(1:TotalN)/TotalN)
-	lines(XLine,YLine,lwd=1.5)
-	a=0
-	if(plotXY==FALSE){
-	for(k in 1:length(chr)){
-	if(k==1){
-	X1chr=(RR)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	Y1chr=(RR)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	X2chr=(RR+chr.band)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	Y2chr=(RR+chr.band)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
-	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}
-	}else{
-	a=a+sum(Pmap[,1]==chr[k-1])
-	X1chr=(RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	Y1chr=(RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	X2chr=(RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	Y2chr=(RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
-	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}		
-	}
-	}
-	}
+	print(paste(paste(rep("*",5),collapse=""),"Welcome to use CMplot!",paste(rep("*",5),collapse=""),sep=""),quote=F)
+	print(paste("* ","Version: ",packageVersion("CMplot"),paste(rep(" ",15),collapse=""),"*",sep=""),quote=F)
+	print(paste("* "," Author: Lilin Yin",paste(rep(" ",11),collapse=""),"*",sep=""),quote=F)
+	print(paste("* ","Contact: ylilin@163.com",paste(rep(" ",6),collapse=""),"*",sep=""),quote=F)
+	print(paste(rep("*",32),collapse=""),quote=F)
+
+	if(plot.type=="b") plot.type=c("c","m","q")
+	plotXY=TRUE
+	Pmap=na.omit(Pmap)
+	Pmap=Pmap[order(Pmap[,1]),]
+	Pmap=Pmap[,-1]
+	taxa=colnames(Pmap)[-c(1,2)]
+	cir.chr.h=cir.chr.h/5
+	cir.band=cir.band/5
+	threshold.col=rep(threshold.col,length(threshold))
+	threshold.lwd=rep(threshold.lwd,length(threshold))
+	threshold.lty=rep(threshold.lty,length(threshold))
+	if(length(cex)!=2) cex[2]=cex[1]
+	if(length(cex)>2) stop("Less than two cexs are allowed!")
+	R=dim(Pmap)[2]-2
+	if(plot0==FALSE) index=c(1:100)
+	if(plot0==TRUE) index=c(0:100)
+	PmapN=Pmap[Pmap[,1] %in% index,]
+	PmapXY=Pmap[!(Pmap[,1] %in% index)&Pmap[,1]!=0,]
+	chrXY=unique(PmapXY[,1])
+	if(dim(PmapXY)[1]==0) plotXY=FALSE
+	#print(plotXY)
+	PmapN=matrix(as.numeric(as.matrix(PmapN)),nrow(PmapN))
+	if(plotXY==TRUE) PmapXY=as.matrix(PmapXY)
+	orderP=PmapN[order(PmapN[,1],PmapN[,2]),]
+	if(plotXY==TRUE) orderPXY.=PmapXY[order(PmapXY[,1],PmapXY[,2]),]
 	if(plotXY==TRUE){
-	for(k in 1:(length(chr)-1)){
-	if(k==1){
-	X1chr=(RR)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	Y1chr=(RR)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	X2chr=(RR+chr.band)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	Y2chr=(RR+chr.band)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
+		chr=c(unique(orderP[,1]),"S")
 	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}	
-	}else{
-	a=a+sum(Pmap[,1]==chr[k-1])
-	X1chr=(RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	Y1chr=(RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	X2chr=(RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	Y2chr=(RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
-	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}	
+		chr=unique(orderP[,1])
 	}
-	}
-	k=length(chr)
-	a=a+sum(Pmap[,1]==chr[k-1])
-	X1chr=(RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
-	Y1chr=(RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
-	X2chr=(RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
-	Y2chr=(RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="gray",border="gray")	
-	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}
-	}
-	}
-    X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(1:TotalN1)/TotalN)
-    Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(1:TotalN1)/TotalN)
-    if(plotXY==TRUE){
-    XX=(CpvalueXY+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*((TotalN1+band+1):TotalN)/TotalN)
-    YY=(CpvalueXY+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*((TotalN1+band+1):TotalN)/TotalN)
-	points(XX,YY,pch=19,cex=cex[1],col="gray")
-	points(X,Y,pch=19,cex=cex[1],col=rep(rep(col,N),add))
-	}else{
-    #plot(chrX,chrY,type="l",col="black",lwd=4)
-    points(X,Y,pch=19,cex=cex[1],col=rep(rep(col,N),add))
-	}
-	if(!is.null(threshold)){
-	if(threshold!=0){
-	significantline1=H*(-log10(threshold/max(dim(Pmap))))/Max
-    s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
-    s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
-    if(significantline1<H){
-	lines(s1X,s1Y,type="l",col=threshold.col,lwd=1)
-	}else{
-	warning(paste("No significant points for ",taxa[i]," pass the threshold level using threshold=",threshold,"!",sep=""))
-	}
-	if(amplify == TRUE){
-    HX1=(Cpvalue[which(Cpvalue>=significantline1)]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(which(Cpvalue>=significantline1))/TotalN)
-    HY1=(Cpvalue[which(Cpvalue>=significantline1)]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(which(Cpvalue>=significantline1))/TotalN)
-	points(HX1,HY1,pch=19,cex=cex[1],col="white")
-	points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[1],col=signal.col)
-	}
-	}
-	}
-	if(cir.chr==TRUE){
-	ticks1=1.07*(RR+chr.band)*sin(2*pi*ticks/TotalN)
-    ticks2=1.07*(RR+chr.band)*cos(2*pi*ticks/TotalN)
-	if(cir.labels==TRUE){
-    for(i in 1:length(ticks)){
-      angle=360*(1-ticks[i]/TotalN)
-      text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
-    }
-	}
-	}else{
-	ticks1=(0.9*r)*sin(2*pi*ticks/TotalN)
-    ticks2=(0.9*r)*cos(2*pi*ticks/TotalN)
-	if(cir.labels==TRUE){
-    for(i in 1:length(ticks)){
-      angle=360*(1-ticks[i]/TotalN)
-      text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=0.5)
-    }
-	}
-	}
-	}
-	if(outward==FALSE){
-	if(cir.chr==TRUE){
-	XLine=(2*cir.band+RR+chr.band)*sin(2*pi*(1:TotalN)/TotalN)
-	YLine=(2*cir.band+RR+chr.band)*cos(2*pi*(1:TotalN)/TotalN)
-	lines(XLine,YLine,lwd=1.5)
-	a=0
-	if(plotXY==FALSE){
-	for(k in 1:length(chr)){
-	if(k==1){
-	X1chr=(2*cir.band+RR)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	Y1chr=(2*cir.band+RR)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
-	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}
-	}else{
-	a=a+sum(Pmap[,1]==chr[k-1])
-	X1chr=(2*cir.band+RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	Y1chr=(2*cir.band+RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
-	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}	
-	}
-	}
-	}
+	pvalueT=as.matrix(orderP[,-c(1:2)])
 	if(plotXY==TRUE){
-	for(k in 1:(length(chr)-1)){
-	if(k==1){
-	X1chr=(2*cir.band+RR)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	Y1chr=(2*cir.band+RR)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((band+1):(band+sum(Pmap[,1]==chr[1])))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
+		if(LOG10 == TRUE){
+			pvalueXY.=-log10(matrix(as.numeric(orderPXY.[,-c(1:2)]),nrow(orderPXY.)))
+		}else{
+			pvalueXY.=matrix(as.numeric(orderPXY.[,-c(1:2)]),nrow(orderPXY.))
+		}
+	} 
+	
+	#palette(heat.colors(1024)) #(heatmap)
+	#T=floor(1024/max(pvalue))
+	#plot(pvalue,pch=19,cex=0.6,col=(1024-floor(pvalue*T)))
+	if(!missing(col)){
+		if(is.vector(col)){
+			col=matrix(col,R,length(col),byrow=T)
+		}
+		if(is.matrix(col)){
+			col=matrix(as.vector(t(col)),R,dim(col)[2],byrow=T)
+		}
 	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}	
-	}else{
-	a=a+sum(Pmap[,1]==chr[k-1])
-	X1chr=(2*cir.band+RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	Y1chr=(2*cir.band+RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(col,ceiling(length(chr)/length(col)))[k],border=rep(col,ceiling(length(chr)/length(col)))[k])	
-	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}	
+		col=matrix(c("darkgreen","darkmagenta","navy","black","orange"),R,5,byrow=T)
 	}
-	}
-	k=length(chr)
-	a=a+sum(Pmap[,1]==chr[k-1])
-	X1chr=(2*cir.band+RR)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
-	Y1chr=(2*cir.band+RR)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
-	X2chr=(2*cir.band+RR+chr.band)*sin(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
-	Y2chr=(2*cir.band+RR+chr.band)*cos(2*pi*((k*band+a+1):(k*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
-	if(is.null(chr.col)){
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="gray",border="gray")	
-	}else{
-	polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=chr.col,border=chr.col)
-	}
-	}
-	}
-	X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(1:TotalN1)/TotalN)
-    Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(1:TotalN1)/TotalN)
-	if(plotXY==TRUE){
-    XX=(-CpvalueXY+r+H*i+cir.band*(i-1))*sin(2*pi*((TotalN1+band+1):TotalN)/TotalN)
-    YY=(-CpvalueXY+r+H*i+cir.band*(i-1))*cos(2*pi*((TotalN1+band+1):TotalN)/TotalN)
-	points(X,Y,pch=19,cex=cex[1],col=rep(rep(col,N),add))
-    points(XX,YY,pch=19,cex=cex[1],col="gray")
-	}else{
-	points(X,Y,pch=19,cex=cex[1],col=rep(rep(col,N),add))
-	}
-	if(!is.null(threshold)){
-	if(threshold!=0){
-	significantline1=H*(-log10(threshold/max(dim(Pmap))))/Max
-    s1X=(-significantline1+r+H*i+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
-    s1Y=(-significantline1+r+H*i+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
-    if(significantline1<H){
-	lines(s1X,s1Y,type="l",col=threshold.col,lwd=1)
-	}else{
-	warning(paste("No significant points for ",taxa[i]," pass the threshold level using threshold=",threshold,"!",sep=""))
-	}
-	if(amplify == TRUE){
-    HX1=(-Cpvalue[which(Cpvalue>=significantline1)]+r+H*i+cir.band*(i-1))*sin(2*pi*(which(Cpvalue>=significantline1))/TotalN)
-    HY1=(-Cpvalue[which(Cpvalue>=significantline1)]+r+H*i+cir.band*(i-1))*cos(2*pi*(which(Cpvalue>=significantline1))/TotalN)
-	points(HX1,HY1,pch=19,cex=cex[1],col="white")
-	points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[1],col=signal.col)
-	}
-	}
-	}
-	if(cir.chr==TRUE){
-	ticks1=1.1*(2*cir.band+RR)*sin(2*pi*ticks/TotalN)
-    ticks2=1.1*(2*cir.band+RR)*cos(2*pi*ticks/TotalN)
-	if(cir.labels==TRUE){
-    for(i in 1:length(ticks)){
-      angle=360*(1-ticks[i]/TotalN)
-      text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
-	}
-	}
-	}else{
-    ticks1=1.07*(RR+cir.band)*sin(2*pi*ticks/TotalN)
-    ticks2=1.07*(RR+cir.band)*cos(2*pi*ticks/TotalN)
-	if(cir.labels==TRUE){
-    for(i in 1:length(ticks)){
-      angle=360*(1-ticks[i]/TotalN)
-      text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
-    }
-	}	
-	}
-	}
-  }
-  if(fill.output==TRUE) dev.off()
-  print("Circular-Manhattan has been finished!",quote=F)
-}
-if("m" %in% output){
-if(multracks==FALSE){
-  print("Starting Rectangular-Manhattan plot!",quote=F)
+	Num=as.numeric(table(PmapN[,1]))
+	Nchr=length(Num)
+	N=NULL
 	for(i in 1:R){
-  	print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
-	if(fill.output==TRUE){
-    if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
-    if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
-    if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
+		colx=col[i,]
+		colx=colx[!is.na(colx)]
+		N[i]=ceiling(Nchr/length(colx))
 	}
-	if(fill.output==FALSE) {
-	dev.new(width = 15, height = 6)
-	}
-	par(mar = c(5,6,4,3),xaxs="i")
-    pvalue=pvalueT[,i]
-    logpvalue=logpvalueT[,i]
-    if(plotXY==TRUE){
-	pvalueXYi.=pvalueXY.[,i]
-	if(!is.null(threshold)){
-	if(threshold!=0){
-    Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.),-log10(threshold/max(dim(Pmap))))
+	if(!missing(band)){
+		band=floor(band*(dim(pvalueT)[1]/100))
 	}else{
-	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
+		band=floor(dim(pvalueT)[1]/100)
 	}
-	}else{
-	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
-	}
-	if(is.null(ylim)){
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
-        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
-		}else{
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=ylim,ylab=ylab,
-        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))	
+	ticks=NULL
+	NewP=NULL
+	for(j in 1:R){
+		pvalue=pvalueT[,j]
+		for(i in 0:(Nchr-1)){
+			if (i==0){
+				pvalue=append(pvalue,rep(Inf,band),after=0)
+				ticks[i+1]=band+floor((Num[i+1])/2)
+			}else{
+				pvalue=append(pvalue,rep(Inf,band),after=sum(Num[1:i])+i*band)
+				ticks[i+1]=band*(i+1)+sum(Num[1:i])+floor((Num[i+1])/2)
+			}
 		}
-	points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
+		NewP[[j]]=pvalue
+	}
+	pvalueT=do.call(cbind,NewP)
+	if(LOG10 == TRUE){
+		logpvalueT=-log10(pvalueT)
 	}else{
-	if(is.null(ylim)){
-    if(!is.null(threshold)){
-	if(threshold!=0){
-    Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(threshold/max(dim(Pmap))))
-	}else{
-	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+		logpvalueT=pvalueT
 	}
-	}else{
-	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
-	}
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
-         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab="Chromosome",main=paste("Manhattan plot of",taxa[i]))
-	}else{
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
-         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
-	}
-	}
-    axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
-	if(is.null(ylim)){
-    axis(2,at=c(0:(Max+1)),cex.axis=cex.axis,font=2,labels=0:(Max+1))
-	}else{
-	axis(2,at=c(0:ylim[2]),cex.axis=cex.axis,font=2,labels=0:ylim[2])
-	}
-	if(!is.null(threshold)){
-	if(threshold!=0){
-	h=-log10(threshold/max(dim(Pmap)))
-	abline(h=h,col=threshold.col)
-	if(amplify == TRUE){
-    sgline1=-log10(threshold/max(dim(Pmap)))
-    HY1=logpvalue[which(logpvalue>=sgline1)]
-    HX1=which(logpvalue>=sgline1)
-	points(HX1,HY1,pch=pch,cex=cex[2],col="white")
-    points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=signal.col)
-	}
-	}
-	}
-	if(fill.output==TRUE)  dev.off()
-  }
-	print("Rectangular-Manhattan has been finished!",quote=F)
-  }else{
-print("Starting Rectangular-Manhattan plot!",quote=F)
-print("Plotting in multiple tracks!",quote=F)
-if(fill.output==TRUE){
-    if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa,".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
-    if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa,".pdf",sep=""), width = 15,height=6*R)
-    if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa,".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
-	}
-	if(fill.output==FALSE) {
-	dev.new(width = 15, height = 6)
-	}
-	par(mfcol=c(R,1),mar = c(5,6,4,3),xaxs="i")
-  for(i in 1:R){
-    print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
-    pvalue=pvalueT[,i]
-    logpvalue=logpvalueT[,i]
-    if(plotXY==TRUE){
-	pvalueXYi.=pvalueXY.[,i]
-    if(!is.null(threshold)){
-	if(threshold!=0){
-    Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.),-log10(threshold/max(dim(Pmap))))
-	}else{
-	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
-	}
-	}else{
-	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
-	}
-	if(is.null(ylim)){
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
-        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
-		}else{
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=ylim,ylab=ylab,
-        cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))	
+	
+	Num=Num+band
+	if(plotXY==TRUE){
+		ticks=c(ticks,dim(pvalueT)[1]+band+dim(pvalueXY.)[1]/2)
+		
+		add=list()
+		for(i in 1:R){
+			colx=col[i,]
+			colx=colx[!is.na(colx)]
+			add[[i]]=c(Num,rep(0,N[i]*length(colx)-Nchr))
 		}
-	points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
+		
+		XYlim=(dim(pvalueT)[1]+band+1):((dim(pvalueT)[1]+band)+dim(pvalueXY.)[1])	
+		TotalN1=dim(pvalueT)[1]
+		TotalN2=dim(pvalueXY.)[1]
+		TotalN=TotalN1+TotalN2+band
 	}else{
-	if(is.null(ylim)){
-	if(!is.null(threshold)){
-	if(threshold!=0){
-    Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(threshold/max(dim(Pmap))))
-	}else{
-	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+		ticks=ticks
+		
+		add=list()
+		for(i in 1:R){
+			colx=col[i,]
+			colx=colx[!is.na(colx)]
+			add[[i]]=c(Num,rep(0,N[i]*length(colx)-Nchr))
+		}
+		
+		TotalN1=dim(pvalueT)[1]
+		TotalN=TotalN1
 	}
-	}else{
-	Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+	
+	if("c" %in% plot.type){
+		#print("Starting Circular-Manhattan plot!",quote=F)
+		if(fill.output==TRUE){
+			if(fill=="jpg")	jpeg("Circular-Manhattan.jpg", width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
+			if(fill=="pdf")	pdf("Circular-Manhattan.pdf", width = 10,height=10)
+			if(fill=="tiff")	tiff("Circular-Manhattan.tiff", width = 8*dpi,height=8*dpi,res=dpi)
+		}
+		par(pty="s",xpd=TRUE)
+		RR=r+H*R+cir.band*R
+		plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),axes=F,xlab="",ylab="")
+		for(i in 1:R){
+			colx=col[i,]
+			colx=colx[!is.na(colx)]
+			
+			#debug
+			#print(colx)
+			
+			print(paste("Circular-Plotting ",taxa[i],"...",sep=""),quote=F)
+			pvalue=pvalueT[,i]
+			logpvalue=logpvalueT[,i]
+			if(plotXY==TRUE){
+				pvalueXYi.=pvalueXY.[,i]
+				if(is.null(ylim)){
+					if(LOG10 == TRUE){
+						Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(max(pvalueXYi.)))
+					}else{
+						Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+					}
+				}else{
+					Max=ylim[2]
+				}
+				Cpvalue=(H*logpvalue/Max)[-c(1:round(band/2))]
+				CpvalueXY=H*pvalueXYi./Max
+			}else{
+				if(LOG10 == TRUE){
+					Max=ceiling(-log10(min(pvalue[pvalue!=0])))
+				}else{
+					Max=ceiling(max(pvalue[pvalue!=Inf]))
+				}
+				Cpvalue=(H*logpvalue/Max)[-c(1:round(band/2))]
+			}
+			if(outward==TRUE){
+				if(cir.chr==TRUE){
+					# XLine=(RR+cir.chr.h)*sin(2*pi*(1:TotalN)/TotalN)
+					# YLine=(RR+cir.chr.h)*cos(2*pi*(1:TotalN)/TotalN)
+					# lines(XLine,YLine,lwd=1.5)
+					circle.plot(r=RR+cir.chr.h,lwd=1.5,add=TRUE)
+					circle.plot(r=RR,lwd=1.5,add=TRUE)
+					a=0
+					if(plotXY==FALSE){
+						for(k in 1:length(chr)){
+							if(k==1){
+								X1chr=(RR)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								Y1chr=(RR)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								X2chr=(RR+cir.chr.h)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								Y2chr=(RR+cir.chr.h)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								if(is.null(cir.chr.col)){
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
+								}else{
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+								}
+							}else{
+								a=a+sum(Pmap[,1]==chr[k-1])
+								X1chr=(RR)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								Y1chr=(RR)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								X2chr=(RR+cir.chr.h)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								Y2chr=(RR+cir.chr.h)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								if(is.null(cir.chr.col)){
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])
+								}else{
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+								}		
+							}
+						}
+					}
+					if(plotXY==TRUE){
+						for(k in 1:(length(chr)-1)){
+							if(k==1){
+								X1chr=(RR)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								Y1chr=(RR)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								X2chr=(RR+cir.chr.h)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								Y2chr=(RR+cir.chr.h)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+									if(is.null(cir.chr.col)){
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
+									}else{
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+									}	
+							}else{
+								a=a+sum(Pmap[,1]==chr[k-1])
+								X1chr=(RR)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								Y1chr=(RR)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								X2chr=(RR+cir.chr.h)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								Y2chr=(RR+cir.chr.h)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								if(is.null(cir.chr.col)){
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
+								}else{
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+								}	
+							}
+						}
+						k=length(chr)
+						a=a+sum(Pmap[,1]==chr[k-1])
+						X1chr=(RR)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+						Y1chr=(RR)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+						X2chr=(RR+cir.chr.h)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+						Y2chr=(RR+cir.chr.h)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+						if(is.null(cir.chr.col)){
+							polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="gray",border="gray")	
+						}else{
+							polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+						}
+					}
+				}
+				if(!is.null(threshold)){
+					if(sum(threshold!=0)==length(threshold)){
+						for(thr in 1:length(threshold)){
+							significantline1=H*(-log10(threshold[thr]/max(dim(Pmap))))/Max
+							#s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
+							#s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
+							if(significantline1<H){
+								#lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
+								circle.plot(r=(significantline1+r+H*(i-1)+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+							}else{
+								warning(paste("No significant points for ",taxa[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
+							}
+						}
+						significantline1=H*(-log10(min(threshold)/max(dim(Pmap))))/Max
+					}
+				}
+				if(cir.legend==TRUE){
+					segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-1)+cir.band*(i-1),H/10,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-0.75)+cir.band*(i-1),H/10,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-0.5)+cir.band*(i-1),H/10,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-0.25)+cir.band*(i-1),H/10,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-0)+cir.band*(i-1),H/10,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Max*0.25,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Max*0.5,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Max*0.75,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0)+cir.band*(i-1),round(Max*1,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+				}
+				X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(1:(TotalN1-round(band/2)))/TotalN)
+				Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(1:(TotalN1-round(band/2)))/TotalN)
+				if(plotXY==TRUE){
+					XX=(CpvalueXY+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(((TotalN1-round(band/2))+band+1):(TotalN-round(band/2)))/TotalN)
+					YY=(CpvalueXY+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(((TotalN1-round(band/2))+band+1):(TotalN-round(band/2)))/TotalN)
+						points(XX,YY,pch=19,cex=cex[1],col="gray")
+						points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
+				}else{
+						#plot(chrX,chrY,type="l",col="black",lwd=4)
+						points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
+				}
+				if(!is.null(threshold)){
+					if(sum(threshold!=0)==length(threshold)){
+						if(amplify == TRUE){
+							HX1=(Cpvalue[which(Cpvalue>=significantline1)]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(which(Cpvalue>=significantline1))/TotalN)
+							HY1=(Cpvalue[which(Cpvalue>=significantline1)]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(which(Cpvalue>=significantline1))/TotalN)
+							points(HX1,HY1,pch=19,cex=cex[1],col="white")
+							if(is.null(signal.col)){
+								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[1],col=rep(rep(colx,N[i]),add[[i]])[which(Cpvalue>=significantline1)])
+							}else{
+								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[1],col=signal.col)
+							}
+						}
+					}
+				}
+				if(cir.chr==TRUE){
+					ticks1=1.07*(RR+cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
+					ticks2=1.07*(RR+cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
+					if(is.null(cir.chr.labels)){
+						for(i in 1:length(ticks)){
+							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
+							text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
+						}
+					}else{
+						for(i in 1:length(ticks)){
+							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
+							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=1)
+						}
+					}
+				}else{
+					ticks1=(0.9*r)*sin(2*pi*(ticks-round(band/2))/TotalN)
+					ticks2=(0.9*r)*cos(2*pi*(ticks-round(band/2))/TotalN)
+					if(is.null(cir.chr.labels)){
+						for(i in 1:length(ticks)){
+						angle=360*(1-(ticks-round(band/2))[i]/TotalN)
+						text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=0.5)
+						}
+					}else{
+						for(i in 1:length(ticks)){
+							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
+							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=1)
+						}
+					}
+				}
+			}
+			if(outward==FALSE){
+				if(cir.chr==TRUE){
+					# XLine=(2*cir.band+RR+cir.chr.h)*sin(2*pi*(1:TotalN)/TotalN)
+					# YLine=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(1:TotalN)/TotalN)
+					# lines(XLine,YLine,lwd=1.5)
+					circle.plot(r=2*cir.band+RR+cir.chr.h,lwd=1.5,add=TRUE)
+					a=0
+					if(plotXY==FALSE){
+						for(k in 1:length(chr)){
+							if(k==1){
+								X1chr=(2*cir.band+RR)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								Y1chr=(2*cir.band+RR)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								X2chr=(2*cir.band+RR+cir.chr.h)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								Y2chr=(2*cir.band+RR+cir.chr.h)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+									if(is.null(cir.chr.col)){
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
+									}else{
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+									}
+							}else{
+								a=a+sum(Pmap[,1]==chr[k-1])
+								X1chr=(2*cir.band+RR)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								Y1chr=(2*cir.band+RR)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								X2chr=(2*cir.band+RR+cir.chr.h)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								Y2chr=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								if(is.null(cir.chr.col)){
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
+								}else{
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+								}	
+							}
+						}
+					}
+					if(plotXY==TRUE){
+						for(k in 1:(length(chr)-1)){
+							if(k==1){
+								X1chr=(2*cir.band+RR)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								Y1chr=(2*cir.band+RR)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								X2chr=(2*cir.band+RR+cir.chr.h)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+								Y2chr=(2*cir.band+RR+cir.chr.h)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
+									if(is.null(cir.chr.col)){
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
+									}else{
+										polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+									}	
+							}else{
+								a=a+sum(Pmap[,1]==chr[k-1])
+								X1chr=(2*cir.band+RR)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								Y1chr=(2*cir.band+RR)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								X2chr=(2*cir.band+RR+cir.chr.h)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								Y2chr=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1]==chr[k])))/TotalN)
+								if(is.null(cir.chr.col)){
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])	
+								}else{
+									polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+								}	
+							}
+						}
+						k=length(chr)
+						a=a+sum(Pmap[,1]==chr[k-1])
+						X1chr=(2*cir.band+RR)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+						Y1chr=(2*cir.band+RR)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+						X2chr=(2*cir.band+RR+cir.chr.h)*sin(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+						Y2chr=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(((k-0.5)*band+a+1):((k-0.5)*band+a+sum(Pmap[,1] %in% chrXY)))/TotalN)
+						if(is.null(cir.chr.col)){
+							polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col="gray",border="gray")	
+						}else{
+							polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=cir.chr.col,border=cir.chr.col)
+						}
+					}
+				}
+				if(!is.null(threshold)){
+					if(sum(threshold!=0)==length(threshold)){
+						for(thr in 1:length(threshold)){
+							significantline1=H*(-log10(threshold[thr]/max(dim(Pmap))))/Max
+							#s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
+							#s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
+							if(significantline1<H){
+								#lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
+								circle.plot(r=(-significantline1+r+H*i+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+							}else{
+								warning(paste("No significant points for ",taxa[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
+							}
+						}
+						significantline1=H*(-log10(min(threshold)/max(dim(Pmap))))/Max
+					}
+				}
+				if(cir.legend==TRUE){
+					segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-1)+cir.band*(i-1),H/10,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-0.75)+cir.band*(i-1),H/10,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-0.5)+cir.band*(i-1),H/10,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-0.25)+cir.band*(i-1),H/10,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					segments(0,r+H*(i-0)+cir.band*(i-1),H/10,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Max*0.25,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Max*0.5,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Max*0.75,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-1)+cir.band*(i-1),round(Max*1,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+				}
+				X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(1:(TotalN1-round(band/2)))/TotalN)
+				Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(1:(TotalN1-round(band/2)))/TotalN)
+				if(plotXY==TRUE){
+					XX=(-CpvalueXY+r+H*i+cir.band*(i-1))*sin(2*pi*(((TotalN1-round(band/2))+band+1):(TotalN-round(band/2)))/TotalN)
+					YY=(-CpvalueXY+r+H*i+cir.band*(i-1))*cos(2*pi*(((TotalN1-round(band/2))+band+1):(TotalN-round(band/2)))/TotalN)
+						points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
+						points(XX,YY,pch=19,cex=cex[1],col="gray")
+				}else{
+						points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
+				}
+				if(!is.null(threshold)){
+					if(sum(threshold!=0)==length(threshold)){
+						if(amplify == TRUE){
+							HX1=(-Cpvalue[which(Cpvalue>=significantline1)]+r+H*i+cir.band*(i-1))*sin(2*pi*(which(Cpvalue>=significantline1))/TotalN)
+							HY1=(-Cpvalue[which(Cpvalue>=significantline1)]+r+H*i+cir.band*(i-1))*cos(2*pi*(which(Cpvalue>=significantline1))/TotalN)
+							points(HX1,HY1,pch=19,cex=cex[1],col="white")
+							if(is.null(signal.col)){
+								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[1],col=rep(rep(colx,N[i]),add[[i]])[which(Cpvalue>=significantline1)])
+							}else{
+								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[1],col=signal.col)
+							}
+							
+						}
+					}
+				}
+				if(cir.chr==TRUE){
+					ticks1=1.1*(2*cir.band+RR)*sin(2*pi*(ticks-round(band/2))/TotalN)
+					ticks2=1.1*(2*cir.band+RR)*cos(2*pi*(ticks-round(band/2))/TotalN)
+					if(is.null(cir.chr.labels)){
+						for(i in 1:length(ticks)){
+						  angle=360*(1-(ticks-round(band/2))[i]/TotalN)
+						  text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
+						}
+					}else{
+						for(i in 1:length(ticks)){
+							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
+							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=1)
+						}
+					}
+				}else{
+					ticks1=1.07*(RR+cir.band)*sin(2*pi*(ticks-round(band/2))/TotalN)
+					ticks2=1.07*(RR+cir.band)*cos(2*pi*(ticks-round(band/2))/TotalN)
+					if(is.null(cir.chr.labels)){
+						for(i in 1:length(ticks)){
+							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
+							text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
+						}
+					}else{
+						for(i in 1:length(ticks)){
+							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
+							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=1)
+						}
+					}	
+				}
+			}
+		}
+		if(fill.output==TRUE) dev.off()
+		#print("Circular-Manhattan has been finished!",quote=F)
 	}
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
-         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
-	}else{
-	plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(col,N),add),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
-         cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+
+	if("m" %in% plot.type){
+		if(multracks==FALSE){
+			#print("Starting Rectangular-Manhattan plot!",quote=F)
+			for(i in 1:R){
+				colx=col[i,]
+				colx=colx[!is.na(colx)]
+				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
+					if(fill.output==TRUE){
+						if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
+						if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
+						if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
+					}
+					if(fill.output==FALSE) {
+						dev.new(width = 15, height = 6)
+					}
+					par(mar = c(5,6,4,3),xaxs="i")
+					pvalue=pvalueT[,i]
+					logpvalue=logpvalueT[,i]
+					if(plotXY==TRUE){
+						pvalueXYi.=pvalueXY.[,i]
+						if(!is.null(threshold)){
+							if(sum(threshold!=0)==length(threshold)){
+								if(LOG10 == TRUE){
+									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(max(pvalueXYi.)),ceiling(-log10(min(threshold)/max(dim(Pmap)))))
+								}else{
+									Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)),ceiling(-log10(min(threshold)/max(dim(Pmap)))))
+								}
+							}else{
+								if( LOG10== TRUE){
+									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(max(pvalueXYi.)))
+								}else{
+									Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+								}	
+							}
+						}else{
+							if( LOG10== TRUE){
+								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(max(pvalueXYi.)))
+							}else{
+								Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+							}
+						}
+						if(is.null(ylim)){
+							if(Max<1){
+								plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							}else{
+								plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
+									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							}
+						}else{
+							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=ylim,ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))	
+						}
+							points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
+					}else{
+						if(is.null(ylim)){
+							if(!is.null(threshold)){
+								if(sum(threshold!=0)==length(threshold)){
+									if(LOG10 == TRUE){
+										Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(-log10(min(threshold)/max(dim(Pmap)))))
+									}else{
+										Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(-log10(min(threshold)/max(dim(Pmap)))))
+									}
+								}else{
+									if(LOG10 == TRUE){
+										Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+									}else{
+										Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+									}
+								}
+							}else{
+								if(LOG10 == TRUE){
+									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+								}else{
+									Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+								}
+							}
+							if(Max<1){
+								plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							}else{
+								plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
+									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							}
+						}else{
+							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+						}
+					}
+					axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
+					if(is.null(ylim)){
+						axis(2,at=c(0:(Max+1)),cex.axis=cex.axis,font=2,labels=0:(Max+1))
+					}else{
+						axis(2,at=c(0:ylim[2]),cex.axis=cex.axis,font=2,labels=0:ylim[2])
+					}
+					if(!is.null(threshold)){
+						if(sum(threshold!=0)==length(threshold)){
+							for(thr in 1:length(threshold)){
+								h=-log10(threshold[thr]/max(dim(Pmap)))
+								# print(h)
+								# print(threshold.col[thr])
+								# print(threshold.lty[thr])
+								# print(threshold.lwd[thr])
+								abline(h=h,col=threshold.col[thr],lty=threshold.lty[thr],lwd=threshold.lwd[thr])
+							}
+							if(amplify == TRUE){
+								sgline1=-log10(min(threshold)/max(dim(Pmap)))
+								HY1=logpvalue[which(logpvalue>=sgline1)]
+								HX1=which(logpvalue>=sgline1)
+								points(HX1,HY1,pch=pch,cex=cex[2],col="white")
+								if(is.null(signal.col)){
+									points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=rep(rep(colx,N[i]),add[[i]])[HX1])
+								}else{
+									points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=signal.col)
+								}
+							}
+						}
+					}
+				if(fill.output==TRUE)  dev.off()
+			}
+			#print("Rectangular-Manhattan has been finished!",quote=F)
+		}else{
+			#print("Starting Rectangular-Manhattan plot!",quote=F)
+			#print("Plotting in multiple tracks!",quote=F)
+			if(fill.output==TRUE){
+				if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa,".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
+				if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa,".pdf",sep=""), width = 15,height=6*R)
+				if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa,".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
+			}
+			if(fill.output==FALSE){
+				dev.new(width = 15, height = 6)
+			}
+			par(mfcol=c(R,1),mar = c(5,6,4,3),xaxs="i")
+			for(i in 1:R){
+				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
+				pvalue=pvalueT[,i]
+				logpvalue=logpvalueT[,i]
+				if(plotXY==TRUE){
+					pvalueXYi.=pvalueXY.[,i]
+					if(!is.null(threshold)){
+						if(sum(threshold!=0)==length(threshold)){
+							if(LOG10 == TRUE){
+								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.),-log10(min(threshold)/max(dim(Pmap))))
+							}else{
+								Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(pvalueXYi.),-log10(min(threshold)/max(dim(Pmap))))
+							}
+						}else{
+							if(LOG10==TRUE){
+								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
+							}else{
+								Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(pvalueXYi.))
+							}
+						}
+					}else{
+						if(LOG10==TRUE){
+							Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
+						}else{
+							Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(pvalueXYi.))
+						}
+					}
+					if(is.null(ylim)){
+						if(Max<1){
+							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+						}else{
+							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+						}
+					}else{
+						plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=ylim,ylab=ylab,
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))	
+					}
+					points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
+				}else{
+					if(is.null(ylim)){
+						if(!is.null(threshold)){
+							if(sum(threshold!=0)==length(threshold)){
+								if(LOG10 ==TRUE){
+									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),-log10(min(threshold)/max(dim(Pmap))))
+								}else{
+									Max=max(ceiling(max(pvalue[pvalue!=Inf])),-log10(min(threshold)/max(dim(Pmap))))
+								}
+							}else{
+								if(LOG10 == TRUE){
+									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+								}else{
+									Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+								}	
+							}
+						}else{
+							if(LOG10 == TRUE){
+								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
+							}else{
+								Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+							}
+						}
+						if(Max<1){
+							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+						}else{
+							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+						}
+					}else{
+						plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+					}
+				}
+				axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
+				if(is.null(ylim)){
+					axis(2,at=c(0:(Max+1)),cex.axis=cex.axis,font=2,labels=0:(Max+1))
+				}else{
+					axis(2,at=c(0:ylim[2]),cex.axis=cex.axis,font=2,labels=0:ylim[2])
+				}
+				if(!is.null(threshold)){
+					if(sum(threshold!=0)==length(threshold)){
+						for(thr in 1:length(threshold)){
+							h=-log10(threshold[thr]/max(dim(Pmap)))
+							abline(h=h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+						}
+						if(amplify == TRUE){
+							sgline1=-log10(min(threshold)/max(dim(Pmap)))
+							HY1=logpvalue[which(logpvalue>=sgline1)]
+							HX1=which(logpvalue>=sgline1)
+							points(HX1,HY1,pch=pch,cex=cex[2],col="white")
+							if(is.null(signal.col)){
+								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=rep(rep(colx,N[i]),add[[i]])[HX1])
+							}else{
+								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=signal.col)
+							}
+						}
+					}
+				}
+			}
+			if(fill.output==TRUE) dev.off()
+			print("Rectangular-Manhattan has been finished!",quote=F)
+		}
 	}
+		
+	if("q" %in% plot.type){
+		#print("Starting QQ-plot!",quote=F)
+		for(i in 1:R){
+			print(paste("QQ-Plotting ",taxa[i],"...",sep=""),quote=F)
+			if(fill.output==TRUE){
+				if(fill=="jpg")	jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
+				if(fill=="pdf")	pdf(paste("QQplot.",taxa[i],".pdf",sep=""), width = 5.5,height=5.5)
+				if(fill=="tiff")	tiff(paste("QQplot.",taxa[i],".tiff",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi)
+			}else{
+				dev.new(width = 5.5, height = 5.5)
+			}
+			par(mar = c(5,6,5,3))
+			if(plotXY==TRUE){
+				P.values=c(as.numeric(PmapN[,i+2]),as.numeric(PmapXY[,i+2]))
+			}else{
+				P.values=as.numeric(PmapN[,i+2])
+			}
+			P.values=P.values[!is.na(P.values)]
+			if(LOG10==TRUE){
+				P.values=P.values[P.values>0]
+				P.values=P.values[P.values<=1]
+				N=length(P.values)
+				P.values=P.values[order(P.values)]
+			}else{
+				N=length(P.values)
+				P.values=P.values[order(P.values,decreasing=TRUE)]
+			}
+			p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
+			log.Quantiles <- -log10(p_value_quantiles)
+			if(LOG10==TRUE){
+				log.P.values <- -log10(P.values)
+			}else{
+				log.P.values <- P.values
+			}
+			plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = paste("QQplot of",taxa[i]))
+			if(conf.int==TRUE){
+				N1=length(log.Quantiles)
+				c95 <- rep(NA,N1)
+				c05 <- rep(NA,N1)
+				for(j in 1:N1){
+					xi=ceiling((10^-log.Quantiles[j])*N)
+					if(xi==0)xi=1
+					c95[j] <- qbeta(0.95,xi,N-xi+1)
+					c05[j] <- qbeta(0.05,xi,N-xi+1)
+				}
+				index=length(c95):1
+				polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
+			}
+			abline(a = 0, b = 1, col = threshold.col[1],lwd=2)
+			points(log.Quantiles, log.P.values, col = "Black",pch=19,cex=cex[2])
+			if(!is.null(threshold)){
+				if(sum(threshold!=0)==length(threshold)){
+					thre.line=-log10(min(threshold)/N)
+					if(amplify==TRUE){
+						thre.index=which(log.P.values>=thre.line)
+						if(length(thre.index)!=0){
+							points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[2])
+							if(is.null(signal.col)){
+									points(log.Quantiles[thre.index],log.P.values[thre.index],col = "black",pch=signal.pch,cex=signal.cex)
+							}else{
+								points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col,pch=signal.pch,cex=signal.cex)
+							}
+						}
+					}
+				}
+			}
+			if(fill.output==TRUE) dev.off()
+		}
 	}
-    axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
-	if(is.null(ylim)){
-    axis(2,at=c(0:(Max+1)),cex.axis=cex.axis,font=2,labels=0:(Max+1))
-	}else{
-	axis(2,at=c(0:ylim[2]),cex.axis=cex.axis,font=2,labels=0:ylim[2])
-	}
-	if(!is.null(threshold)){
-	if(threshold!=0){
-	h=-log10(threshold/max(dim(Pmap)))
-	abline(h=h,col=threshold.col)
-	if(amplify == TRUE){
-    sgline1=-log10(threshold/max(dim(Pmap)))
-    HY1=logpvalue[which(logpvalue>=sgline1)]
-    HX1=which(logpvalue>=sgline1)
-	points(HX1,HY1,pch=pch,cex=cex[2],col="white")
-    points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=signal.col)
-	}
-	}
-	}
-  }
-if(fill.output==TRUE) dev.off()
-	print("Rectangular-Manhattan has been finished!",quote=F)
-  }
-  }
-  print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=F)
+	print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=F)
 }
 
