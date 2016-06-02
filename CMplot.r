@@ -1,5 +1,7 @@
 # R-CMplot
 CMplot <-
+
+#Adjustable parameters in CMplot
 function(
 Pmap,
 col=c("darkgreen","darkmagenta","navy","black","orange"),
@@ -11,12 +13,12 @@ ylim=NULL,
 cex.axis=1,
 plot.type="b",
 multracks=FALSE,
-cex=c(0.5,1),
+cex=c(0.5,1,1),
 r=1,
 xlab="Chromosome",
 ylab=expression(-log[10](italic(p))),
 outward=TRUE,
-threshold = 0.01, 
+threshold = NULL, 
 threshold.col="red",
 threshold.lwd=1,
 threshold.lty=2,
@@ -39,49 +41,82 @@ fill.output=TRUE,
 fill="jpg",
 dpi=300
 )
+
 {	
-	circle.plot <- function(r,type="l",lty=1,lwd=1,col="black",add=TRUE,n.point=1000)
+	#plot a circle with a radius of r
+	circle.plot <- function(myr,type="l",x=NULL,lty=1,lwd=1,col="black",add=TRUE,n.point=1000)
 	{
-		curve(sqrt(r^2-x^2),xlim=c(-r,r),n=n.point,ylim=c(-r,r),type=type,lty=lty,col=col,lwd=lwd,add=add)
-		curve(-sqrt(r^2-x^2),xlim=c(-r,r),n=n.point,ylim=c(-r,r),type=type,lty=lty,col=col,lwd=lwd,add=TRUE)
+		curve(sqrt(myr^2-x^2),xlim=c(-myr,myr),n=n.point,ylim=c(-myr,myr),type=type,lty=lty,col=col,lwd=lwd,add=add)
+		curve(-sqrt(myr^2-x^2),xlim=c(-myr,myr),n=n.point,ylim=c(-myr,myr),type=type,lty=lty,col=col,lwd=lwd,add=TRUE)
 	}
+	
+	#print the version of CMplot
 	print(paste(paste(rep("*",5),collapse=""),"Welcome to use CMplot!",paste(rep("*",5),collapse=""),sep=""),quote=F)
 	print(paste("* ","Version: ",packageVersion("CMplot"),paste(rep(" ",15),collapse=""),"*",sep=""),quote=F)
 	print(paste("* "," Author: Lilin Yin",paste(rep(" ",11),collapse=""),"*",sep=""),quote=F)
 	print(paste("* ","Contact: ylilin@163.com",paste(rep(" ",6),collapse=""),"*",sep=""),quote=F)
 	print(paste(rep("*",32),collapse=""),quote=F)
 
-	if(plot.type=="b") plot.type=c("c","m","q")
+	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q")
 	plotXY=TRUE
+	
+	#remove the SNPs of which the pavlues equal to NA
 	Pmap=na.omit(Pmap)
+	
+	#order Pmap by the name of SNP
 	Pmap=Pmap[order(Pmap[,1]),]
+	
+	#delete the column of SNPs names
 	Pmap=Pmap[,-1]
+	
 	taxa=colnames(Pmap)[-c(1,2)]
+	
+	#scale and adjust the parameters
 	cir.chr.h=cir.chr.h/5
 	cir.band=cir.band/5
 	threshold.col=rep(threshold.col,length(threshold))
 	threshold.lwd=rep(threshold.lwd,length(threshold))
 	threshold.lty=rep(threshold.lty,length(threshold))
-	if(length(cex)!=2) cex[2]=cex[1]
-	if(length(cex)>2) stop("Less than two cexs are allowed!")
+	if(length(cex)!=3) cex=rep(cex,3)
+	if(!is.null(ylim)){
+		if(length(ylim)==1) ylim=c(0,ylim)
+	}
+	
+	#get the number of traits
 	R=dim(Pmap)[2]-2
+	
+	#choose whether to plot the SNPs that have no clear chromosome
 	if(plot0==FALSE) index=c(1:100)
 	if(plot0==TRUE) index=c(0:100)
+	
+	#pick the SNPs on euchromosome
 	PmapN=Pmap[Pmap[,1] %in% index,]
+	
+	#pick the SNPs on heterosome
 	PmapXY=Pmap[!(Pmap[,1] %in% index)&Pmap[,1]!=0,]
 	chrXY=unique(PmapXY[,1])
+	
+	#check whether there exits heterosome
 	if(dim(PmapXY)[1]==0) plotXY=FALSE
+	
 	#print(plotXY)
 	PmapN=matrix(as.numeric(as.matrix(PmapN)),nrow(PmapN))
 	if(plotXY==TRUE) PmapXY=as.matrix(PmapXY)
+	
+	#order the GWAS results by chromosome and position
 	orderP=PmapN[order(PmapN[,1],PmapN[,2]),]
 	if(plotXY==TRUE) orderPXY.=PmapXY[order(PmapXY[,1],PmapXY[,2]),]
+	
+	#get the index of chromosome
 	if(plotXY==TRUE){
 		chr=c(unique(orderP[,1]),"S")
 	}else{
 		chr=unique(orderP[,1])
 	}
+	
 	pvalueT=as.matrix(orderP[,-c(1:2)])
+	
+	#change the original pvalues into LOG10 format
 	if(plotXY==TRUE){
 		if(LOG10 == TRUE){
 			pvalueXY.=-log10(matrix(as.numeric(orderPXY.[,-c(1:2)]),nrow(orderPXY.)))
@@ -90,6 +125,7 @@ dpi=300
 		}
 	} 
 	
+	#set the colors for the plot
 	#palette(heat.colors(1024)) #(heatmap)
 	#T=floor(1024/max(pvalue))
 	#plot(pvalue,pch=19,cex=0.6,col=(1024-floor(pvalue*T)))
@@ -98,24 +134,33 @@ dpi=300
 			col=matrix(col,R,length(col),byrow=T)
 		}
 		if(is.matrix(col)){
+			#try to transform the colors into matrix for all traits
 			col=matrix(as.vector(t(col)),R,dim(col)[2],byrow=T)
 		}
 	}else{
+		# "byrow=T" must be needed to set 
 		col=matrix(c("darkgreen","darkmagenta","navy","black","orange"),R,5,byrow=T)
 	}
+	
 	Num=as.numeric(table(PmapN[,1]))
 	Nchr=length(Num)
 	N=NULL
+	
+	#set the colors for each traits
 	for(i in 1:R){
 		colx=col[i,]
 		colx=colx[!is.na(colx)]
 		N[i]=ceiling(Nchr/length(colx))
 	}
+	
+	#scale the space parameter between chromosomes
 	if(!missing(band)){
 		band=floor(band*(dim(pvalueT)[1]/100))
 	}else{
 		band=floor(dim(pvalueT)[1]/100)
 	}
+	
+	#insert the space into chromosomes and return the midpoint of each chromosome
 	ticks=NULL
 	NewP=NULL
 	for(j in 1:R){
@@ -131,6 +176,8 @@ dpi=300
 		}
 		NewP[[j]]=pvalue
 	}
+	
+	#merge the pvalues of traits by column
 	pvalueT=do.call(cbind,NewP)
 	if(LOG10 == TRUE){
 		logpvalueT=-log10(pvalueT)
@@ -149,6 +196,7 @@ dpi=300
 			add[[i]]=c(Num,rep(0,N[i]*length(colx)-Nchr))
 		}
 		
+		#get the total number of points which need to plot
 		XYlim=(dim(pvalueT)[1]+band+1):((dim(pvalueT)[1]+band)+dim(pvalueXY.)[1])	
 		TotalN1=dim(pvalueT)[1]
 		TotalN2=dim(pvalueXY.)[1]
@@ -167,17 +215,21 @@ dpi=300
 		TotalN=TotalN1
 	}
 	
+	#plot circle Manhattan
 	if("c" %in% plot.type){
 		#print("Starting Circular-Manhattan plot!",quote=F)
 		if(fill.output==TRUE){
-			if(fill=="jpg")	jpeg("Circular-Manhattan.jpg", width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
-			if(fill=="pdf")	pdf("Circular-Manhattan.pdf", width = 10,height=10)
-			if(fill=="tiff")	tiff("Circular-Manhattan.tiff", width = 8*dpi,height=8*dpi,res=dpi)
+			if(fill=="jpg")	jpeg(paste("Circular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
+			if(fill=="pdf")	pdf(paste("Circular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 10,height=10)
+			if(fill=="tiff")	tiff(paste("Circular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 8*dpi,height=8*dpi,res=dpi)
 		}
-		par(pty="s",xpd=TRUE)
+		par(pty="s",xpd=TRUE,mar=c(1,1,1,1))
 		RR=r+H*R+cir.band*R
 		plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),axes=F,xlab="",ylab="")
+		
 		for(i in 1:R){
+		
+			#get the colors for each trait
 			colx=col[i,]
 			colx=colx[!is.na(colx)]
 			
@@ -194,6 +246,8 @@ dpi=300
 						Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(max(pvalueXYi.)))
 					}else{
 						Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+						if(Max<=1)
+						Max=max(max(pvalue[pvalue!=Inf]),max(pvalueXYi.))
 					}
 				}else{
 					Max=ylim[2]
@@ -201,10 +255,16 @@ dpi=300
 				Cpvalue=(H*logpvalue/Max)[-c(1:round(band/2))]
 				CpvalueXY=H*pvalueXYi./Max
 			}else{
-				if(LOG10 == TRUE){
-					Max=ceiling(-log10(min(pvalue[pvalue!=0])))
+				if(is.null(ylim)){
+					if(LOG10 == TRUE){
+						Max=ceiling(-log10(min(pvalue[pvalue!=0])))
+					}else{
+						Max=ceiling(max(pvalue[pvalue!=Inf]))
+						if(Max<=1)
+						Max=max(pvalue[pvalue!=Inf])
+					}
 				}else{
-					Max=ceiling(max(pvalue[pvalue!=Inf]))
+					Max=ylim[2]
 				}
 				Cpvalue=(H*logpvalue/Max)[-c(1:round(band/2))]
 			}
@@ -213,12 +273,16 @@ dpi=300
 					# XLine=(RR+cir.chr.h)*sin(2*pi*(1:TotalN)/TotalN)
 					# YLine=(RR+cir.chr.h)*cos(2*pi*(1:TotalN)/TotalN)
 					# lines(XLine,YLine,lwd=1.5)
-					circle.plot(r=RR+cir.chr.h,lwd=1.5,add=TRUE)
-					circle.plot(r=RR,lwd=1.5,add=TRUE)
+					circle.plot(myr=RR+cir.chr.h,lwd=1.5,add=TRUE)
+					circle.plot(myr=RR,lwd=1.5,add=TRUE)
 					a=0
+					
+					#plot the boundary which represents the chromosomes
 					if(plotXY==FALSE){
 						for(k in 1:length(chr)){
 							if(k==1){
+							
+								#change the axis from right angle into circle format
 								X1chr=(RR)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
 								Y1chr=(RR)*cos(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
 								X2chr=(RR+cir.chr.h)*sin(2*pi*((round(band/2)+1):(round(band/2)+sum(Pmap[,1]==chr[1])))/TotalN)
@@ -288,7 +352,7 @@ dpi=300
 							#s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
 							if(significantline1<H){
 								#lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
-								circle.plot(r=(significantline1+r+H*(i-1)+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+								circle.plot(myr=(significantline1+r+H*(i-1)+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
 							}else{
 								warning(paste("No significant points for ",taxa[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
 							}
@@ -296,17 +360,26 @@ dpi=300
 						significantline1=H*(-log10(min(threshold)/max(dim(Pmap))))/Max
 					}
 				}
+				
+				#plot the legend for each trait
 				if(cir.legend==TRUE){
+				
+					#try to get the number after radix point
+					if(Max<=1) {
+						round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
+					}else{
+						round.n=2
+					}
 					segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-1)+cir.band*(i-1),H/10,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-0.75)+cir.band*(i-1),H/10,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-0.5)+cir.band*(i-1),H/10,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-0.25)+cir.band*(i-1),H/10,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-0)+cir.band*(i-1),H/10,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Max*0.25,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Max*0.5,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Max*0.75,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-					text(-r/15,r+H*(i-0)+cir.band*(i-1),round(Max*1,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Max*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Max*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Max*0.75,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0)+cir.band*(i-1),round(Max*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 				}
 				X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(1:(TotalN1-round(band/2)))/TotalN)
 				Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(1:(TotalN1-round(band/2)))/TotalN)
@@ -324,6 +397,8 @@ dpi=300
 						if(amplify == TRUE){
 							HX1=(Cpvalue[which(Cpvalue>=significantline1)]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(which(Cpvalue>=significantline1))/TotalN)
 							HY1=(Cpvalue[which(Cpvalue>=significantline1)]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(which(Cpvalue>=significantline1))/TotalN)
+							
+							#cover the points that exceed the threshold with the color "white"
 							points(HX1,HY1,pch=19,cex=cex[1],col="white")
 							if(is.null(signal.col)){
 								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[1],col=rep(rep(colx,N[i]),add[[i]])[which(Cpvalue>=significantline1)])
@@ -339,12 +414,12 @@ dpi=300
 					if(is.null(cir.chr.labels)){
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
+							text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}else{
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=1)
+							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}
 				}else{
@@ -353,12 +428,12 @@ dpi=300
 					if(is.null(cir.chr.labels)){
 						for(i in 1:length(ticks)){
 						angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-						text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=0.5)
+						text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}else{
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=1)
+							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}
 				}
@@ -368,7 +443,8 @@ dpi=300
 					# XLine=(2*cir.band+RR+cir.chr.h)*sin(2*pi*(1:TotalN)/TotalN)
 					# YLine=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(1:TotalN)/TotalN)
 					# lines(XLine,YLine,lwd=1.5)
-					circle.plot(r=2*cir.band+RR+cir.chr.h,lwd=1.5,add=TRUE)
+					circle.plot(myr=2*cir.band+RR+cir.chr.h,lwd=1.5,add=TRUE)
+					
 					a=0
 					if(plotXY==FALSE){
 						for(k in 1:length(chr)){
@@ -442,7 +518,7 @@ dpi=300
 							#s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
 							if(significantline1<H){
 								#lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
-								circle.plot(r=(-significantline1+r+H*i+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+								circle.plot(myr=(-significantline1+r+H*i+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
 							}else{
 								warning(paste("No significant points for ",taxa[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
 							}
@@ -451,16 +527,23 @@ dpi=300
 					}
 				}
 				if(cir.legend==TRUE){
+					
+					#try to get the number after radix point
+					if(Max<=1) {
+						round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
+					}else{
+						round.n=2
+					}
 					segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-1)+cir.band*(i-1),H/10,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-0.75)+cir.band*(i-1),H/10,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-0.5)+cir.band*(i-1),H/10,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-0.25)+cir.band*(i-1),H/10,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					segments(0,r+H*(i-0)+cir.band*(i-1),H/10,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Max*0.25,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Max*0.5,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Max*0.75,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-					text(-r/15,r+H*(i-1)+cir.band*(i-1),round(Max*1,2),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Max*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Max*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Max*0.75,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-1)+cir.band*(i-1),round(Max*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 				}
 				X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(1:(TotalN1-round(band/2)))/TotalN)
 				Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(1:(TotalN1-round(band/2)))/TotalN)
@@ -477,6 +560,8 @@ dpi=300
 						if(amplify == TRUE){
 							HX1=(-Cpvalue[which(Cpvalue>=significantline1)]+r+H*i+cir.band*(i-1))*sin(2*pi*(which(Cpvalue>=significantline1))/TotalN)
 							HY1=(-Cpvalue[which(Cpvalue>=significantline1)]+r+H*i+cir.band*(i-1))*cos(2*pi*(which(Cpvalue>=significantline1))/TotalN)
+							
+							#cover the points that exceed the threshold with the color "white"
 							points(HX1,HY1,pch=19,cex=cex[1],col="white")
 							if(is.null(signal.col)){
 								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[1],col=rep(rep(colx,N[i]),add[[i]])[which(Cpvalue>=significantline1)])
@@ -493,12 +578,12 @@ dpi=300
 					if(is.null(cir.chr.labels)){
 						for(i in 1:length(ticks)){
 						  angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-						  text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
+						  text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}else{
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=1)
+							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}
 				}else{
@@ -506,13 +591,15 @@ dpi=300
 					ticks2=1.07*(RR+cir.band)*cos(2*pi*(ticks-round(band/2))/TotalN)
 					if(is.null(cir.chr.labels)){
 						for(i in 1:length(ticks)){
+						
+							#adjust the angle of labels of circle plot
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=1)
+							text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}else{
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=1)
+							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}	
 				}
@@ -533,11 +620,11 @@ dpi=300
 						if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
 						if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
 						if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
+						par(mar = c(5,6,4,3),xaxs="i")
 					}
 					if(fill.output==FALSE) {
 						dev.new(width = 15, height = 6)
 					}
-					par(mar = c(5,6,4,3),xaxs="i")
 					pvalue=pvalueT[,i]
 					logpvalue=logpvalueT[,i]
 					if(plotXY==TRUE){
@@ -554,6 +641,12 @@ dpi=300
 									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(max(pvalueXYi.)))
 								}else{
 									Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+									if(Max<=1)
+									# {
+										Max=max(max(pvalue[pvalue!=Inf]),max(pvalueXYi.))
+									# }else{
+										# Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+									# }
 								}	
 							}
 						}else{
@@ -561,10 +654,16 @@ dpi=300
 								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),ceiling(max(pvalueXYi.)))
 							}else{
 								Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+								if(Max<=1)
+								# {
+									Max=max(max(pvalue[pvalue!=Inf]),max(pvalueXYi.))
+								# }else{
+									# Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+								# }
 							}
 						}
 						if(is.null(ylim)){
-							if(Max<1){
+							if(Max<=1){
 								plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 							}else{
@@ -590,6 +689,12 @@ dpi=300
 										Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 									}else{
 										Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+										if(Max<=1)
+										#{
+											Max=max(max(pvalue[pvalue!=Inf]))
+										# }else{
+											# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+										# }
 									}
 								}
 							}else{
@@ -597,9 +702,15 @@ dpi=300
 									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 								}else{
 									Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+									if(Max<=1)
+									#{
+										Max=max(max(pvalue[pvalue!=Inf]))
+									# }else{
+										# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+									# }
 								}
 							}
-							if(Max<1){
+							if(Max<=1){
 								plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
 									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 							}else{
@@ -613,9 +724,18 @@ dpi=300
 					}
 					axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
 					if(is.null(ylim)){
-						axis(2,at=c(0:(Max+1)),cex.axis=cex.axis,font=2,labels=0:(Max+1))
+						if(Max>1){
+							#print(seq(0,(Max+1),round((Max+1)/10)))
+							axis(2,at=seq(0,(Max+1),round((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),round((Max+1)/10)))
+						}else{
+							axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+						}
 					}else{
-						axis(2,at=c(0:ylim[2]),cex.axis=cex.axis,font=2,labels=0:ylim[2])
+						if(ylim[2]>1){
+							axis(2,at=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)))
+						}else{
+							axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
+						}
 					}
 					if(!is.null(threshold)){
 						if(sum(threshold!=0)==length(threshold)){
@@ -631,6 +751,8 @@ dpi=300
 								sgline1=-log10(min(threshold)/max(dim(Pmap)))
 								HY1=logpvalue[which(logpvalue>=sgline1)]
 								HX1=which(logpvalue>=sgline1)
+								
+								#cover the points that exceed the threshold with the color "white"
 								points(HX1,HY1,pch=pch,cex=cex[2],col="white")
 								if(is.null(signal.col)){
 									points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=rep(rep(colx,N[i]),add[[i]])[HX1])
@@ -647,14 +769,14 @@ dpi=300
 			#print("Starting Rectangular-Manhattan plot!",quote=F)
 			#print("Plotting in multiple tracks!",quote=F)
 			if(fill.output==TRUE){
-				if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa,".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
-				if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa,".pdf",sep=""), width = 15,height=6*R)
-				if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa,".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
+				if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
+				if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
+				if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
 			}
 			if(fill.output==FALSE){
 				dev.new(width = 15, height = 6)
 			}
-			par(mfcol=c(R,1),mar = c(5,6,4,3),xaxs="i")
+			par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,0,3,0),xaxs="i")
 			for(i in 1:R){
 				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
 				pvalue=pvalueT[,i]
@@ -672,27 +794,39 @@ dpi=300
 							if(LOG10==TRUE){
 								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
 							}else{
-								Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(pvalueXYi.))
+								Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+								if(Max<=1)
+								#{
+									Max=max(max(pvalue[pvalue!=Inf]),max(pvalueXYi.))
+								# }else{
+									# Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+								# }
 							}
 						}
 					}else{
 						if(LOG10==TRUE){
 							Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))),max(pvalueXYi.))
 						}else{
-							Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(pvalueXYi.))
+							Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+							if(Max<=1)
+							#{
+								Max=max(max(pvalue[pvalue!=Inf]),max(pvalueXYi.))
+							# }else{
+								# Max=max(ceiling(max(pvalue[pvalue!=Inf])),ceiling(max(pvalueXYi.)))
+							# }
 						}
 					}
 					if(is.null(ylim)){
-						if(Max<1){
+						if(Max<=1){
 							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
-								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)
 						}else{
 							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
-								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)
 						}
 					}else{
 						plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=ylim,ylab=ylab,
-							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))	
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)	
 					}
 					points(pvalueXYi.~XYlim,pch=pch,cex=cex[2],col="gray")
 				}else{
@@ -709,32 +843,56 @@ dpi=300
 									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 								}else{
 									Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+									if(Max<=1)
+									#{
+										Max=max(max(pvalue[pvalue!=Inf]))
+									# }else{
+										# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+									# }
 								}	
 							}
 						}else{
 							if(LOG10 == TRUE){
 								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 							}else{
-								Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+							Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+								if(Max<=1)
+								#{
+									Max=max(max(pvalue[pvalue!=Inf]))
+								# }else{
+									# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
+								# }
 							}
 						}
-						if(Max<1){
-							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
-								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+						if(Max<=1){
+							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)
 						}else{
-							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+3*band+length(pvalueXYi.)),ylim=c(0,Max+1),ylab=ylab,
-								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
+								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)
 						}
 					}else{
 						plot(logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
-							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
+							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE)
 					}
 				}
+				
+				#add the names of traits on plot  
+				text(ticks[1],Max,labels=taxa[i],adj=0,font=3,cex=1.5)
 				axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
+				if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=1.5)
 				if(is.null(ylim)){
-					axis(2,at=c(0:(Max+1)),cex.axis=cex.axis,font=2,labels=0:(Max+1))
+					if(Max>1){
+						axis(2,at=seq(0,(Max+1),round((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),round((Max+1)/10)))
+					}else{
+						axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+					}
 				}else{
-					axis(2,at=c(0:ylim[2]),cex.axis=cex.axis,font=2,labels=0:ylim[2])
+					if(ylim[2]>1){
+						axis(2,at=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)))
+					}else{
+						axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
+					}
 				}
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
@@ -746,6 +904,8 @@ dpi=300
 							sgline1=-log10(min(threshold)/max(dim(Pmap)))
 							HY1=logpvalue[which(logpvalue>=sgline1)]
 							HX1=which(logpvalue>=sgline1)
+							
+							#cover the points that exceed the threshold with the color "white"
 							points(HX1,HY1,pch=pch,cex=cex[2],col="white")
 							if(is.null(signal.col)){
 								points(HX1,HY1,pch=signal.pch,cex=signal.cex*cex[2],col=rep(rep(colx,N[i]),add[[i]])[HX1])
@@ -755,9 +915,13 @@ dpi=300
 						}
 					}
 				}
+				
 			}
+			
+			#add the labels of X-axis
+			mtext(xlab,side=1,padj=2.5,font=2,cex=1.5)
 			if(fill.output==TRUE) dev.off()
-			print("Rectangular-Manhattan has been finished!",quote=F)
+			#print("Rectangular-Manhattan has been finished!",quote=F)
 		}
 	}
 		
@@ -772,7 +936,7 @@ dpi=300
 			}else{
 				dev.new(width = 5.5, height = 5.5)
 			}
-			par(mar = c(5,6,5,3))
+			par(mar = c(5,5,4,2))
 			if(plotXY==TRUE){
 				P.values=c(as.numeric(PmapN[,i+2]),as.numeric(PmapXY[,i+2]))
 			}else{
@@ -796,6 +960,8 @@ dpi=300
 				log.P.values <- P.values
 			}
 			plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = paste("QQplot of",taxa[i]))
+			
+			#calculate the confidence interval of QQ-plot
 			if(conf.int==TRUE){
 				N1=length(log.Quantiles)
 				c95 <- rep(NA,N1)
@@ -807,19 +973,25 @@ dpi=300
 					c05[j] <- qbeta(0.05,xi,N-xi+1)
 				}
 				index=length(c95):1
+				
+				#plot the confidence interval of QQ-plot
 				polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
 			}
+			
 			abline(a = 0, b = 1, col = threshold.col[1],lwd=2)
-			points(log.Quantiles, log.P.values, col = "Black",pch=19,cex=cex[2])
+			points(log.Quantiles, log.P.values, col = "Black",pch=19,cex=cex[3])
+			
 			if(!is.null(threshold)){
 				if(sum(threshold!=0)==length(threshold)){
 					thre.line=-log10(min(threshold)/N)
 					if(amplify==TRUE){
 						thre.index=which(log.P.values>=thre.line)
 						if(length(thre.index)!=0){
-							points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[2])
+						
+							#cover the points that exceed the threshold with the color "white"
+							points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
 							if(is.null(signal.col)){
-									points(log.Quantiles[thre.index],log.P.values[thre.index],col = "black",pch=signal.pch,cex=signal.cex)
+								points(log.Quantiles[thre.index],log.P.values[thre.index],col = "black",pch=signal.pch,cex=signal.cex)
 							}else{
 								points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col,pch=signal.pch,cex=signal.cex)
 							}
@@ -832,4 +1004,3 @@ dpi=300
 	}
 	print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=F)
 }
-
