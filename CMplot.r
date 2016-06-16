@@ -37,8 +37,8 @@ LOG10=TRUE,
 conf.int=TRUE,
 conf.int.col="grey",
 plot0=TRUE,
-fill.output=TRUE,
-fill="jpg",
+file.output=TRUE,
+file="jpg",
 dpi=300
 )
 
@@ -74,9 +74,11 @@ dpi=300
 	#scale and adjust the parameters
 	cir.chr.h=cir.chr.h/5
 	cir.band=cir.band/5
-	threshold.col=rep(threshold.col,length(threshold))
-	threshold.lwd=rep(threshold.lwd,length(threshold))
-	threshold.lty=rep(threshold.lty,length(threshold))
+	if(!is.null(threshold)){
+		threshold.col=rep(threshold.col,length(threshold))
+		threshold.lwd=rep(threshold.lwd,length(threshold))
+		threshold.lty=rep(threshold.lty,length(threshold))
+	}
 	if(length(cex)!=3) cex=rep(cex,3)
 	if(!is.null(ylim)){
 		if(length(ylim)==1) ylim=c(0,ylim)
@@ -218,10 +220,10 @@ dpi=300
 	#plot circle Manhattan
 	if("c" %in% plot.type){
 		#print("Starting Circular-Manhattan plot!",quote=F)
-		if(fill.output==TRUE){
-			if(fill=="jpg")	jpeg(paste("Circular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
-			if(fill=="pdf")	pdf(paste("Circular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 10,height=10)
-			if(fill=="tiff")	tiff(paste("Circular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 8*dpi,height=8*dpi,res=dpi)
+		if(file.output==TRUE){
+			if(file=="jpg")	jpeg(paste("Circular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
+			if(file=="pdf")	pdf(paste("Circular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 10,height=10)
+			if(file=="tiff")	tiff(paste("Circular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 8*dpi,height=8*dpi,res=dpi)
 		}
 		par(pty="s",xpd=TRUE,mar=c(1,1,1,1))
 		RR=r+H*R+cir.band*R
@@ -587,8 +589,8 @@ dpi=300
 						}
 					}
 				}else{
-					ticks1=1.07*(RR+cir.band)*sin(2*pi*(ticks-round(band/2))/TotalN)
-					ticks2=1.07*(RR+cir.band)*cos(2*pi*(ticks-round(band/2))/TotalN)
+					ticks1=1.0*(RR+cir.band)*sin(2*pi*(ticks-round(band/2))/TotalN)
+					ticks2=1.0*(RR+cir.band)*cos(2*pi*(ticks-round(band/2))/TotalN)
 					if(is.null(cir.chr.labels)){
 						for(i in 1:length(ticks)){
 						
@@ -605,7 +607,7 @@ dpi=300
 				}
 			}
 		}
-		if(fill.output==TRUE) dev.off()
+		if(file.output==TRUE) dev.off()
 		#print("Circular-Manhattan has been finished!",quote=F)
 	}
 
@@ -616,13 +618,13 @@ dpi=300
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
 				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
-					if(fill.output==TRUE){
-						if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
-						if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
-						if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
+					if(file.output==TRUE){
+						if(file=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
+						if(file=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
+						if(file=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
 						par(mar = c(5,6,4,3),xaxs="i")
 					}
-					if(fill.output==FALSE) {
+					if(file.output==FALSE) {
 						dev.new(width = 15, height = 6)
 					}
 					pvalue=pvalueT[,i]
@@ -762,18 +764,18 @@ dpi=300
 							}
 						}
 					}
-				if(fill.output==TRUE)  dev.off()
+				if(file.output==TRUE)  dev.off()
 			}
 			#print("Rectangular-Manhattan has been finished!",quote=F)
 		}else{
 			#print("Starting Rectangular-Manhattan plot!",quote=F)
 			#print("Plotting in multiple tracks!",quote=F)
-			if(fill.output==TRUE){
-				if(fill=="jpg")	jpeg(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
-				if(fill=="pdf")	pdf(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
-				if(fill=="tiff")	tiff(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
+			if(file.output==TRUE){
+				if(file=="jpg")	jpeg(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
+				if(file=="pdf")	pdf(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
+				if(file=="tiff")	tiff(paste("Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
 			}
-			if(fill.output==FALSE){
+			if(file.output==FALSE){
 				dev.new(width = 15, height = 6)
 			}
 			par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,0,3,0),xaxs="i")
@@ -920,7 +922,7 @@ dpi=300
 			
 			#add the labels of X-axis
 			mtext(xlab,side=1,padj=2.5,font=2,cex=1.5)
-			if(fill.output==TRUE) dev.off()
+			if(file.output==TRUE) dev.off()
 			#print("Rectangular-Manhattan has been finished!",quote=F)
 		}
 	}
@@ -929,10 +931,10 @@ dpi=300
 		#print("Starting QQ-plot!",quote=F)
 		for(i in 1:R){
 			print(paste("QQ-Plotting ",taxa[i],"...",sep=""),quote=F)
-			if(fill.output==TRUE){
-				if(fill=="jpg")	jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
-				if(fill=="pdf")	pdf(paste("QQplot.",taxa[i],".pdf",sep=""), width = 5.5,height=5.5)
-				if(fill=="tiff")	tiff(paste("QQplot.",taxa[i],".tiff",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi)
+			if(file.output==TRUE){
+				if(file=="jpg")	jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
+				if(file=="pdf")	pdf(paste("QQplot.",taxa[i],".pdf",sep=""), width = 5.5,height=5.5)
+				if(file=="tiff")	tiff(paste("QQplot.",taxa[i],".tiff",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi)
 			}else{
 				dev.new(width = 5.5, height = 5.5)
 			}
@@ -978,8 +980,8 @@ dpi=300
 				polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
 			}
 			
-			abline(a = 0, b = 1, col = threshold.col[1],lwd=2)
-			points(log.Quantiles, log.P.values, col = "Black",pch=19,cex=cex[3])
+			if(!is.null(threshold.col))	abline(a = 0, b = 1, col = threshold.col[1],lwd=2)
+			points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3])
 			
 			if(!is.null(threshold)){
 				if(sum(threshold!=0)==length(threshold)){
@@ -991,7 +993,7 @@ dpi=300
 							#cover the points that exceed the threshold with the color "white"
 							points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
 							if(is.null(signal.col)){
-								points(log.Quantiles[thre.index],log.P.values[thre.index],col = "black",pch=signal.pch,cex=signal.cex)
+								points(log.Quantiles[thre.index],log.P.values[thre.index],col = col[1],pch=signal.pch,cex=signal.cex)
 							}else{
 								points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col,pch=signal.pch,cex=signal.cex)
 							}
@@ -999,7 +1001,7 @@ dpi=300
 					}
 				}
 			}
-			if(fill.output==TRUE) dev.off()
+			if(file.output==TRUE) dev.off()
 		}
 	}
 	print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=F)
