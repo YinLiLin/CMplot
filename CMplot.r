@@ -446,7 +446,8 @@ dpi=300
 					# YLine=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(1:TotalN)/TotalN)
 					# lines(XLine,YLine,lwd=1.5)
 					circle.plot(myr=2*cir.band+RR+cir.chr.h,lwd=1.5,add=TRUE)
-					
+					circle.plot(myr=2*cir.band+RR,lwd=1.5,add=TRUE)
+
 					a=0
 					if(plotXY==FALSE){
 						for(k in 1:length(chr)){
