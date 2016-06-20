@@ -17,6 +17,8 @@ cex=c(0.5,1,1),
 r=1,
 xlab="Chromosome",
 ylab=expression(-log[10](italic(p))),
+xaxs="i",
+yaxs="r",
 outward=TRUE,
 threshold = NULL, 
 threshold.col="red",
@@ -34,6 +36,7 @@ cir.legend=TRUE,
 cir.legend.cex=0.5,
 cir.legend.col="grey45",
 LOG10=TRUE,
+box=FALSE,
 conf.int=TRUE,
 conf.int.col="grey",
 plot0=TRUE,
@@ -623,7 +626,7 @@ dpi=300
 						if(file=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
 						if(file=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
 						if(file=="tiff")	tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = 14*dpi,height=5*dpi,res=dpi)
-						par(mar = c(5,6,4,3),xaxs="i")
+						par(mar = c(5,6,4,3),xaxs=xaxs,yaxs=yaxs)
 					}
 					if(file.output==FALSE) {
 						dev.new(width = 15, height = 6)
@@ -725,7 +728,7 @@ dpi=300
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 						}
 					}
-					axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
+					axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr))
 					if(is.null(ylim)){
 						if(Max>1){
 							#print(seq(0,(Max+1),round((Max+1)/10)))
@@ -765,6 +768,7 @@ dpi=300
 							}
 						}
 					}
+				if(box==TRUE) box()
 				if(file.output==TRUE)  dev.off()
 			}
 			#print("Rectangular-Manhattan has been finished!",quote=F)
@@ -779,7 +783,7 @@ dpi=300
 			if(file.output==FALSE){
 				dev.new(width = 15, height = 6)
 			}
-			par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,0,3,0),xaxs="i")
+			par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,0,3,0),xaxs=xaxs,yaxs=yaxs)
 			for(i in 1:R){
 				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
 				pvalue=pvalueT[,i]
@@ -882,7 +886,7 @@ dpi=300
 				
 				#add the names of traits on plot  
 				text(ticks[1],Max,labels=taxa[i],adj=0,font=3,cex=1.5)
-				axis(1, at=ticks,cex.axis=cex.axis,font=2,labels=chr)
+				axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr))
 				if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=1.5)
 				if(is.null(ylim)){
 					if(Max>1){
