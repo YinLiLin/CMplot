@@ -110,6 +110,9 @@ a character, the color of the axis of legend.
   \item{LOG10}{
 logical, whether to change the p-value into log10(p-value).
 }
+ \item{box}{
+logical, this function draws a box around the current Manhattan plot.
+}
   \item{conf.int}{
 logical, whether to drew the confidence interval on QQ-plot.
 }
@@ -118,9 +121,6 @@ a character, the color of the confidence interval on QQ-plot.
 }
  \item{plot0}{
 logical, users can choose whether to plot the chromosome (written as 0) which has no clear chromosome number in all plots.
-}
- \item{box}{
-logical, this function draws a box around the current Manhattan plot.
 }
  \item{file.output}{
 a logical, users can choose whether to output the plot results.
