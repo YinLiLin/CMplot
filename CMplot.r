@@ -1,4 +1,4 @@
-# R-CMplot
+# R-CMplot Version: 3.1.4
 CMplot <-
 
 #Adjustable parameters in CMplot
