@@ -3,8 +3,8 @@ CMplot(Pmap, col = c("darkgreen","darkmagenta","navy","black","orange"), pch = 1
 	  multracks = FALSE, cex = c(0.5,1,1),r = 1, xlab = "Chromosome",
 	  ylab = expression(-log[10](italic(p))),xaxs="i",yaxs="r",outward = TRUE, 
 	  threshold = NULL,threshold.col="red", threshold.lwd = 1, threshold.lty = 2,
-	  amplify = TRUE,signal.cex = 1.5, signal.pch = 19, signal.col="red", 
-	  cir.chr = TRUE,cir.chr.h = 1,cir.chr.col = "black", cir.chr.labels = NULL,
+	  amplify = TRUE,cir.chr.labels = NULL,signal.cex = 1.5, signal.pch = 19,
+	  signal.col="red",cir.chr = TRUE,cir.chr.h = 1,cir.chr.col = "black",
 	  cir.legend = TRUE, cir.legend.cex = 0.5, cir.legend.col = "grey45",
 	  LOG10 = TRUE, box=FALSE, conf.int = TRUE, conf.int.col = "grey", 
 	  plot0 = TRUE,file.output = TRUE, file = "jpg", dpi = 300)
@@ -77,6 +77,9 @@ a number or vector, the type for the line of threshold levels.
   \item{amplify}{
 logical, CMplot can amplify the significant points, if amplify=T, then the points greater than the minimal significant level will be highlighted, the default: amplify=TRUE.
 }
+  \item{cir.chr.labels}{
+a vector, the labels for the chromosomes of circle-Manhattan plot.
+}
 \item{signal.cex}{
 a number, if amplify=TRUE, users can set the size of significant points.
 }
@@ -94,9 +97,6 @@ a number, the width for the boundary, if cir.chr=FALSE, then this parameter will
 }
   \item{cir.chr.col}{
 a character, the colour for the boundary, only one colour is allowed, if cir.chr.col=NULL, then the default colours are the same with the parameter "col".
-}
-  \item{cir.chr.labels}{
-a vector, the labels for the chromosomes of circle-Manhattan plot.
 }
   \item{cir.legend}{
 logical, whether to add the legend of each circle.
