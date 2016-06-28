@@ -1,4 +1,4 @@
-# R-CMplot Version: 3.1.4
+# R-CMplot
 CMplot <-
 
 #Adjustable parameters in CMplot
@@ -25,13 +25,13 @@ threshold.col="red",
 threshold.lwd=1,
 threshold.lty=2,
 amplify= TRUE,
+chr.labels=NULL,
 signal.cex = 1.5,
 signal.pch = 19,
 signal.col="red",
 cir.chr=TRUE,
 cir.chr.h=1,
 cir.chr.col="black",
-cir.chr.labels=NULL,
 cir.legend=TRUE,
 cir.legend.cex=0.5,
 cir.legend.col="grey45",
@@ -54,11 +54,11 @@ dpi=300
 	}
 	
 	#print the version of CMplot
-	print(paste(paste(rep("*",5),collapse=""),"Welcome to use CMplot!",paste(rep("*",5),collapse=""),sep=""),quote=F)
-	print(paste("* ","Version: ",packageVersion("CMplot"),paste(rep(" ",15),collapse=""),"*",sep=""),quote=F)
-	print(paste("* "," Author: Lilin Yin",paste(rep(" ",11),collapse=""),"*",sep=""),quote=F)
-	print(paste("* ","Contact: ylilin@163.com",paste(rep(" ",6),collapse=""),"*",sep=""),quote=F)
-	print(paste(rep("*",32),collapse=""),quote=F)
+	print(paste("#",paste(rep("-",10),collapse=""),"Welcome to use CMplot!",paste(rep("-",10),collapse=""),"#",sep=""),quote=FALSE)
+	print(paste("# ","Version: ",packageVersion("CMplot"),paste(rep(" ",27),collapse=""),"#",sep=""),quote=FALSE)
+	print(paste("# "," Author: Lilin Yin",paste(rep(" ",11),collapse=""),"_\\|//_",paste(rep(" ",5),collapse=""),"#",sep=""),quote=FALSE)
+	print(paste("# ","Contact: ylilin@163.com",paste(rep(" ",5),collapse=""),"(‘ o-o ’)",paste(rep(" ",4),collapse=""),"#",sep=""),quote=FALSE)
+	print(paste("#",paste(rep("-",28),collapse=""),"ooO-(_)-Ooo",paste(rep("-",3),collapse=""),"#",sep=""),quote=FALSE)
 
 	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q")
 	plotXY=TRUE
@@ -91,8 +91,8 @@ dpi=300
 	R=dim(Pmap)[2]-2
 	
 	#choose whether to plot the SNPs that have no clear chromosome
-	if(plot0==FALSE) index=c(1:100)
-	if(plot0==TRUE) index=c(0:100)
+	if(plot0==FALSE) index=c(1:10000)
+	if(plot0==TRUE) index=c(0:10000)
 	
 	#pick the SNPs on euchromosome
 	PmapN=Pmap[Pmap[,1] %in% index,]
@@ -230,7 +230,7 @@ dpi=300
 		}
 		par(pty="s",xpd=TRUE,mar=c(1,1,1,1))
 		RR=r+H*R+cir.band*R
-		plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),axes=F,xlab="",ylab="")
+		plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),axes=FALSE,xlab="",ylab="")
 		
 		for(i in 1:R){
 		
@@ -241,7 +241,7 @@ dpi=300
 			#debug
 			#print(colx)
 			
-			print(paste("Circular-Plotting ",taxa[i],"...",sep=""),quote=F)
+			print(paste("Circular-Plotting ",taxa[i],"...",sep=""),quote=FALSE)
 			pvalue=pvalueT[,i]
 			logpvalue=logpvalueT[,i]
 			if(plotXY==TRUE){
@@ -416,7 +416,7 @@ dpi=300
 				if(cir.chr==TRUE){
 					ticks1=1.07*(RR+cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
 					ticks2=1.07*(RR+cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
-					if(is.null(cir.chr.labels)){
+					if(is.null(chr.labels)){
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
 							text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=cex.axis)
@@ -424,13 +424,13 @@ dpi=300
 					}else{
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=cex.axis)
+							text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}
 				}else{
 					ticks1=(0.9*r)*sin(2*pi*(ticks-round(band/2))/TotalN)
 					ticks2=(0.9*r)*cos(2*pi*(ticks-round(band/2))/TotalN)
-					if(is.null(cir.chr.labels)){
+					if(is.null(chr.labels)){
 						for(i in 1:length(ticks)){
 						angle=360*(1-(ticks-round(band/2))[i]/TotalN)
 						text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=cex.axis)
@@ -438,7 +438,7 @@ dpi=300
 					}else{
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=cex.axis)
+							text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}
 				}
@@ -581,7 +581,7 @@ dpi=300
 				if(cir.chr==TRUE){
 					ticks1=1.1*(2*cir.band+RR)*sin(2*pi*(ticks-round(band/2))/TotalN)
 					ticks2=1.1*(2*cir.band+RR)*cos(2*pi*(ticks-round(band/2))/TotalN)
-					if(is.null(cir.chr.labels)){
+					if(is.null(chr.labels)){
 						for(i in 1:length(ticks)){
 						  angle=360*(1-(ticks-round(band/2))[i]/TotalN)
 						  text(ticks1[i],ticks2[i],chr[i],srt=angle,font=2,cex=cex.axis)
@@ -589,13 +589,13 @@ dpi=300
 					}else{
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=cex.axis)
+							text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}
 				}else{
 					ticks1=1.0*(RR+cir.band)*sin(2*pi*(ticks-round(band/2))/TotalN)
 					ticks2=1.0*(RR+cir.band)*cos(2*pi*(ticks-round(band/2))/TotalN)
-					if(is.null(cir.chr.labels)){
+					if(is.null(chr.labels)){
 						for(i in 1:length(ticks)){
 						
 							#adjust the angle of labels of circle plot
@@ -605,7 +605,7 @@ dpi=300
 					}else{
 						for(i in 1:length(ticks)){
 							angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-							text(ticks1[i],ticks2[i],cir.chr.labels[i],srt=angle,font=2,cex=cex.axis)
+							text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
 						}
 					}	
 				}
@@ -621,7 +621,7 @@ dpi=300
 			for(i in 1:R){
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
-				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
+				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=FALSE)
 					if(file.output==TRUE){
 						if(file=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
 						if(file=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
@@ -728,7 +728,11 @@ dpi=300
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 						}
 					}
-					axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr))
+					if(is.null(chr.labels)){
+						axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr))
+					}else{
+						axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.labels))
+					}
 					if(is.null(ylim)){
 						if(Max>1){
 							#print(seq(0,(Max+1),round((Max+1)/10)))
@@ -785,7 +789,7 @@ dpi=300
 			}
 			par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,0,3,0),xaxs=xaxs,yaxs=yaxs)
 			for(i in 1:R){
-				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=F)
+				print(paste("Rectangular-Plotting ",taxa[i],"...",sep=""),quote=FALSE)
 				pvalue=pvalueT[,i]
 				logpvalue=logpvalueT[,i]
 				if(plotXY==TRUE){
@@ -886,7 +890,11 @@ dpi=300
 				
 				#add the names of traits on plot  
 				text(ticks[1],Max,labels=taxa[i],adj=0,font=3,cex=1.5)
-				axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr))
+				if(is.null(chr.labels)){
+					axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr))
+				}else{
+					axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.labels))
+				}
 				if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=1.5)
 				if(is.null(ylim)){
 					if(Max>1){
@@ -935,7 +943,7 @@ dpi=300
 	if("q" %in% plot.type){
 		#print("Starting QQ-plot!",quote=F)
 		for(i in 1:R){
-			print(paste("QQ-Plotting ",taxa[i],"...",sep=""),quote=F)
+			print(paste("QQ-Plotting ",taxa[i],"...",sep=""),quote=FALSE)
 			if(file.output==TRUE){
 				if(file=="jpg")	jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
 				if(file=="pdf")	pdf(paste("QQplot.",taxa[i],".pdf",sep=""), width = 5.5,height=5.5)
@@ -1009,5 +1017,5 @@ dpi=300
 			if(file.output==TRUE) dev.off()
 		}
 	}
-	print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=F)
+	print(paste("The plots have been stored in ","[",getwd(),"]",sep=""),quote=FALSE)
 }
