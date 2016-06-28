@@ -3,7 +3,7 @@ CMplot(Pmap, col = c("darkgreen","darkmagenta","navy","black","orange"), pch = 1
 	  multracks = FALSE, cex = c(0.5,1,1),r = 1, xlab = "Chromosome",
 	  ylab = expression(-log[10](italic(p))),xaxs="i",yaxs="r",outward = TRUE, 
 	  threshold = NULL,threshold.col="red", threshold.lwd = 1, threshold.lty = 2,
-	  amplify = TRUE,cir.chr.labels = NULL,signal.cex = 1.5, signal.pch = 19,
+	  amplify = TRUE,chr.labels = NULL,signal.cex = 1.5, signal.pch = 19,
 	  signal.col="red",cir.chr = TRUE,cir.chr.h = 1,cir.chr.col = "black",
 	  cir.legend = TRUE, cir.legend.cex = 0.5, cir.legend.col = "grey45",
 	  LOG10 = TRUE, box=FALSE, conf.int = TRUE, conf.int.col = "grey", 
