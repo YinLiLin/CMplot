@@ -29,6 +29,7 @@ chr.labels=NULL,
 signal.cex = 1.5,
 signal.pch = 19,
 signal.col="red",
+signal.line=NULL,
 cir.chr=TRUE,
 cir.chr.h=1,
 cir.chr.col="black",
@@ -57,7 +58,7 @@ dpi=300
 	print(paste("#",paste(rep("-",10),collapse=""),"Welcome to use CMplot!",paste(rep("-",10),collapse=""),"#",sep=""),quote=FALSE)
 	print(paste("# ","Version: ",packageVersion("CMplot"),paste(rep(" ",27),collapse=""),"#",sep=""),quote=FALSE)
 	print(paste("# "," Author: Lilin Yin",paste(rep(" ",11),collapse=""),"_\\|//_",paste(rep(" ",5),collapse=""),"#",sep=""),quote=FALSE)
-	print(paste("# ","Contact: ylilin@163.com",paste(rep(" ",5),collapse=""),"(‘ o-o ’)",paste(rep(" ",4),collapse=""),"#",sep=""),quote=FALSE)
+	print(paste("# ","Contact: ylilin@163.com",paste(rep(" ",5),collapse=""),"( ^o-o^ )",paste(rep(" ",4),collapse=""),"#",sep=""),quote=FALSE)
 	print(paste("#",paste(rep("-",28),collapse=""),"ooO-(_)-Ooo",paste(rep("-",3),collapse=""),"#",sep=""),quote=FALSE)
 
 	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q")
@@ -219,7 +220,15 @@ dpi=300
 		TotalN1=dim(pvalueT)[1]
 		TotalN=TotalN1
 	}
-	
+	signal.line.index <- NULL
+	if(!is.null(threshold)){
+		if(!is.null(signal.line)){
+			for(l in 1:R){
+				signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min(threshold)/max(dim(Pmap))))
+			}
+			signal.line.index <- unique(signal.line.index)
+		}
+	}
 	#plot circle Manhattan
 	if("c" %in% plot.type){
 		#print("Starting Circular-Manhattan plot!",quote=F)
@@ -231,7 +240,15 @@ dpi=300
 		par(pty="s",xpd=TRUE,mar=c(1,1,1,1))
 		RR=r+H*R+cir.band*R
 		plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.05*(RR+4*cir.chr.h)),axes=FALSE,xlab="",ylab="")
-		
+		if(!is.null(signal.line)){
+			if(!is.null(signal.line.index)){
+				X1chr=(RR)*sin(2*pi*(signal.line.index-round(band/2))/TotalN)
+				Y1chr=(RR)*cos(2*pi*(signal.line.index-round(band/2))/TotalN)
+				X2chr=(r)*sin(2*pi*(signal.line.index-round(band/2))/TotalN)
+				Y2chr=(r)*cos(2*pi*(signal.line.index-round(band/2))/TotalN)
+				segments(X1chr,Y1chr,X2chr,Y2chr,lty=2,lwd=signal.line,col="grey")
+			}
+		}
 		for(i in 1:R){
 		
 			#get the colors for each trait
