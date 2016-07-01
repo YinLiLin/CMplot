@@ -89,6 +89,9 @@ a number, if amplify=TRUE, users can set the shape of significant points.
 \item{signal.col}{
 a character, if amplify=TRUE, users can set the colour of significant points, if signal.col=NULL, then the colors of significant points will not be changed.
 }
+\item{signal.line}{
+a number, the width of line of the same signal points, if signal.line=NULL, then the lines will not be added.
+}
   \item{cir.chr}{
 logical, a boundary represents chromosome, the default is TRUE.
 }
