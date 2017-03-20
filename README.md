@@ -42,9 +42,9 @@ CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",dpi=3
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-CMplot(pig60K,plot.type="c",cir.chr.h=1,chr.labels=paste("Chr",c(1:18,"X"),sep=""),threshold=c(0.05,0.01),
-      amplify=TRUE,threshold.lty=c(2,1),threshold.col=c("blue","red"),signal.line=1,signal.col="red",
-      file="jpg",dpi=300)
+CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),threshold=c(0.05,0.01),
+      cir.chr.h=1,amplify=TRUE,threshold.lty=c(2,1),threshold.col=c("blue","red"),signal.line=1,
+      signal.col="red",file="jpg",dpi=300)
 #Note: if signal.line=NULL, the lines that crosse circles won't be added.
 ```
 
@@ -57,8 +57,8 @@ CMplot(pig60K,plot.type="c",cir.chr.h=1,chr.labels=paste("Chr",c(1:18,"X"),sep="
 #### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
-CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,r=1.2,cir.chr.h=1.3,chr.labels=paste("Chr",c(1:29),sep=""),
-cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=300)
+CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,chr.labels=paste("Chr",c(1:29),sep=""),
+r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=300)
 ```
 
 <p align="center">
