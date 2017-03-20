@@ -28,7 +28,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ### SNP-density plot
 
 ```r
-CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",dpi=300)
+CMplot(pig60K,plot.type="d",bin.size=1e6,col=c("darkgreen", "yellow", "red"),file="jpg",dpi=300)
 ```
 
 <p align="center">
