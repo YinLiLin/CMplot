@@ -1,6 +1,7 @@
 CMplot <- function(
 	Pmap,
 	col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1", "red"),
+	bin.size=1e6,
 	pch=19,
 	band=1,
 	cir.band=0.5,
@@ -148,7 +149,7 @@ CMplot <- function(
 		if(!file.output){
 			dev.new(width=9, height=7)
 		}
-		Densitplot(map=Pmap[,c(1:3)], col=col)
+		Densitplot(map=Pmap[,c(1:3)], col=col,bin=bin.size)
 		if(file.output)	dev.off()
 	}
 	
