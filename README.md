@@ -21,6 +21,8 @@ head(pig60K)
 head(cattle50K)
 ```
 
+Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get the detail function of all parameters.
+
 ### SNP-density plot
 
 ```r
@@ -49,7 +51,7 @@ CMplot(pig60K,plot.type="c",cir.chr.h=1,chr.labels=paste("Chr",c(1:18,"X"),sep="
 ### Rectangular-Manhattan plot
 
 ```r
-CMplot(pig60K[,c(1,6)],plot.type="m")
+CMplot(pig60K[,c(1:3,6)],plot.type="m")
 ```
 
 <p align="center">
@@ -61,7 +63,7 @@ CMplot(pig60K[,c(1,6)],plot.type="m")
 ### Q-Q plot
 
 ```r
-CMplot(pig60K[,c(1,6)],plot.type="q")
+CMplot(pig60K[,c(1:3,6)],plot.type="q")
 ```
 
 <p align="center">
