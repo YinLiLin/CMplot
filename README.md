@@ -17,8 +17,8 @@ library("CMplot")
 There are two example datasets attached in **CMplot**, users can export and view the details by following R code:
 
 ```r
-data(pig60K)
-data(cattle50K)
+data(pig60K)   #calculated p-values by MLM
+data(cattle50K)   #calculated SNP effects by rrblup
 head(pig60K)
 head(cattle50K)
 ```
@@ -28,7 +28,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ### SNP-density plot
 
 ```r
-CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"))
+CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",dpi=300)
 ```
 
 <p align="center">
@@ -39,9 +39,13 @@ CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"))
 
 ### Circular-Manhattan plot
 
+#### (1) Genome-wide association study(GWAS)
+
 ```r
 CMplot(pig60K,plot.type="c",cir.chr.h=1,chr.labels=paste("Chr",c(1:18,"X"),sep=""),threshold=c(0.05,0.01),
-      amplify=T,threshold.lty=c(2,1),threshold.col=c("blue","red"))
+      amplify=TRUE,threshold.lty=c(2,1),threshold.col=c("blue","red"),signal.line=1,signal.col="red",
+      file="jpg",dpi=300)
+#Note: if signal.line=NULL, the lines that crosse circles won't be added.
 ```
 
 <p align="center">
@@ -50,10 +54,25 @@ CMplot(pig60K,plot.type="c",cir.chr.h=1,chr.labels=paste("Chr",c(1:18,"X"),sep="
 </a>
 </p>
 
-### Rectangular-Manhattan plot
+#### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
-CMplot(pig60K[,c(1:3,6)],plot.type="m")
+CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,r=1.2,cir.chr.h=1.3,chr.labels=paste("Chr",c(1:29),sep=""),
+cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Circular-Manhattan.cattle.jpg">
+<img src="Figure/Circular-Manhattan.cattle.jpg" height="400px" width="400px">
+</a>
+</p>
+
+### Rectangular-Manhattan plot
+
+#### (1) Genome-wide association study(GWAS)
+
+```r
+CMplot(pig60K[,c(1:3,6)],plot.type="m",threshold=NULL,file="jpg",dpi=300)
 ```
 
 <p align="center">
@@ -62,10 +81,22 @@ CMplot(pig60K[,c(1:3,6)],plot.type="m")
 </a>
 </p>
 
+#### (2) Genomic Selection/Prediction(GS/GP)
+
+```r
+CMplot(cattle50K,plot.type="m",LOG10=FALSE,ylab="SNP effect",threshold=NULL,file="jpg",dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Rectangular-Manhattan.Fat percentage.jpg">
+<img src="Figure/Rectangular-Manhattan.Fat percentage.jpg" height="300px" width="900px">
+</a>
+</p>
+
 ### Q-Q plot
 
 ```r
-CMplot(pig60K[,c(1:3,6)],plot.type="q")
+CMplot(pig60K[,c(1:3,6)],plot.type="q",conf.int=TRUE,conf.int.col="grey",file="jpg",dpi=300)
 ```
 
 <p align="center">
