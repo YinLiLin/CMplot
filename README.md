@@ -10,6 +10,8 @@ CMplot v3.2.0
 ```r
 install.packages("CMplot")
 library("CMplot")
+#(optional)if you want to use the latest version:
+#source("https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/CMplot.r")
 ```
 
 There are two example datasets attached in **CMplot**, users can export and view the details by following R code:
