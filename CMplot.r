@@ -149,7 +149,7 @@ CMplot <- function(
 		if(!file.output){
 			dev.new(width=9, height=7)
 		}
-		Densitplot(map=Pmap[,c(1:3)], col=col,bin=bin.size)
+		Densitplot(map=Pmap[,c(1:3)], col=col, bin=bin.size, main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""))
 		if(file.output)	dev.off()
 	}
 	
