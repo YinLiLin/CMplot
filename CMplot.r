@@ -58,6 +58,7 @@ CMplot <- function(
 		band=3,
 		width=5,
 		legend.len=10,
+		legend.max=NULL,
 		legend.pt.cex=3,
 		legend.cex=1,
 		legend.y.intersp=1
@@ -99,12 +100,21 @@ CMplot <- function(
 				col.index[[i]] <- rep(eachbin.num, eachbin.num)
 			}
 		}
-		maxbin.num <- max(maxbin.num)
+		Maxbin.num <- max(maxbin.num)
+		maxbin.num <- Maxbin.num
+		if(!is.null(legend.max)){
+			maxbin.num <- legend.max
+		}
 		col=colorRampPalette(col)(maxbin.num)
 		for(i in 1 : length(chr.num)){
 			polygon(c(min(pos.x[[i]]), min(pos.x[[i]]), max(pos.x[[i]]), max(pos.x[[i]])), 
 				c(-width/5 - band * (i - length(chr.num) - 1), width/5 - band * (i - length(chr.num) - 1), 
 				width/5 - band * (i - length(chr.num) - 1), -width/5 - band * (i - length(chr.num) - 1)), col="grey", border="grey")
+			if(!is.null(legend.max)){
+				if(legend.max < Maxbin.num){
+					col.index[[i]][col.index[[i]] > legend.max] <- legend.max
+				}
+			}
 			segments(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), pos.x[[i]], width/5 - band * (i - length(chr.num) - 1), 
 			col=col[round(col.index[[i]] * length(col) / maxbin.num)], lwd=1)
 		}
@@ -123,12 +133,29 @@ CMplot <- function(
 		legend.y <- round(seq(0, maxbin.num, length=legend.len))
 		len <- legend.y[2]
 		legend.y <- seq(0, maxbin.num, len)
-		if(!maxbin.num %in% legend.y){
-			legend.y <- c(legend.y, paste(">", max(legend.y), sep=""))
-			legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
-			legend.y.col <- as.numeric(legend.y.col)
+		if(!is.null(legend.max)){
+			if(legend.max < Maxbin.num){
+				if(!maxbin.num %in% legend.y){
+					legend.y <- c(legend.y, paste(">=", maxbin.num, sep=""))
+					legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
+				}else{
+					legend.y[length(legend.y)] <- paste(">=", maxbin.num, sep="")
+					legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
+				}
+			}else{
+				if(!maxbin.num %in% legend.y){
+					legend.y <- c(legend.y, maxbin.num)
+				}
+				legend.y.col <- c(legend.y[-1])
+			}
 		}else{
-			legend.y.col <- c(legend.y[-1])
+			if(!maxbin.num %in% legend.y){
+				legend.y <- c(legend.y, paste(">", max(legend.y), sep=""))
+				legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
+				legend.y.col <- as.numeric(legend.y.col)
+			}else{
+				legend.y.col <- c(legend.y[-1])
+			}
 		}
 		legend('bottomright', title="", legend=legend.y, pch=15, pt.cex = legend.pt.cex, col=c("grey", col[round(legend.y.col * length(col) / maxbin.num)]),
 			cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=1, yjust=0.5, xjust=0)
