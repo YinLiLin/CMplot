@@ -2,6 +2,7 @@ CMplot <- function(
 	Pmap,
 	col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1", "red"),
 	bin.size=1e6,
+	bin.max=NULL,
 	pch=19,
 	band=1,
 	cir.band=0.5,
@@ -176,7 +177,7 @@ CMplot <- function(
 		if(!file.output){
 			dev.new(width=9, height=7)
 		}
-		Densitplot(map=Pmap[,c(1:3)], col=col, bin=bin.size, main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""))
+		Densitplot(map=Pmap[,c(1:3)], col=col, bin=bin.size, legend.max=bin.max, main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""))
 		if(file.output)	dev.off()
 	}
 	
