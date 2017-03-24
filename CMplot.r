@@ -153,11 +153,11 @@ CMplot <- function(
 			if(!maxbin.num %in% legend.y){
 				legend.y <- c(legend.y, paste(">", max(legend.y), sep=""))
 				legend.y.col <- c(legend.y[c(-1, -length(legend.y))], maxbin.num)
-				legend.y.col <- as.numeric(legend.y.col)
 			}else{
 				legend.y.col <- c(legend.y[-1])
 			}
 		}
+		legend.y.col <- as.numeric(legend.y.col)
 		legend('bottomright', title="", legend=legend.y, pch=15, pt.cex = legend.pt.cex, col=c("grey", col[round(legend.y.col * length(col) / maxbin.num)]),
 			cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=1, yjust=0.5, xjust=0)
 	}
