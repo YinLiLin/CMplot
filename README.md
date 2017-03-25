@@ -113,4 +113,4 @@ CMplot(pig60K[,c(1:3,6)],plot.type="q",conf.int=TRUE,conf.int.col="grey",file="j
 Questions, suggestions, and bug reports are welcome and appreciated.
 - **Author:** Lilin Yin
 - **Contact:** ylilin@163.com
-- **Institution:** [*Huazhong agriculture university*](http://www.hzau.edu.cn/2014/ch/)
+- **Institution:** [*Huazhong agricultural university*](http://www.hzau.edu.cn/2014/ch/)
