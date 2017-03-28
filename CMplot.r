@@ -180,142 +180,143 @@ CMplot <- function(
 		Densitplot(map=Pmap[,c(1:3)], col=col, bin=bin.size, legend.max=bin.max, main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""))
 		if(file.output)	dev.off()
 	}
-	
-	#order Pmap by the name of SNP
-	#Pmap=Pmap[order(Pmap[,1]),]
-	Pmap <- as.matrix(Pmap)
-	
-	#delete the column of SNPs names
-	Pmap <- Pmap[,-1]
-	Pmap <- na.omit(Pmap)
-	
-	#scale and adjust the parameters
-	cir.chr.h <- cir.chr.h/5
-	cir.band <- cir.band/5
-	if(!is.null(threshold)){
-		threshold.col <- rep(threshold.col,length(threshold))
-		threshold.lwd <- rep(threshold.lwd,length(threshold))
-		threshold.lty <- rep(threshold.lty,length(threshold))
-	}
-	if(length(cex)!=3) cex <- rep(cex,3)
-	if(!is.null(ylim)){
-		if(length(ylim)==1) ylim <- c(0,ylim)
-	}
-	
-	#get the number of traits
-	R=ncol(Pmap)-2
-	
-	#replace the non-euchromosome
-	options(warn = -1)
-	numeric.chr <- as.numeric(Pmap[, 1])
-	options(warn = 0)
-	max.chr <- max(numeric.chr, na.rm=TRUE)
-	if(is.infinite(max.chr))	max.chr <- 0
-	map.xy.index <- which(!numeric.chr %in% c(0:max.chr))
-	if(length(map.xy.index) != 0){
-		chr.xy <- unique(Pmap[map.xy.index, 1])
-		for(i in 1:length(chr.xy)){
-			Pmap[Pmap[, 1] == chr.xy[i], 1] <- max.chr + i
-		}
-	}
-	
-	Pmap <- matrix(as.numeric(Pmap), nrow(Pmap))
-	
-	#order the GWAS results by chromosome and position
-	Pmap <- Pmap[order(Pmap[, 1], Pmap[,2]), ]
-	
-	#get the index of chromosome
-	chr <- unique(Pmap[,1])
-	chr.ori <- chr
-	if(length(map.xy.index) != 0){
-		for(i in 1:length(chr.xy)){
-			chr.ori[chr.ori == max.chr + i] <- chr.xy[i]
-		}
-	}
-	
-	pvalueT <- as.matrix(Pmap[,-c(1:2)])
-	
-	if(LOG10){
-		pvalueT[pvalueT <= 0] <- 1
-		pvalueT[pvalueT > 1] <- 1
-	}
+	if(length(plot.type) !=1 | (!"d" %in% plot.type)){
+		#order Pmap by the name of SNP
+		#Pmap=Pmap[order(Pmap[,1]),]
+		Pmap <- as.matrix(Pmap)
 
-	#set the colors for the plot
-	#palette(heat.colors(1024)) #(heatmap)
-	#T=floor(1024/max(pvalue))
-	#plot(pvalue,pch=19,cex=0.6,col=(1024-floor(pvalue*T)))
-	if(is.vector(col)){
-		col <- matrix(col,R,length(col),byrow=T)
-	}
-	if(is.matrix(col)){
-		#try to transform the colors into matrix for all traits
-		col <- matrix(as.vector(t(col)),R,dim(col)[2],byrow=T)
-	}
-	
-	Num <- as.numeric(table(Pmap[,1]))
-	Nchr <- length(Num)
-	N <- NULL
-	
-	#set the colors for each traits
-	for(i in 1:R){
-		colx <- col[i,]
-		colx <- colx[!is.na(colx)]
-		N[i] <- ceiling(Nchr/length(colx))
-	}
-	
-	#scale the space parameter between chromosomes
-	if(!missing(band)){
-		band <- floor(band*(dim(pvalueT)[1]/100))
-	}else{
-		band <- floor(dim(pvalueT)[1]/100)
-	}
-	
-	#insert the space into chromosomes and return the midpoint of each chromosome
-	ticks <- NULL
-	NewP <- NULL
-	for(j in 1:R){
-		pvalue <- pvalueT[,j]
-		for(i in 0:(Nchr-1)){
-			if (i==0){
-				pvalue <- append(pvalue,rep(Inf,band),after=0)
-				ticks[i+1] <- band+floor((Num[i+1])/2)
-			}else{
-				pvalue <- append(pvalue,rep(Inf,band),after=sum(Num[1:i])+i*band)
-				ticks[i+1] <- band*(i+1)+sum(Num[1:i])+floor((Num[i+1])/2)
+		#delete the column of SNPs names
+		Pmap <- Pmap[,-1]
+		Pmap <- na.omit(Pmap)
+
+		#scale and adjust the parameters
+		cir.chr.h <- cir.chr.h/5
+		cir.band <- cir.band/5
+		if(!is.null(threshold)){
+			threshold.col <- rep(threshold.col,length(threshold))
+			threshold.lwd <- rep(threshold.lwd,length(threshold))
+			threshold.lty <- rep(threshold.lty,length(threshold))
+		}
+		if(length(cex)!=3) cex <- rep(cex,3)
+		if(!is.null(ylim)){
+			if(length(ylim)==1) ylim <- c(0,ylim)
+		}
+
+		#get the number of traits
+		R=ncol(Pmap)-2
+
+		#replace the non-euchromosome
+		options(warn = -1)
+		numeric.chr <- as.numeric(Pmap[, 1])
+		options(warn = 0)
+		max.chr <- max(numeric.chr, na.rm=TRUE)
+		if(is.infinite(max.chr))	max.chr <- 0
+		map.xy.index <- which(!numeric.chr %in% c(0:max.chr))
+		if(length(map.xy.index) != 0){
+			chr.xy <- unique(Pmap[map.xy.index, 1])
+			for(i in 1:length(chr.xy)){
+				Pmap[Pmap[, 1] == chr.xy[i], 1] <- max.chr + i
 			}
 		}
-		NewP[[j]] <- pvalue
-	}
-	
-	#merge the pvalues of traits by column
-	pvalueT <- do.call(cbind,NewP)
-	if(LOG10 == TRUE){
-		logpvalueT <- -log10(pvalueT)
-	}else{
-		logpvalueT <- pvalueT
-	}
-	
-	Num <- Num+band
-	add <- list()
-	for(i in 1:R){
-		colx <- col[i,]
-		colx <- colx[!is.na(colx)]
-		add[[i]] <- c(Num,rep(0,N[i]*length(colx)-Nchr))
-	}
 
-	TotalN1 <- nrow(pvalueT)
-	TotalN <- TotalN1
+		Pmap <- matrix(as.numeric(Pmap), nrow(Pmap))
 
-	signal.line.index <- NULL
-	if(!is.null(threshold)){
-		if(!is.null(signal.line)){
-			for(l in 1:R){
-				signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min(threshold)/nrow(pvalueT)))
+		#order the GWAS results by chromosome and position
+		Pmap <- Pmap[order(Pmap[, 1], Pmap[,2]), ]
+
+		#get the index of chromosome
+		chr <- unique(Pmap[,1])
+		chr.ori <- chr
+		if(length(map.xy.index) != 0){
+			for(i in 1:length(chr.xy)){
+				chr.ori[chr.ori == max.chr + i] <- chr.xy[i]
 			}
-			signal.line.index <- unique(signal.line.index)
+		}
+
+		pvalueT <- as.matrix(Pmap[,-c(1:2)])
+
+		if(LOG10){
+			pvalueT[pvalueT <= 0] <- 1
+			pvalueT[pvalueT > 1] <- 1
+		}
+
+		#set the colors for the plot
+		#palette(heat.colors(1024)) #(heatmap)
+		#T=floor(1024/max(pvalue))
+		#plot(pvalue,pch=19,cex=0.6,col=(1024-floor(pvalue*T)))
+		if(is.vector(col)){
+			col <- matrix(col,R,length(col),byrow=T)
+		}
+		if(is.matrix(col)){
+			#try to transform the colors into matrix for all traits
+			col <- matrix(as.vector(t(col)),R,dim(col)[2],byrow=T)
+		}
+
+		Num <- as.numeric(table(Pmap[,1]))
+		Nchr <- length(Num)
+		N <- NULL
+
+		#set the colors for each traits
+		for(i in 1:R){
+			colx <- col[i,]
+			colx <- colx[!is.na(colx)]
+			N[i] <- ceiling(Nchr/length(colx))
+		}
+
+		#scale the space parameter between chromosomes
+		if(!missing(band)){
+			band <- floor(band*(dim(pvalueT)[1]/100))
+		}else{
+			band <- floor(dim(pvalueT)[1]/100)
+		}
+
+		#insert the space into chromosomes and return the midpoint of each chromosome
+		ticks <- NULL
+		NewP <- NULL
+		for(j in 1:R){
+			pvalue <- pvalueT[,j]
+			for(i in 0:(Nchr-1)){
+				if (i==0){
+					pvalue <- append(pvalue,rep(Inf,band),after=0)
+					ticks[i+1] <- band+floor((Num[i+1])/2)
+				}else{
+					pvalue <- append(pvalue,rep(Inf,band),after=sum(Num[1:i])+i*band)
+					ticks[i+1] <- band*(i+1)+sum(Num[1:i])+floor((Num[i+1])/2)
+				}
+			}
+			NewP[[j]] <- pvalue
+		}
+
+		#merge the pvalues of traits by column
+		pvalueT <- do.call(cbind,NewP)
+		if(LOG10 == TRUE){
+			logpvalueT <- -log10(pvalueT)
+		}else{
+			pvalueT <- abs(pvalueT)
+			logpvalueT <- pvalueT
+		}
+
+		Num <- Num+band
+		add <- list()
+		for(i in 1:R){
+			colx <- col[i,]
+			colx <- colx[!is.na(colx)]
+			add[[i]] <- c(Num,rep(0,N[i]*length(colx)-Nchr))
+		}
+
+		TotalN1 <- nrow(pvalueT)
+		TotalN <- TotalN1
+
+		signal.line.index <- NULL
+		if(!is.null(threshold)){
+			if(!is.null(signal.line)){
+				for(l in 1:R){
+					signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min(threshold)/nrow(pvalueT)))
+				}
+				signal.line.index <- unique(signal.line.index)
+			}
 		}
 	}
-
 	#plot circle Manhattan
 	if("c" %in% plot.type){
 		#print("Starting Circular-Manhattan plot!",quote=F)
