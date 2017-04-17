@@ -1,4 +1,4 @@
-CMplot v3.2.0
+CMplot v3.2.0 [![](https://img.shields.io/github/issues-raw/badges/shields/website.svg](https://github.com/YinLiLin/R-CMplot/issues) [![](https://img.shields.io/chrome-web-store/stars/nimelepbpejjlbmoobocpfnjhihnpked.svg)](https://cran.r-project.org/web/packages/CMplot/)
 =========
 
 ## A high-quality drawing tool designed for genome-wide association study
