@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="84"
+   height="20"
+   version="1.1"
+   id="svg3706"
+   sodipodi:docname="free-programming-books-zh_CN (1).svg"
+   inkscape:version="0.92.1 r15371">
+  <metadata
+     id="metadata3712">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3710" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
+     id="namedview3708"
+     showgrid="false"
+     inkscape:zoom="4.7738095"
+     inkscape:cx="42"
+     inkscape:cy="10"
+     inkscape:window-x="463"
+     inkscape:window-y="81"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg3706" />
+  <linearGradient
+     id="b"
+     x2="0"
+     y2="100%">
+    <stop
+       offset="0"
+       stop-color="#bbb"
+       stop-opacity=".1"
+       id="stop3680" />
+    <stop
+       offset="1"
+       stop-opacity=".1"
+       id="stop3682" />
+  </linearGradient>
+  <clipPath
+     id="a">
+    <rect
+       width="84"
+       height="20"
+       rx="3"
+       fill="#fff"
+       id="rect3685" />
+  </clipPath>
+  <g
+     clip-path="url(#a)"
+     id="g3694">
+    <path
+       fill="#555"
+       d="M0 0h49v20H0z"
+       id="path3688" />
+    <path
+       fill="#007ec6"
+       d="M49 0h35v20H49z"
+       id="path3690" />
+    <path
+       fill="url(#b)"
+       d="M0 0h84v20H0z"
+       id="path3692" />
+  </g>
+</svg>
