@@ -91,7 +91,7 @@ CMplot <- function(
 		maxbin.num <- NULL
 		for(i in 1 : length(chr.num)){
 			pos.x[[i]] <- pos[which(chr == chr.num[i])]
-			cut.len <- round((max(pos.x[[i]]) - min(pos.x[[i]])) / bin)
+			cut.len <- ceiling((max(pos.x[[i]]) - min(pos.x[[i]])) / bin)
 			if(cut.len <= 1){
 				col.index[[i]] = 1
 			}else{
@@ -684,14 +684,14 @@ CMplot <- function(
 					}
 					if(is.null(ylim)){
 						if(Max>1){
-							#print(seq(0,(Max+1),round((Max+1)/10)))
-							axis(2,at=seq(0,(Max+1),round((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),round((Max+1)/10)))
+							#print(seq(0,(Max+1),ceiling((Max+1)/10)))
+							axis(2,at=seq(0,(Max+1),ceiling((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),ceiling((Max+1)/10)))
 						}else{
 							axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
 						}
 					}else{
 						if(ylim[2]>1){
-							axis(2,at=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)))
+							axis(2,at=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)))
 						}else{
 							axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
 						}
@@ -798,13 +798,13 @@ CMplot <- function(
 				if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=1.5)
 				if(is.null(ylim)){
 					if(Max>1){
-						axis(2,at=seq(0,(Max+1),round((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),round((Max+1)/10)))
+						axis(2,at=seq(0,(Max+1),ceiling((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),ceiling((Max+1)/10)))
 					}else{
 						axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
 					}
 				}else{
 					if(ylim[2]>1){
-						axis(2,at=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),round((ylim[2]+1)/10)))
+						axis(2,at=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]+1),ceiling((ylim[2]+1)/10)))
 					}else{
 						axis(2,at=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2]+10^(-ceiling(-log10(ylim[2]))),10^(-ceiling(-log10(ylim[2])))))
 					}
