@@ -918,22 +918,22 @@ CMplot <- function(
 			if(file.output==TRUE) dev.off()
 			if(R > 1){
 				if(file.output==TRUE){
-					if(file=="jpg")	jpeg(paste("Multraits.QQplot.",taxa[i],".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
-					if(file=="pdf")	pdf(paste("Multraits.QQplot.",taxa[i],".pdf",sep=""), width = 5.5,height=5.5)
-					if(file=="tiff")	tiff(paste("Multraits.QQplot.",taxa[i],".tiff",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi)
+					if(file=="jpg")	jpeg(paste("Multraits.QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
+					if(file=="pdf")	pdf(paste("Multraits.QQplot.",paste(taxa,collapse="."),".pdf",sep=""), width = 5.5,height=5.5)
+					if(file=="tiff")	tiff(paste("Multraits.QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi)
 					par(mar = c(5,5,4,2))
 				}else{
 					dev.new(width = 5.5, height = 5.5)
 				}
 				p_value_quantiles=(1:nrow(Pmap))/(nrow(Pmap)+1)
 				log.Quantiles <- -log10(p_value_quantiles)
-				plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,-log10(min(Pmap[,3:(R+2)]))),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
+				plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,-log10(min(Pmap[Pmap[,3:(R+2)] != 0]))),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
 				for(i in 1:R){
 					print(paste("Multraits_QQ Plotting ",taxa[i],"...",sep=""))
 					P.values=as.numeric(Pmap[,i+2])
 					P.values=P.values[!is.na(P.values)]
 					if(LOG10==TRUE){
-						P.values=P.values[P.values>0]
+						P.values=P.values[P.values>=0]
 						P.values=P.values[P.values<=1]
 						N=length(P.values)
 						P.values=P.values[order(P.values)]
