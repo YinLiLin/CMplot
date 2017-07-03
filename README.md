@@ -19,8 +19,29 @@ There are two example datasets attached in **CMplot**, users can export and view
 ```r
 data(pig60K)   #calculated p-values by MLM
 data(cattle50K)   #calculated SNP effects by rrblup
-head(pig60K)
-head(cattle50K)
+
+> `head(pig60K)`
+
+|SNP |Chromosome| Position  |  trait1   |  trait2   |  trait3|
+|:---: |:---:| :---:  | :---:  | :---:  | :---:|
+|ALGA0000009 |1|52297 |0.7738187| 0.51194318| 0.51194318|
+|ALGA0000014|1| 79763| 0.7738187 |0.51194318 |0.51194318|
+|ALGA0000021|1 |  209568| 0.7583016 |0.98405289 |0.98405289|
+|ALGA0000022|1  | 292758 |0.7200305 |0.48887140|0.48887140|
+|ALGA0000046|1 |  747831 |0.9736840 |0.22096836| 0.22096836|
+|ALGA0000047|1 |  761957 |0.9174565 |0.05753712| 0.05753712|
+
+> `head(cattle50K)`
+
+|SNP| chr  |  pos |Somatic cell score | Milk yield| Fat percentage|
+|:---:|:---: |:---:|:---:|:---:|:---:|
+| SNP1| 1 | 59082  | 0.000244361 |0.000484255  |  0.001379210|
+|SNP2| 1 |118164 |  0.000532272| 0.000039800  |  0.000598951|
+| SNP3 | 1| 177246  |  0.001633058 |0.000311645 |   0.000279427|
+|SNP4 | 1 |236328  |  0.001412865 |0.000909370  |  0.001040161|
+|SNP5 | 1 |295410  |   0.000090700 |0.002202973  |  0.000351394|
+| SNP6 | 1 |354493  | 0.000110681| 0.000342628  |  0.000105792|
+
 ```
 
 Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get the detail function of all parameters.
