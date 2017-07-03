@@ -883,8 +883,7 @@ CMplot <- function(
 				# }else{
 					# plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab =expression(Expected~~-log[10](italic(p))), ylab="", main = taxa[i])
 				# }
-				xn <- ifelse(R == 1, R, R * 2/3)
-				plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis*xn, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab ="", ylab="", main = taxa[i])
+				plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab ="", ylab="", main = taxa[i])
 				#calculate the confidence interval of QQ-plot
 				if(conf.int==TRUE){
 					N1=length(log.Quantiles)
@@ -903,7 +902,7 @@ CMplot <- function(
 				}
 				
 				if(!is.null(threshold.col))	abline(a = 0, b = 1, col = threshold.col[1],lwd=2)
-				points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3]*xn)
+				points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3])
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
 						thre.line=-log10(min(threshold)/N)
@@ -912,11 +911,11 @@ CMplot <- function(
 							if(length(thre.index)!=0){
 							
 								#cover the points that exceed the threshold with the color "white"
-								points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3]*xn)
+								points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
 								if(is.null(signal.col)){
-									points(log.Quantiles[thre.index],log.P.values[thre.index],col = col[1],pch=signal.pch,cex=signal.cex*xn)
+									points(log.Quantiles[thre.index],log.P.values[thre.index],col = col[1],pch=signal.pch,cex=signal.cex)
 								}else{
-									points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col,pch=signal.pch,cex=signal.cex*xn)
+									points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col,pch=signal.pch,cex=signal.cex)
 								}
 							}
 						}
