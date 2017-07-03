@@ -101,7 +101,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 
 ---
 
-### Single_tracks Rectangular-Manhattan plot
+### Single_track Rectangular-Manhattan plot
 
 #### (1) Genome-wide association study(GWAS)
 
@@ -141,7 +141,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 
 ---
 
-### Single_tracks Q-Q plot
+### Single_track Q-Q plot
 
 ```r
 > CMplot(pig60K[,c(1:3,6)],plot.type="q",conf.int=TRUE,conf.int.col="grey",file="jpg",dpi=300)
