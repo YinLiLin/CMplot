@@ -733,7 +733,7 @@ CMplot <- function(
 				if(file=="jpg")	jpeg(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
 				if(file=="pdf")	pdf(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
 				if(file=="tiff")	tiff(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
-				par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,0,3,0),xaxs=xaxs,yaxs=yaxs)
+				par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,0,4,0),xaxs=xaxs,yaxs=yaxs)
 			}
 			if(file.output==FALSE){
 				dev.new(width = 15, height = 6)
@@ -778,18 +778,22 @@ CMplot <- function(
 					}
 					if(Max<=1){
 						plot(logpvalue,pch=pch,cex=cex[2]*R*2/3,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
-							cex.axis=cex.axis*R*2/3,cex.lab=2,font=2,axes=FALSE)
+							cex.axis=cex.axis*R*2/3,cex.lab=2*R*2/3,font=2,axes=FALSE)
 					}else{
 						plot(logpvalue,pch=pch,cex=cex[2]*R*2/3,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=c(0,Max+1),ylab=ylab,
-							cex.axis=cex.axis*R*2/3,cex.lab=2,font=2,axes=FALSE)
+							cex.axis=cex.axis*R*2/3,cex.lab=2*R*2/3,font=2,axes=FALSE)
 					}
 				}else{
 					plot(logpvalue,pch=pch,cex=cex[2]*R*2/3,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,length(logpvalue)+band),ylim=ylim,ylab=ylab,
-						cex.axis=cex.axis*R*2/3,cex.lab=2,font=2,axes=FALSE)
+						cex.axis=cex.axis*R*2/3,cex.lab=2*R*2/3,font=2,axes=FALSE)
 				}
 				
-				#add the names of traits on plot  
-				text(ticks[1],Max,labels=taxa[i],adj=0,font=3,cex=R*2/3)
+				#add the names of traits on plot 
+				if(Max<=1){
+					text(ticks[1],Max+10^(-ceiling(-log10(Max))),labels=taxa[i],adj=0,font=3,cex=R*2/3)
+				}else{
+					text(ticks[1],Max+1,labels=taxa[i],adj=0,font=3,cex=R*2/3)
+				}
 				if(i == R){
 					if(is.null(chr.labels)){
 						axis(1, at=c(0,ticks),cex.axis=cex.axis*R*2/3,font=2,labels=c("Chr",chr.ori))
@@ -836,7 +840,7 @@ CMplot <- function(
 			}
 			
 			#add the labels of X-axis
-			mtext(xlab,side=1,padj=2.5,font=2,cex=R*2/3)
+			#mtext(xlab,side=1,padj=2.5,font=2,cex=R*2/3)
 			if(file.output==TRUE) dev.off()
 			#print("Rectangular-Manhattan has been finished!",quote=F)
 		}
