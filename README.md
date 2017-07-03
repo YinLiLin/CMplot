@@ -161,7 +161,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Multi_QQplot.trait1.trait2.trait3.jpg">
-<img src="Figure/Multi_QQplot.trait1.trait2.trait3.jpg" height="826px" width="330px">
+<img src="Figure/Multi_QQplot.trait1.trait2.trait3.jpg" height="330px" width="826px">
 </a>
 </p>
 
