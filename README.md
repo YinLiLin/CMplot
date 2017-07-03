@@ -8,8 +8,8 @@ CMplot [![](https://img.shields.io/badge/Issues-1%2B-brightgreen.svg)](https://g
 **CMplot** is available on CRAN, so it can be installed with the following R code:
 
 ```r
-install.packages("CMplot")
-library("CMplot")
+> install.packages("CMplot")
+> library("CMplot")
 #(optional)if you want to use the latest version:
 #source("https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/CMplot.r")
 ```
@@ -17,10 +17,10 @@ library("CMplot")
 There are two example datasets attached in **CMplot**, users can export and view the details by following R code:
 
 ```r
-data(pig60K)   #calculated p-values by MLM
-data(cattle50K)   #calculated SNP effects by rrblup
+> data(pig60K)   #calculated p-values by MLM
+> data(cattle50K)   #calculated SNP effects by rrblup
 
-> `head(pig60K)`
+> head(pig60K)
 
           SNP Chromosome Position    trait1     trait2     trait3
 1 ALGA0000009          1    52297 0.7738187 0.51194318 0.51194318
@@ -30,7 +30,7 @@ data(cattle50K)   #calculated SNP effects by rrblup
 5 ALGA0000046          1   747831 0.9736840 0.22096836 0.22096836
 6 ALGA0000047          1   761957 0.9174565 0.05753712 0.05753712
 
-> `head(cattle50K)`
+> head(cattle50K)
 
    SNP chr    pos Somatic cell score  Milk yield Fat percentage
 1 SNP1   1  59082        0.000244361 0.000484255    0.001379210
@@ -41,6 +41,7 @@ data(cattle50K)   #calculated SNP effects by rrblup
 6 SNP6   1 354493        0.000110681 0.000342628    0.000105792
 
 ```
+As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the res of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
 Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get the detail function of all parameters.
 
