@@ -14,6 +14,8 @@ CMplot [![](https://img.shields.io/badge/Issues-1%2B-brightgreen.svg)](https://g
 #source("https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/CMplot.r")
 ```
 
+---
+
 There are two example datasets attached in **CMplot**, users can export and view the details by following R code:
 
 ```r
@@ -43,7 +45,11 @@ There are two example datasets attached in **CMplot**, users can export and view
 ```
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the res of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
 
+---
+
 Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get the detail function of all parameters.
+
+---
 
 ### SNP-density plot
 
@@ -60,6 +66,8 @@ CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",dpi=3
 <img src="Figure/illumilla_60K.jpg" height="460px" width="680px">
 </a>
 </p>
+
+---
 
 ### Circular-Manhattan plot
 
@@ -90,6 +98,8 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 <img src="Figure/Circular-Manhattan.cattle.jpg" height="400px" width="400px">
 </a>
 </p>
+
+---
 
 ### Single_tracks Rectangular-Manhattan plot
 
@@ -125,9 +135,11 @@ CMplot(pig60K,plot.type="m",threshold=0.05,amplify=TRUE,multracks=TRUE,file="jpg
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Multi_Rectangular-Manhattan.trait1.trait2.trait3.jpg">
-<img src="Figure/Rectangular-Manhattan.Fat percentage.jpg" height="900px" width="840px">
+<img src="Figure/Multi_Rectangular-Manhattan.trait1.trait2.trait3.jpg" height="900px" width="840px">
 </a>
 </p>
+
+---
 
 ### Single_tracks Q-Q plot
 
@@ -149,9 +161,11 @@ CMplot(pig60K,plot.type="q",conf.int=TRUE,conf.int.col="grey",multracks=TRUE,fil
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Multi_QQplot.trait1.trait2.trait3.jpg">
-<img src="Figure/QQplot.trait3.jpg" height="826px" width="330px">
+<img src="Figure/Multi_QQplot.trait1.trait2.trait3.jpg" height="826px" width="330px">
 </a>
 </p>
+
+---
 
 ### Contact
 Questions, suggestions, and bug reports are welcome and appreciated.
