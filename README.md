@@ -91,7 +91,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 </a>
 </p>
 
-### Rectangular-Manhattan plot
+### Single_tracks Rectangular-Manhattan plot
 
 #### (1) Genome-wide association study(GWAS)
 
@@ -117,7 +117,19 @@ CMplot(cattle50K,plot.type="m",LOG10=FALSE,ylab="SNP effect",threshold=NULL,file
 </a>
 </p>
 
-### Q-Q plot
+### Multi_tracks Rectangular-Manhattan plot
+
+```r
+CMplot(pig60K,plot.type="m",threshold=0.05,amplify=TRUE,multracks=TRUE,file="jpg",dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Multi_Rectangular-Manhattan.trait1.trait2.trait3.jpg">
+<img src="Figure/Rectangular-Manhattan.Fat percentage.jpg" height="900px" width="840px">
+</a>
+</p>
+
+### Single_tracks Q-Q plot
 
 ```r
 CMplot(pig60K[,c(1:3,6)],plot.type="q",conf.int=TRUE,conf.int.col="grey",file="jpg",dpi=300)
@@ -126,6 +138,18 @@ CMplot(pig60K[,c(1:3,6)],plot.type="q",conf.int=TRUE,conf.int.col="grey",file="j
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/QQplot.trait3.jpg">
 <img src="Figure/QQplot.trait3.jpg" height="400px" width="400px">
+</a>
+</p>
+
+### Multi_tracks Q-Q plot
+
+```r
+CMplot(pig60K,plot.type="q",conf.int=TRUE,conf.int.col="grey",multracks=TRUE,file="jpg",dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Multi_QQplot.trait1.trait2.trait3.jpg">
+<img src="Figure/QQplot.trait3.jpg" height="826px" width="330px">
 </a>
 </p>
 
