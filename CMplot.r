@@ -733,7 +733,7 @@ CMplot <- function(
 				if(file=="jpg")	jpeg(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
 				if(file=="pdf")	pdf(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
 				if(file=="tiff")	tiff(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
-				par(mfcol=c(R,1),mar=c(0, 4+(R-1)*2, 0, 2),oma=c(4,0,4,0),xaxs=xaxs,yaxs=yaxs)
+				par(mfcol=c(R,1),mar=c(0, 6+(R-1)*2, 0, 2),oma=c(4,0,4,0),xaxs=xaxs,yaxs=yaxs)
 			}
 			if(file.output==FALSE){
 				dev.new(width = 15, height = 6)
@@ -791,15 +791,15 @@ CMplot <- function(
 				
 				#add the names of traits on plot 
 				if(Max<=1){
-					text(ticks[1],Max+10^(-ceiling(-log10(Max))),labels=taxa[i],adj=0,font=3,cex=R*1.5)
+					text(ticks[1],Max+10^(-ceiling(-log10(Max))),labels=taxa[i],adj=0,font=3,cex=xn)
 				}else{
-					text(ticks[1],Max+1,labels=taxa[i],adj=0,font=3,cex=R*1.5)
+					text(ticks[1],Max+1,labels=taxa[i],adj=0,font=3,cex=xn)
 				}
 				if(i == R){
 					if(is.null(chr.labels)){
-						axis(1, at=c(0,ticks),cex.axis=cex.axis*xn,font=2,labels=c("Chr",chr.ori))
+						axis(1, at=c(0,ticks),cex.axis=cex.axis*xn,font=2,labels=c("Chr",chr.ori),padj=(xn-1)/2)
 					}else{
-						axis(1, at=c(0,ticks),cex.axis=cex.axis*xn,font=2,labels=c("Chr",chr.labels))
+						axis(1, at=c(0,ticks),cex.axis=cex.axis*xn,font=2,labels=c("Chr",chr.labels),padj=(xn-1)/2)
 					}
 				}
 				if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=xn)
@@ -883,7 +883,8 @@ CMplot <- function(
 				# }else{
 					# plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab =expression(Expected~~-log[10](italic(p))), ylab="", main = taxa[i])
 				# }
-				plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab ="", ylab="", main = taxa[i])
+				xn <- ifelse(R == 1, R, R * 2/3)
+				plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis*xn, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab ="", ylab="", main = taxa[i])
 				#calculate the confidence interval of QQ-plot
 				if(conf.int==TRUE){
 					N1=length(log.Quantiles)
@@ -902,7 +903,7 @@ CMplot <- function(
 				}
 				
 				if(!is.null(threshold.col))	abline(a = 0, b = 1, col = threshold.col[1],lwd=2)
-				points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3])
+				points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3]*xn)
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
 						thre.line=-log10(min(threshold)/N)
@@ -911,11 +912,11 @@ CMplot <- function(
 							if(length(thre.index)!=0){
 							
 								#cover the points that exceed the threshold with the color "white"
-								points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
+								points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3]*xn)
 								if(is.null(signal.col)){
-									points(log.Quantiles[thre.index],log.P.values[thre.index],col = col[1],pch=signal.pch,cex=signal.cex)
+									points(log.Quantiles[thre.index],log.P.values[thre.index],col = col[1],pch=signal.pch,cex=signal.cex*xn)
 								}else{
-									points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col,pch=signal.pch,cex=signal.cex)
+									points(log.Quantiles[thre.index],log.P.values[thre.index],col = signal.col,pch=signal.pch,cex=signal.cex*xn)
 								}
 							}
 						}
