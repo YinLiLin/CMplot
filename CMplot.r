@@ -733,7 +733,7 @@ CMplot <- function(
 				if(file=="jpg")	jpeg(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi,quality = 100)
 				if(file=="pdf")	pdf(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 15,height=6*R)
 				if(file=="tiff")	tiff(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 14*dpi,height=5*dpi*R,res=dpi)
-				par(mfcol=c(R,1),mar=c(1, 5, 1, 2),oma=c(4,0,4,0),xaxs=xaxs,yaxs=yaxs)
+				par(mfcol=c(R,1),mar=c(0, 2*R, 0, 2),oma=c(4,0,4,0),xaxs=xaxs,yaxs=yaxs)
 			}
 			if(file.output==FALSE){
 				dev.new(width = 15, height = 6)
