@@ -43,7 +43,8 @@ There are two example datasets attached in **CMplot**, users can export and view
 6 SNP6   1 354493        0.000110681 0.000342628    0.000105792
 
 ```
-As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the res of columns are the pvalues of GWAS or effects GS/GP for traits,  the number of traits is unlimited.
+As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the res of columns are the pvalues of GWAS or effects of GS/GP for traits,  the number of traits is unlimited.
+Note: if plotting SNP_Density, only the first three columns are needed.
 
 ---
 
