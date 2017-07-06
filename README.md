@@ -55,10 +55,11 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ### SNP-density plot
 
 ```r
-> CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",dpi=300)
+> CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300)
 # users can personally set the windowsize and the max of legend by:
 # bin.size=1e6
 # bin.max=N
+# memo: add a character to the output file name.
 # but the latest version should be sourced.
 ```
 
@@ -77,7 +78,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ```r
 > CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),threshold=c(0.05,0.01),
       cir.chr.h=1,amplify=TRUE,threshold.lty=c(2,1),threshold.col=c("blue","red"),signal.line=1,
-      signal.col="red",file="jpg",dpi=300)
+      signal.col="red",file="jpg",memo="",dpi=300)
 #Note: if signal.line=NULL, the lines that crosse circles won't be added.
 ```
 
@@ -91,7 +92,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 
 ```r
 > CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,chr.labels=paste("Chr",c(1:29),sep=""),
-r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=300)
+r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -107,7 +108,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K[,c(1:3,6)],plot.type="m",threshold=NULL,file="jpg",dpi=300)
+> CMplot(pig60K[,c(1:3,6)],plot.type="m",threshold=NULL,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -119,7 +120,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 #### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
-> CMplot(cattle50K,plot.type="m",LOG10=FALSE,ylab="SNP effect",threshold=NULL,file="jpg",dpi=300)
+> CMplot(cattle50K,plot.type="m",LOG10=FALSE,ylab="SNP effect",threshold=NULL,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -131,7 +132,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 ### Multi_tracks Rectangular-Manhattan plot
 
 ```r
-> CMplot(pig60K,plot.type="m",threshold=0.05,amplify=TRUE,multracks=TRUE,file="jpg",dpi=300)
+> CMplot(pig60K,plot.type="m",threshold=0.05,amplify=TRUE,multracks=TRUE,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -145,7 +146,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 ### Single_track Q-Q plot
 
 ```r
-> CMplot(pig60K[,c(1:3,6)],plot.type="q",conf.int=TRUE,conf.int.col="grey",file="jpg",dpi=300)
+> CMplot(pig60K[,c(1:3,6)],plot.type="q",conf.int=TRUE,conf.int.col="grey",file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -157,7 +158,7 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",dpi=
 ### Multi_tracks Q-Q plot
 
 ```r
-> CMplot(pig60K,plot.type="q",conf.int=TRUE,conf.int.col="grey",multracks=TRUE,file="jpg",dpi=300)
+> CMplot(pig60K,plot.type="q",conf.int=TRUE,conf.int.col="grey",multracks=TRUE,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
