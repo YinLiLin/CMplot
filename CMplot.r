@@ -40,7 +40,8 @@ CMplot <- function(
 	conf.int.col="grey",
 	file.output=TRUE,
 	file="jpg",
-	dpi=300
+	dpi=300,
+	memo=""
 )
 {	
 
@@ -165,6 +166,9 @@ CMplot <- function(
 	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
 	
 	taxa=colnames(Pmap)[-c(1:3)]
+	if(!is.null(memo) | memo != "")	memo <- paste("_", memo, sep="")
+	if(length(taxa) == 0)	taxa <- "Index"
+	taxa <- paste(taxa, memo, sep="")
 	
 	#SNP-Density plot
 	if("d" %in% plot.type){
