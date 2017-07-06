@@ -1,4 +1,4 @@
-CMplot [![](https://img.shields.io/badge/Issues-1%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![](https://img.shields.io/badge/Release-v3.2.0-blue.svg)](https://cran.r-project.org/web/packages/CMplot/)
+CMplot [![](https://img.shields.io/badge/Issues-1%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![](https://img.shields.io/badge/Release-v3.2.1-blue.svg)](https://cran.r-project.org/web/packages/CMplot/)
 =========
 
 ## A high-quality drawing tool designed for genome-wide association study
