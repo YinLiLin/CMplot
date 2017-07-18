@@ -51,7 +51,10 @@ Note: if plotting SNP_Density, only the first three columns are needed.
 Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get the detail function of all parameters.
 
 ---
+### Citation
+(waiting for updating...)
 
+---
 ### SNP-density plot
 
 ```r
