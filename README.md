@@ -63,7 +63,6 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 # bin.size=1e6
 # bin.max=N
 # memo: add a character to the output file name.
-# but the latest version should be sourced.
 ```
 
 <p align="center">
