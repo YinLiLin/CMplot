@@ -109,7 +109,7 @@ CMplot <- function(
 		}
 		col=colorRampPalette(col)(maxbin.num)
 		for(i in 1 : length(chr.num)){
-			polygon(c(min(pos.x[[i]]), min(pos.x[[i]]), max(pos.x[[i]]), max(pos.x[[i]])), 
+			polygon(c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])), 
 				c(-width/5 - band * (i - length(chr.num) - 1), width/5 - band * (i - length(chr.num) - 1), 
 				width/5 - band * (i - length(chr.num) - 1), -width/5 - band * (i - length(chr.num) - 1)), col="grey", border="grey")
 			if(!is.null(legend.max)){
