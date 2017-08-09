@@ -82,7 +82,12 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 > CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),threshold=c(0.05,0.01),
       cir.chr.h=1,amplify=TRUE,threshold.lty=c(2,1),threshold.col=c("blue","red"),signal.line=1,
       signal.col="red",file="jpg",memo="",dpi=300)
-#Note: if signal.line=NULL, the lines that crosse circles won't be added.
+#Note:
+1. if signal.line=NULL, the lines that crosse circles won't be added.
+2. By default, CMplot uses the Bonferroni adjustmeant to get the significant level, 
+so if "threshold=c(0.05, 0.01)", CMplot will daw the significant lines at -log10(0.05/n) 
+and -log10(0.01/n) of y axis(n is the number of SNPs). if users want to set assigned levels, 
+for example 0.001, it could be achieved by using "threshold=0.001 * n".
 ```
 
 <p align="center">
