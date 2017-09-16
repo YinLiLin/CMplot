@@ -63,7 +63,8 @@ CMplot <- function(
 		legend.max=NULL,
 		legend.pt.cex=3,
 		legend.cex=1,
-		legend.y.intersp=1
+		legend.y.intersp=1,
+		legend.x.intersp=1
 	)
 	{
 		map <- as.matrix(map)
@@ -86,7 +87,7 @@ CMplot <- function(
 		pos <- as.numeric(map[, 3])
 		chr.num <- unique(chr)
 		chorm.maxlen <- max(pos)
-		plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/100), ylim=c(0, length(chr.num) * band + band), main=main,axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
+		plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/10), ylim=c(0, length(chr.num) * band + band), main=main,axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
 		pos.x <- list()
 		col.index <- list()
 		maxbin.num <- NULL
@@ -159,8 +160,8 @@ CMplot <- function(
 			}
 		}
 		legend.y.col <- as.numeric(legend.y.col)
-		legend('bottomright', title="", legend=legend.y, pch=15, pt.cex = legend.pt.cex, col=c("grey", col[round(legend.y.col * length(col) / maxbin.num)]),
-			cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=1, yjust=0.5, xjust=0)
+		legend(x=(chorm.maxlen + chorm.maxlen/100), y=( -width/2.5 - band * (i - length(chr.num) - 1)), title="", legend=legend.y, pch=15, pt.cex = legend.pt.cex, col=c("grey", col[round(legend.y.col * length(col) / maxbin.num)]),
+			cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=legend.x.intersp, yjust=0, xjust=0, xpd=TRUE)
 	}
 
 	if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
