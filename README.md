@@ -181,4 +181,5 @@ r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",memo
 Questions, suggestions, and bug reports are welcome and appreciated.
 - **Author:** Lilin Yin
 - **Contact:** ylilin@163.com
+- **QQ group:** 166305848
 - **Institution:** [*Huazhong agricultural university*](http://www.hzau.edu.cn/2014/ch/)
