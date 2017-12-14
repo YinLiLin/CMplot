@@ -80,8 +80,8 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ##### Basic
 
 ```r
-> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,outward=FALSE,
-        cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,outward=FALSE
+        ,cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
