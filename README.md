@@ -164,8 +164,9 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 #### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
-> CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, threshold=0.015, threshold.lty=2, threshold.lwd=1,
-        threshold.col="red", amplify=TRUE, signal.col=NULL,signal.cex=1.5,file="jpg",memo="",dpi=300)
+> CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
+        threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, signal.col=NULL,
+        file="jpg",memo="",dpi=300)
 
 #Note: 
 if signal.col=NULL, the significant SNPs will be plotted with original colors.
@@ -206,24 +207,36 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ### Single_track Q-Q plot
 
 ```r
-> CMplot(pig60K[,c(1:3,6)],plot.type="q",conf.int=TRUE,conf.int.col="grey",file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/QQplot.trait3.jpg">
-<img src="Figure/QQplot.trait3.jpg" height="400px" width="400px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/6.jpg">
+<img src="Figure/6.jpg" height="400px" width="400px">
 </a>
 </p>
 
 ### Multi_tracks Q-Q plot
 
 ```r
-> CMplot(pig60K,plot.type="q",conf.int=TRUE,conf.int.col="grey",multracks=TRUE,file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
+        signal.pch=19,signal.cex=1.5,signal.col="red",conf.int.col="grey",box=FALSE,multracks=
+        TRUE,file="jpg",memo="",dpi=300)
 ```
 
+#### a. all traits in a axes:
+
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Multi_QQplot.trait1.trait2.trait3.jpg">
-<img src="Figure/Multi_QQplot.trait1.trait2.trait3.jpg" height="330px" width="826px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/8.jpg">
+<img src="Figure/8.jpg" height="400px" width="400px">
+</a>
+</p>
+
+#### b. all traits in separated axes:
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
+<img src="Figure/7.jpg" height="330px" width="826px">
 </a>
 </p>
 
