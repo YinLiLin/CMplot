@@ -1,4 +1,4 @@
-CMplot [![](https://img.shields.io/badge/Issues-1%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![](https://img.shields.io/badge/Release-v3.2.1-blue.svg)](https://cran.r-project.org/web/packages/CMplot/)
+CMplot [![](https://img.shields.io/badge/Issues-1%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![](https://img.shields.io/badge/Release-v3.3.0-blue.svg)](https://cran.r-project.org/web/packages/CMplot/)
 =========
 
 ## A high-quality drawing tool designed for genome-wide association study
@@ -79,22 +79,33 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),threshold=c(0.05,0.01),
-      cir.chr.h=1,amplify=TRUE,threshold.lty=c(2,1),threshold.col=c("blue","red"),signal.line=1,
-      signal.col="red",file="jpg",memo="",dpi=300)
-#Note:
-1. if signal.line=NULL, the lines that crosse circles won't be added.
-2. By default, CMplot uses the Bonferroni adjustmeant to get the significant level, 
-   so if "threshold=c(0.05, 0.01)", CMplot will daw the significant lines at -log10(0.05/n) 
-   and -log10(0.01/n) of y axis(n is the number of SNPs). if users want to set assigned levels, 
-   for example 0.001, it could be achieved by using "threshold=0.001 * n".
+> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
+          cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Circular-Manhattan.jpg">
-<img src="Figure/Circular-Manhattan.jpg" height="400px" width="400px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/9.jpg">
+<img src="Figure/9.jpg" height="400px" width="400px">
 </a>
 </p>
+
+```r
+CMplot(pig60K,plot.type="c",r=0.4,outward=FALSE,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
+threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red","blue"),signal.line=1,
+      signal.col=c("red","green"),cir.chr.col=c("darkgreen", "yellow", "red"),bin.size=1e6,file="jpg",memo="",dpi=300)
+
+#Note:
+1. if signal.line=NULL, the lines that crosse circles won't be added.
+2. if the length of parameter 'cir.chr.col' is not equal to 1, SNP density that counts the number of
+   SNP within given size('bin.size') will be plotted around the circle.
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/10.jpg">
+<img src="Figure/10.jpg" height="400px" width="400px">
+</a>
+</p>
+
 
 #### (2) Genomic Selection/Prediction(GS/GP)
 
