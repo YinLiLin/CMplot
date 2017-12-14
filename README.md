@@ -77,8 +77,6 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 
 #### (1) Genome-wide association study(GWAS)
 
-##### Basic
-
 ```r
 > CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,outward=FALSE
         ,cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
@@ -90,10 +88,8 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 </a>
 </p>
 
-##### Advanced
-
 ```r
-CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
+> CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),cir.chr.col=c("darkgreen","yellow","red"),
       outward=FALSE,bin.size=1e6,file="jpg",memo="",dpi=300)
@@ -135,8 +131,6 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 
 #### (1) Genome-wide association study(GWAS)
 
-##### Basic
-
 ```r
 > CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,file="jpg",memo="",dpi=300)
 ```
@@ -146,8 +140,6 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 <img src="Figure/1.jpg" height="300px" width="900px">
 </a>
 </p>
-
-##### Advanced
 
 ```r
 > CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
@@ -236,7 +228,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
-<img src="Figure/7.jpg" height="450px" width="650px">
+<img src="Figure/7.jpg" height="450px" width="680px">
 </a>
 </p>
 
