@@ -1245,14 +1245,6 @@ CMplot <- function(
 				}else{
 					log.P.values <- P.values
 				}
-				# if(i == 1){
-					# plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = taxa[i])
-				# }else{
-					# plot(NULL, xlim = c(0,max(log.Quantiles)), cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,max(log.P.values)),xlab =expression(Expected~~-log[10](italic(p))), ylab="", main = taxa[i])
-				# }
-				plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,floor(max(log.P.values)+1)),xlab ="", ylab="", main = taxa[i])
-				axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
-				axis(2, at=seq(0,floor(max(log.P.values)+1),ceiling((max(log.P.values)+1)/10)), labels=seq(0,floor(max(log.P.values)+1),ceiling((max(log.P.values)+1)/10)), cex.axis=cex.axis)
 				
 				#calculate the confidence interval of QQ-plot
 				if(conf.int){
@@ -1266,10 +1258,18 @@ CMplot <- function(
 						c05[j] <- qbeta(0.05,xi,N-xi+1)
 					}
 					index=length(c95):1
-					
-					#plot the confidence interval of QQ-plot
-					polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
+				}else{
+					c05 <- 1
+					c95 <- 1
 				}
+				
+				YlimMax <- max(floor(max(max(-log10(c05)), max(-log10(c95)))+1), floor(max(log.P.values)+1))
+				plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,YlimMax),xlab ="", ylab="", main = taxa[i])
+				axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
+				axis(2, at=seq(0,YlimMax,ceiling(YlimMax/10)), labels=seq(0,YlimMax,ceiling(YlimMax/10)), cex.axis=cex.axis)
+				
+				#plot the confidence interval of QQ-plot
+				if(conf.int)	polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
 				
 				if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
 				points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3])
@@ -1307,12 +1307,32 @@ CMplot <- function(
 				}
 				p_value_quantiles=(1:nrow(Pmap))/(nrow(Pmap)+1)
 				log.Quantiles <- -log10(p_value_quantiles)
+											
+				# calculate the confidence interval of QQ-plot
+				if((i == 1) & conf.int){
+					N1=length(log.Quantiles)
+					c95 <- rep(NA,N1)
+					c05 <- rep(NA,N1)
+					for(j in 1:N1){
+						xi=ceiling((10^-log.Quantiles[j])*N)
+						if(xi==0)xi=1
+						c95[j] <- qbeta(0.95,xi,N-xi+1)
+						c05[j] <- qbeta(0.05,xi,N-xi+1)
+					}
+					index=length(c95):1
+				}
+				
+				if(!conf.int){c05 <- 1; c95 <- 1}
+				
 				Pmap.min <- Pmap[,3:(R+2)]
-				YlimMax <- -log10(min(Pmap.min[Pmap.min > 0]))
+				YlimMax <- max(floor(max(max(-log10(c05)), max(-log10(c95)))+1), -log10(min(Pmap.min[Pmap.min > 0])))
 				plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
 				legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
 				axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
 				axis(2, at=seq(0,floor(YlimMax+1),ceiling((YlimMax+1)/10)), labels=seq(0,floor((YlimMax+1)),ceiling((YlimMax+1)/10)), cex.axis=cex.axis)
+				
+				# plot the confidence interval of QQ-plot
+				if(conf.int)	polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
 				
 				for(i in 1:R){
 					print(paste("Multraits_QQ Plotting ",taxa[i],"...",sep=""))
@@ -1332,23 +1352,7 @@ CMplot <- function(
 					}else{
 						log.P.values <- P.values
 					}
-							
-					# calculate the confidence interval of QQ-plot
-					if((i == 1) & conf.int){
-						N1=length(log.Quantiles)
-						c95 <- rep(NA,N1)
-						c05 <- rep(NA,N1)
-						for(j in 1:N1){
-							xi=ceiling((10^-log.Quantiles[j])*N)
-							if(xi==0)xi=1
-							c95[j] <- qbeta(0.95,xi,N-xi+1)
-							c05[j] <- qbeta(0.05,xi,N-xi+1)
-						}
-						index=length(c95):1
-							
-						# plot the confidence interval of QQ-plot
-						polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
-					}
+
 						
 					if((i == 1) & !is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
 					points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
@@ -1405,9 +1409,6 @@ CMplot <- function(
 				}else{
 					log.P.values <- P.values
 				}
-				plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,floor(max(log.P.values)+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = paste("QQplot of",taxa[i]))
-				axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
-				axis(2, at=seq(0,floor(max(log.P.values)+1),ceiling((max(log.P.values)+1)/10)), labels=seq(0,floor(max(log.P.values)+1),ceiling((max(log.P.values)+1)/10)), cex.axis=cex.axis)
 				
 				#calculate the confidence interval of QQ-plot
 				if(conf.int){
@@ -1421,10 +1422,17 @@ CMplot <- function(
 						c05[j] <- qbeta(0.05,xi,N-xi+1)
 					}
 					index=length(c95):1
-					
-					#plot the confidence interval of QQ-plot
-					polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
+				}else{
+					c05 <- 1
+					c95 <- 1
 				}
+				YlimMax <- max(floor(max(max(-log10(c05)), max(-log10(c95)))+1), floor(max(log.P.values)+1))
+				plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0,YlimMax),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = paste("QQplot of",taxa[i]))
+				axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
+				axis(2, at=seq(0,YlimMax,ceiling(YlimMax/10)), labels=seq(0,YlimMax,ceiling(YlimMax/10)), cex.axis=cex.axis)
+				
+				#plot the confidence interval of QQ-plot
+				if(conf.int)	polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
 				
 				if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
 				points(log.Quantiles, log.P.values, col = col[1],pch=19,cex=cex[3])
@@ -1452,4 +1460,3 @@ CMplot <- function(
 			}
 		}
 	}
-}
