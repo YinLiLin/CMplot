@@ -212,7 +212,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/6.jpg">
-<img src="Figure/6.jpg" height="400px" width="400px">
+<img src="Figure/6.jpg" height="450px" width="450px">
 </a>
 </p>
 
@@ -228,7 +228,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/8.jpg">
-<img src="Figure/8.jpg" height="400px" width="400px">
+<img src="Figure/8.jpg" height="450px" width="450px">
 </a>
 </p>
 
@@ -236,7 +236,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
-<img src="Figure/7.jpg" height="330px" width="826px">
+<img src="Figure/7.jpg" height="450px" width="550px">
 </a>
 </p>
 
