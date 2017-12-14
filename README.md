@@ -80,7 +80,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 
 ```r
 > CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
-          cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
+        cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -90,19 +90,20 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 </p>
 
 ```r
-CMplot(pig60K,plot.type="c",r=0.4,outward=FALSE,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
-threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red","blue"),signal.line=1,
-      signal.col=c("red","green"),cir.chr.col=c("darkgreen", "yellow", "red"),bin.size=1e6,file="jpg",memo="",dpi=300)
+CMplot(pig60K,plot.type="c",r=0.4,outward=FALSE,col=c("grey30","grey60"),chr.labels=paste("Chr",
+      c(1:18,"X"),sep=""),threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),
+      threshold.col=c("red","blue"),signal.line=1,signal.col=c("red","green"),cir.chr.col=
+      c("darkgreen","yellow", "red"),bin.size=1e6,file="jpg",memo="",dpi=300)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
-2. if the length of parameter 'cir.chr.col' is not equal to 1, SNP density that counts the number of
-   SNP within given size('bin.size') will be plotted around the circle.
+2. if the length of parameter 'cir.chr.col' is not equal to 1, SNP density that counts 
+   the number ofSNP within given size('bin.size') will be plotted around the circle.
 ```
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/10.jpg">
-<img src="Figure/10.jpg" height="400px" width="400px">
+<img src="Figure/10.jpg" height="453px" width="400px">
 </a>
 </p>
 
