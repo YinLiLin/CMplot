@@ -21,7 +21,6 @@ There are two example datasets attached in **CMplot**, users can export and view
 ```r
 > data(pig60K)   #calculated p-values by MLM
 > data(cattle50K)   #calculated SNP effects by rrblup
-
 > head(pig60K)
 
           SNP Chromosome Position    trait1     trait2     trait3
@@ -136,37 +135,68 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 
 #### (1) Genome-wide association study(GWAS)
 
+##### Basic
+
 ```r
-> CMplot(pig60K[,c(1:3,6)],plot.type="m",threshold=NULL,file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Rectangular-Manhattan.trait3.jpg">
-<img src="Figure/Rectangular-Manhattan.trait3.jpg" height="300px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/1.jpg">
+<img src="Figure/1.jpg" height="300px" width="900px">
+</a>
+</p>
+
+##### Advanced
+
+```r
+> CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
+        threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+        signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
+<img src="Figure/2.jpg" height="300px" width="900px">
 </a>
 </p>
 
 #### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
-> CMplot(cattle50K,plot.type="m",LOG10=FALSE,ylab="SNP effect",threshold=NULL,file="jpg",memo="",dpi=300)
+> CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, threshold=0.015, threshold.lty=2, threshold.lwd=1,
+        threshold.col="red", amplify=TRUE, signal.col=NULL,signal.cex=1.5,file="jpg",memo="",dpi=300)
+
+#Note: 
+if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Rectangular-Manhattan.Fat percentage.jpg">
-<img src="Figure/Rectangular-Manhattan.Fat percentage.jpg" height="300px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/3.jpg">
+<img src="Figure/3.jpg" height="300px" width="900px">
 </a>
 </p>
 
 ### Multi_tracks Rectangular-Manhattan plot
 
 ```r
-> CMplot(pig60K,plot.type="m",threshold=0.05,amplify=TRUE,multracks=TRUE,file="jpg",memo="",dpi=300)
+> CMplot(pig60K, plot.type="m", multracks=TRUE, col=c("orange", "blue", "darkgreen"), threshold=c(1e-6,1e-4),                           threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+        signal.col=c("red","green"),signal.cex=c(1,1),file="jpg",memo="",dpi=300)
 ```
 
+#### a. all traits in a axes:
+
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Multi_Rectangular-Manhattan.trait1.trait2.trait3.jpg">
-<img src="Figure/Multi_Rectangular-Manhattan.trait1.trait2.trait3.jpg" height="900px" width="840px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
+<img src="Figure/4.jpg" height="300px" width="900px">
+</a>
+</p>
+
+#### b. all traits in separated axes:
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
+<img src="Figure/5.jpg" height="900px" width="840px">
 </a>
 </p>
 
