@@ -78,6 +78,8 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 
 #### (1) Genome-wide association study(GWAS)
 
+##### Basic
+
 ```r
 > CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
         cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
@@ -88,6 +90,8 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 <img src="Figure/9.jpg" height="400px" width="400px">
 </a>
 </p>
+
+##### Advanced
 
 ```r
 CMplot(pig60K,plot.type="c",r=0.4,outward=FALSE,col=c("grey30","grey60"),chr.labels=paste("Chr",
@@ -103,7 +107,7 @@ CMplot(pig60K,plot.type="c",r=0.4,outward=FALSE,col=c("grey30","grey60"),chr.lab
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/10.jpg">
-<img src="Figure/10.jpg" height="453px" width="400px">
+<img src="Figure/10.jpg" height="400px" width="453px">
 </a>
 </p>
 
