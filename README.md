@@ -180,8 +180,8 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ### Multi_tracks Rectangular-Manhattan plot
 
 ```r
-> CMplot(pig60K, plot.type="m", multracks=TRUE, col=c("orange", "blue", "darkgreen"), threshold=c(1e-6,1e-4),
-        threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+> CMplot(pig60K, plot.type="m", multracks=TRUE, col=c("orange", "blue", "darkgreen"), threshold=c(1e-6,
+        1e-4),threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         signal.col=c("red","green"),signal.cex=c(1,1),file="jpg",memo="",dpi=300)
 ```
 
