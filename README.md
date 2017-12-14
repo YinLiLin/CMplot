@@ -236,7 +236,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
-<img src="Figure/7.jpg" height="450px" width="550px">
+<img src="Figure/7.jpg" height="450px" width="650px">
 </a>
 </p>
 
