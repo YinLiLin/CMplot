@@ -94,10 +94,10 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ##### Advanced
 
 ```r
-CMplot(pig60K,plot.type="c",r=0.4,outward=FALSE,col=c("grey30","grey60"),chr.labels=paste("Chr",
-      c(1:18,"X"),sep=""),threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),
-      threshold.col=c("red","blue"),signal.line=1,signal.col=c("red","green"),cir.chr.col=
-      c("darkgreen","yellow", "red"),bin.size=1e6,file="jpg",memo="",dpi=300)
+CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
+      threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
+      "blue"),signal.line=1,signal.col=c("red","green"),cir.chr.col=c("darkgreen","yellow","red"),
+      bin.size=1e6,file="jpg",memo="",dpi=300)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
@@ -115,13 +115,15 @@ CMplot(pig60K,plot.type="c",r=0.4,outward=FALSE,col=c("grey30","grey60"),chr.lab
 #### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
-> CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,chr.labels=paste("Chr",c(1:29),sep=""),
-r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,file="jpg",memo="",dpi=300)
+> CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("darkgreen",NA,NA,"black","red",
+        NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),chr.labels=paste("Chr",
+        c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,
+        file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/Circular-Manhattan.cattle.jpg">
-<img src="Figure/Circular-Manhattan.cattle.jpg" height="400px" width="400px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/11.jpg">
+<img src="Figure/11.jpg" height="400px" width="400px">
 </a>
 </p>
 
