@@ -82,7 +82,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 
 ```r
 > CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
-        cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
+        outward=FALSE,cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -97,7 +97,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),cir.chr.col=c("darkgreen","yellow","red"),
-      bin.size=1e6,file="jpg",memo="",dpi=300)
+      outward=FALSE,bin.size=1e6,file="jpg",memo="",dpi=300)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
@@ -119,6 +119,9 @@ CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr
         NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),chr.labels=paste("Chr",
         c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,
         file="jpg",memo="",dpi=300)
+        
+#Note: 
+Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
 ```
 
 <p align="center">
