@@ -52,7 +52,6 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ---
 ### Citation
 **waiting for updating...**<br>
-*(Actually no journals ware interested in my work, but it is worth to updata it even if there is only one user)*
 
 ---
 ### SNP-density plot
