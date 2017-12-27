@@ -150,7 +150,7 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
-<img src="Figure/2.jpg" height="300px" width="900px">
+<img src="Figure/2.jpg" height="400px" width="900px">
 </a>
 </p>
 
@@ -167,7 +167,7 @@ if the length of parameter 'chr.den.col' is bigger than 1, SNP density that coun
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
-<img src="Figure/2_2.jpg" height="300px" width="900px">
+<img src="Figure/2_2.jpg" height="400px" width="900px">
 </a>
 </p>
 
