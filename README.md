@@ -111,8 +111,8 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ```r
 > CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("darkgreen",NA,NA,"black","red",
         NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),chr.labels=paste("Chr",
-        c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,
-        file="jpg",memo="",dpi=300,chr.den.col="black")
+        c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,cir.band=1,file="jpg",
+        memo="",dpi=300,chr.den.col="black")
         
 #Note: 
 Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
