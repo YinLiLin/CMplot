@@ -57,7 +57,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ### SNP-density plot
 
 ```r
-> CMplot(pig60K,plot.type="d",col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="d",bin.size=1e6,col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300)
 # users can personally set the windowsize and the max of legend by:
 # bin.size=1e6
 # bin.max=N
@@ -91,7 +91,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 > CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
-      outward=FALSE,bin.size=1e6,file="jpg",memo="",dpi=300)
+      bin.size=1e6,outward=FALSE,bin.size=1e6,file="jpg",memo="",dpi=300)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
@@ -156,8 +156,8 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 ```r
 > CMplot(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
-        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"), signal.cex=c(1,1),
-        signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+        chr.den.col=c("darkgreen", "yellow", "red"),bin.size=1e6,signal.col=c("red","green"),
+        signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -186,8 +186,8 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ### Multi_tracks Rectangular-Manhattan plot
 
 ```r
-> CMplot(pig60K, plot.type="m", multracks=TRUE, col=c("orange", "blue", "darkgreen"), threshold=c(1e-6,
-        1e-4),threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+> CMplot(pig60K, plot.type="m", multracks=TRUE, threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
+        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),signal.cex=c(1,1),
         file="jpg",memo="",dpi=300)
 ```
