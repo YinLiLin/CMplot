@@ -1,4 +1,4 @@
-CMplot [![](https://img.shields.io/badge/Issues-10%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![](https://img.shields.io/badge/Release-v3.3.0-blue.svg)](https://cran.r-project.org/web/packages/CMplot/)
+CMplot [![](https://img.shields.io/badge/Issues-10%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![](https://img.shields.io/badge/Release-v3.3.1-blue.svg)](https://cran.r-project.org/web/packages/CMplot/)
 =========
 
 ## A high-quality drawing tool designed for genome-wide association study
@@ -78,7 +78,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 
 ```r
 > CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,outward=FALSE
-        ,cir.legend.col="black",cir.chr.h=1,cir.chr.col="black",file="jpg",memo="",dpi=300)
+        ,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -90,12 +90,12 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ```r
 > CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
-      "blue"),signal.line=1,signal.col=c("red","green"),cir.chr.col=c("darkgreen","yellow","red"),
+      "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
       outward=FALSE,bin.size=1e6,file="jpg",memo="",dpi=300)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
-2. if the length of parameter 'cir.chr.col' is not equal to 1, SNP density that counts 
+2. if the length of parameter 'chr.den.col' is not equal to 1, SNP density that counts 
    the number ofSNP within given size('bin.size') will be plotted around the circle.
 ```
 
@@ -112,7 +112,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 > CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("darkgreen",NA,NA,"black","red",
         NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),chr.labels=paste("Chr",
         c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.3,cir.legend.cex=0.5,cir.band=1,threshold=NULL,
-        file="jpg",memo="",dpi=300)
+        file="jpg",memo="",dpi=300,chr.den.col="black")
         
 #Note: 
 Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
@@ -131,7 +131,7 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,chr.den.col=NULL,file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -143,7 +143,8 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 ```r
 > CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
         threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
-        signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+        chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),
+        file="jpg",memo="",dpi=300)
 ```
 
 <p align="center">
@@ -152,12 +153,25 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 </a>
 </p>
 
+```r
+> CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
+        threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
+        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"), signal.cex=c(1,1),
+        signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
+<img src="Figure/2_2.jpg" height="300px" width="900px">
+</a>
+</p>
+
 #### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
 > CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
         threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, signal.col=NULL,
-        file="jpg",memo="",dpi=300)
+        chr.den.col=NULL, file="jpg",memo="",dpi=300)
 
 #Note: 
 if signal.col=NULL, the significant SNPs will be plotted with original colors.
@@ -174,7 +188,8 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```r
 > CMplot(pig60K, plot.type="m", multracks=TRUE, col=c("orange", "blue", "darkgreen"), threshold=c(1e-6,
         1e-4),threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
-        signal.col=c("red","green"),signal.cex=c(1,1),file="jpg",memo="",dpi=300)
+        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),signal.cex=c(1,1),
+        file="jpg",memo="",dpi=300)
 ```
 
 #### a. all traits in a axes:
