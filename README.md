@@ -77,8 +77,9 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,outward=FALSE
-        ,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
+        outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
+        memo="",dpi=300)
 ```
 
 <p align="center">
@@ -96,7 +97,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
 2. if the length of parameter 'chr.den.col' is not equal to 1, SNP density that counts 
-   the number ofSNP within given size('bin.size') will be plotted around the circle.
+   the number of SNP within given size('bin.size') will be plotted around the circle.
 ```
 
 <p align="center">
@@ -158,6 +159,10 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=c("darkgreen", "yellow", "red"),bin.size=1e6,signal.col=c("red","green"),
         signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+        
+#Note:
+if the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts 
+   the number of SNP within given size('bin.size') will be plotted.
 ```
 
 <p align="center">
@@ -196,7 +201,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
-<img src="Figure/4.jpg" height="300px" width="900px">
+<img src="Figure/5.jpg" height="300px" width="900px">
 </a>
 </p>
 
@@ -204,7 +209,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
-<img src="Figure/5.jpg" height="900px" width="840px">
+<img src="Figure/4.jpg" height="900px" width="840px">
 </a>
 </p>
 
