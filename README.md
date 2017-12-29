@@ -166,7 +166,7 @@ if the length of parameter 'chr.den.col' is bigger than 1, SNP density that coun
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2.jpg">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_2.jpg">
 <img src="Figure/2_2.jpg" height="330px" width="900px">
 </a>
 </p>
