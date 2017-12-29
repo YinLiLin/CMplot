@@ -904,14 +904,18 @@ CMplot <- function(
 						if(Max>1){
 							#print(seq(0,(Max+1),ceiling((Max+1)/10)))
 							axis(2,at=seq(0,(Max+1),ceiling((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),ceiling((Max+1)/10)))
+							legend.y <- tail(seq(0,(Max+1),ceiling((Max+1)/10)), 1)
 						}else{
 							axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+							legend.y <- tail(seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))), 1)
 						}
 					}else{
 						if(ylim[2]>1){
 							axis(2,at=seq(0,ylim[2],ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]),ceiling((ylim[2])/10)))
+							legend.y <- tail(ylim[2], 1)
 						}else{
 							axis(2,at=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))))
+							legend.y <- tail(ylim[2], 1)
 						}
 					}
 					if(!is.null(threshold)){
@@ -990,9 +994,9 @@ CMplot <- function(
 						)
 						legend(
 							x=max(pvalue.posN),
-							y=1.02*Max,
-							title="", legend=density.list$legend.y, pch=15, pt.cex = 2.2, col=density.list$legend.col,
-							cex=0.6, bty="n",
+							y=legend.y,
+							title="", legend=density.list$legend.y, pch=15, pt.cex = 2.5, col=density.list$legend.col,
+							cex=0.8, bty="n",
 							y.intersp=1,
 							x.intersp=1,
 							yjust=1, xjust=0, xpd=TRUE
@@ -1243,14 +1247,18 @@ CMplot <- function(
 				if(Max>1){
 					#print(seq(0,(Max+1),ceiling((Max+1)/10)))
 					axis(2,at=seq(0,(Max+1),ceiling((Max+1)/10)),cex.axis=cex.axis,font=2,labels=seq(0,(Max+1),ceiling((Max+1)/10)))
+					legend.y <- tail(seq(0,(Max+1),ceiling((Max+1)/10)), 1)
 				}else{
 					axis(2,at=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+					legend.y <- tail(seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))), 1)
 				}
 			}else{
 				if(ylim[2]>1){
 					axis(2,at=seq(0,(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]),ceiling((ylim[2])/10)))
+					legend.y <- tail(ylim[2], 1)
 				}else{
 					axis(2,at=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))))
+					legend.y <- tail(ylim[2], 1)
 				}
 			}
 			do <- TRUE
@@ -1265,7 +1273,7 @@ CMplot <- function(
 					if(length(sam.index[[i]]) < sam.num){
 						plot.index <- sam.index[[i]]
 					}else{
-						plot.index <- sample(sam.index[[i]], sam.num, rep=FALSE)
+						plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
 					}
 					sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
 					logpvalue=logpvalueT[plot.index,i]
@@ -1305,9 +1313,9 @@ CMplot <- function(
 						)
 						legend(
 							x=max(pvalue.posN),
-							y=1.02*Max,
-							title="", legend=density.list$legend.y, pch=15, pt.cex = 2.2, col=density.list$legend.col,
-							cex=0.6, bty="n",
+							y=legend.y,
+							title="", legend=density.list$legend.y, pch=15, pt.cex = 2.5, col=density.list$legend.col,
+							cex=0.8, bty="n",
 							y.intersp=1,
 							x.intersp=1,
 							yjust=1, xjust=0, xpd=TRUE
