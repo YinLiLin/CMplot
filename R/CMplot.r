@@ -1170,7 +1170,7 @@ CMplot <- function(
 				par(mar = c(5,6,4,3),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
 			}
 			if(!file.output){
-				if(is.null(dev.list()))	dev.new(width = 15, height = 6)
+				dev.new(width = 15, height = 6)
 				par(xpd=TRUE)
 			}
 			
@@ -1416,7 +1416,7 @@ CMplot <- function(
 					if(file=="tiff")	tiff(paste("Multraits.QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi)
 					par(mar = c(5,5,4,2),xpd=TRUE)
 				}else{
-					if(is.null(dev.list()))	dev.new(width = 5.5, height = 5.5)
+					dev.new(width = 5.5, height = 5.5)
 					par(xpd=TRUE)
 				}
 				p_value_quantiles=(1:nrow(Pmap))/(nrow(Pmap)+1)
