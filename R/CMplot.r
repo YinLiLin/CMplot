@@ -1573,5 +1573,7 @@ CMplot <- function(
 				if(file.output) dev.off()
 			}
 		}
+		
 	}
+	if(file.output)	print(paste("Plots are stored in: ", getwd(), sep=""))
 }
