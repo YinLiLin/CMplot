@@ -1,5 +1,5 @@
 #Version:3.3.1
-#Data: 2017/12/12
+#Data: 2018/01/01
 #Author: Lilin Yin
 
 CMplot <- function(
@@ -887,10 +887,10 @@ CMplot <- function(
 					}else{
 						Max <- max(ylim)
 						if(cir.density){
-							plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold, max(ylim)),ylab=ylab,
+							plot(pvalue.posN[logpvalue>=min(ylim)],logpvalue[logpvalue>=min(ylim)],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min(ylim)],xlim=c(0,1.01*max(pvalue.posN)),ylim=c(min(ylim)-Max/den.fold, max(ylim)),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 						}else{
-							plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
+							plot(pvalue.posN[logpvalue>=min(ylim)],logpvalue[logpvalue>=min(ylim)],pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min(ylim)],xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main=paste("Manhattan plot of",taxa[i]))
 						}
 					}
@@ -911,10 +911,10 @@ CMplot <- function(
 						}
 					}else{
 						if(ylim[2]>1){
-							axis(2,at=seq(0,ylim[2],ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]),ceiling((ylim[2])/10)))
+							axis(2,at=seq(min(ylim),ylim[2],ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)))
 							legend.y <- tail(ylim[2], 1)
 						}else{
-							axis(2,at=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))))
+							axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))))
 							legend.y <- tail(ylim[2], 1)
 						}
 					}
@@ -977,19 +977,20 @@ CMplot <- function(
 							}
 						}
 					}
+					if(is.null(ylim)){ymin <- 0}else{ymin <- min(ylim)}
 					if(cir.density){
 						for(yll in 1:length(pvalue.posN.list)){
 							polygon(c(min(pvalue.posN.list[[yll]]), min(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]])), 
-								c(-0.5*Max/den.fold, -1.5*Max/den.fold, 
-								-1.5*Max/den.fold, -0.5*Max/den.fold), 
+								c(ymin-0.5*Max/den.fold, ymin-1.5*Max/den.fold, 
+								ymin-1.5*Max/den.fold, ymin-0.5*Max/den.fold), 
 								col="grey", border="grey")
 						}
 						
 						segments(
 							pvalue.posN,
-							-0.5*Max/den.fold,
+							ymin-0.5*Max/den.fold,
 							pvalue.posN,
-							-1.5*Max/den.fold,
+							ymin-1.5*Max/den.fold,
 							col=density.list$den.col, lwd=0.1
 						)
 						legend(
@@ -1071,7 +1072,7 @@ CMplot <- function(
 				}else{
 					xn <- ifelse(R == 1, R, R * 2/3)
 					Max <- max(ylim)
-					plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=ylim,ylab=ylab,
+					plot(pvalue.posN[logpvalue>=min(ylim)],logpvalue[logpvalue>=min(ylim)],pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min(ylim)],xlim=c(0,max(pvalue.posN)+band),ylim=ylim,ylab=ylab,
 						cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 				}
 				
@@ -1097,9 +1098,9 @@ CMplot <- function(
 					}
 				}else{
 					if(ylim[2]>1){
-						axis(2,at=seq(0,(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis*xn,font=2,labels=seq(0,(ylim[2]),ceiling((ylim[2])/10)))
+						axis(2,at=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis*xn,font=2,labels=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)))
 					}else{
-						axis(2,at=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis*xn,font=2,labels=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))))
+						axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis*xn,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))))
 					}
 				}
 				if(!is.null(threshold)){
@@ -1230,7 +1231,7 @@ CMplot <- function(
 			}else{
 				Max <- max(ylim)
 				if(cir.density){
-					plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(-Max/den.fold,Max+1),ylab=ylab,
+					plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(min(ylim)-Max/den.fold,Max+1),ylab=ylab,
 						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
 				}else{
 					plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
@@ -1254,10 +1255,10 @@ CMplot <- function(
 				}
 			}else{
 				if(ylim[2]>1){
-					axis(2,at=seq(0,(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(0,(ylim[2]),ceiling((ylim[2])/10)))
+					axis(2,at=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)))
 					legend.y <- tail(ylim[2], 1)
 				}else{
-					axis(2,at=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(0,ylim[2],10^(-ceiling(-log10(ylim[2])))))
+					axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))))
 					legend.y <- tail(ylim[2], 1)
 				}
 			}
@@ -1277,7 +1278,8 @@ CMplot <- function(
 					}
 					sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
 					logpvalue=logpvalueT[plot.index,i]
-					points(pvalue.posN[plot.index],logpvalue,pch=pch,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
+					if(!is.null(ylim)){indexx <- logpvalue>=min(ylim)}
+					points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
 					#if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))	abline(v=which(pvalueT[,i] < min(threshold)/max(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
 				}
 				if(length(sam.index[[i]]) == 0) do <- FALSE
@@ -1296,19 +1298,20 @@ CMplot <- function(
 					}
 				}
 			}
+			if(is.null(ylim)){ymin <- 0}else{ymin <- min(ylim)}
 			if(cir.density){
 						for(yll in 1:length(pvalue.posN.list)){
 							polygon(c(min(pvalue.posN.list[[yll]]), min(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]])), 
-								c(-0.5*Max/den.fold, -1.5*Max/den.fold, 
-								-1.5*Max/den.fold, -0.5*Max/den.fold), 
+								c(ymin-0.5*Max/den.fold, ymin-1.5*Max/den.fold, 
+								ymin-1.5*Max/den.fold, ymin-0.5*Max/den.fold), 
 								col="grey", border="grey")
 						}
 						
 						segments(
 							pvalue.posN,
-							-0.5*Max/den.fold,
+							ymin-0.5*Max/den.fold,
 							pvalue.posN,
-							-1.5*Max/den.fold,
+							ymin-1.5*Max/den.fold,
 							col=density.list$den.col, lwd=0.1
 						)
 						legend(
@@ -1573,7 +1576,6 @@ CMplot <- function(
 				if(file.output) dev.off()
 			}
 		}
-		
 	}
 	if(file.output)	print(paste("Plots are stored in: ", getwd(), sep=""))
 }
