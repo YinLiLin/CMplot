@@ -142,10 +142,13 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 </p>
 
 ```r
-> CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),
+> CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=c(2,12), threshold=c(1e-6,1e-4),
         threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),
         file="jpg",memo="",dpi=300)
+
+#Note:
+if the ylim is setted, then CMplot will only plot the ponits which among this interval.
 ```
 
 <p align="center">
