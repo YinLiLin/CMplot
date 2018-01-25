@@ -1278,7 +1278,7 @@ CMplot <- function(
 					}
 					sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
 					logpvalue=logpvalueT[plot.index,i]
-					if(!is.null(ylim)){indexx <- logpvalue>=min(ylim)}
+					if(!is.null(ylim)){indexx <- logpvalue>=min(ylim)}else{indexx <- length(logpvalue)}
 					points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
 					#if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))	abline(v=which(pvalueT[,i] < min(threshold)/max(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
 				}
