@@ -99,7 +99,8 @@ CMplot <- function(
 			pos.x[[i]] <- pos[which(chr == chr.num[i])]
 			cut.len <- ceiling((max(pos.x[[i]]) - min(pos.x[[i]])) / bin)
 			if(cut.len <= 1){
-				col.index[[i]] = 1
+				maxbin.num <- length(pos.x[[i]])
+               			col.index[[i]] <- rep(maxbin.num, maxbin.num)
 			}else{
 				cut.r <- cut(pos.x[[i]], cut.len, labels=FALSE)
 				eachbin.num <- table(cut.r)
