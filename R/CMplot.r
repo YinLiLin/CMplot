@@ -134,9 +134,12 @@ CMplot <- function(
 			}
 		}
 		chr.num <- rev(chr.num)
-		if(plot)	mtext(at=seq(band, length(chr.num) * band, band),text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=0.6, line=0.2)
-		if(plot)	axis(3, at=seq(0, chorm.maxlen, length=10), labels=c(NA, paste(round((seq(0, chorm.maxlen, length=10))[-1] / 1e6, 0), "Mb", sep="")),
-			font=1, cex.axis=0.8, tck=0.01, lwd=2, padj=1.2)
+		if(plot){
+			if(max.chr == 0)	mtext(at=seq(band, length(chr.num) * band, band),text=chr.num, side=2, las=2, font=1, cex=cex.axis*0.6, line=0.2)
+			if(max.chr != 0)	mtext(at=seq(band, length(chr.num) * band, band),text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=cex.axis*0.6, line=0.2)
+		}
+		if(plot)	axis(3, at=seq(0, chorm.maxlen, length=10), labels=paste(round((seq(0, chorm.maxlen, length=10)) / 1e6, 0), "Mb", sep=""),
+			font=1, cex.axis=cex.axis*0.8, tck=0.01, lwd=2, padj=1.2)
 		# image(c(chorm.maxlen-chorm.maxlen * legend.width / 20 , chorm.maxlen), 
 		# round(seq(band - width/5, (length(chr.num) * band + band) * legend.height / 2 , length=maxbin.num+1), 2), 
 		# t(matrix(0 : maxbin.num)), col=c("white", rev(heat.colors(maxbin.num))), add=TRUE)
