@@ -73,7 +73,7 @@ CMplot <- function(
 	{
 		map <- as.matrix(map)
 		map <- map[!is.na(map[, 2]), ]
-		map <- map[!is.na(map[, 3]), ]
+		map <- map[!is.na(as.numeric(map[, 3])), ]
 		map <- map[map[, 2] != 0, ]
 		#map <- map[map[, 3] != 0, ]
 		options(warn = -1)
