@@ -1,3 +1,7 @@
+#Version:3.3.2
+#Data: 2018/11/11
+#Author: Lilin Yin
+
 #Version:3.3.1
 #Data: 2018/01/01
 #Author: Lilin Yin
@@ -99,8 +103,8 @@ CMplot <- function(
 			pos.x[[i]] <- pos[which(chr == chr.num[i])]
 			cut.len <- ceiling((max(pos.x[[i]]) - min(pos.x[[i]])) / bin)
 			if(cut.len <= 1){
-				maxbin.num <- length(pos.x[[i]])
-               			col.index[[i]] <- rep(maxbin.num, maxbin.num)
+				maxbin.num <- c(maxbin.num,length(pos.x[[i]]))
+               	col.index[[i]] <- rep(length(pos.x[[i]]), length(pos.x[[i]]))
 			}else{
 				cut.r <- cut(pos.x[[i]], cut.len, labels=FALSE)
 				eachbin.num <- table(cut.r)
@@ -143,6 +147,9 @@ CMplot <- function(
 		# image(c(chorm.maxlen-chorm.maxlen * legend.width / 20 , chorm.maxlen), 
 		# round(seq(band - width/5, (length(chr.num) * band + band) * legend.height / 2 , length=maxbin.num+1), 2), 
 		# t(matrix(0 : maxbin.num)), col=c("white", rev(heat.colors(maxbin.num))), add=TRUE)
+				
+		if(maxbin.num <= legend.len)	legend.len <- maxbin.num		
+		
 		legend.y <- round(seq(0, maxbin.num, length=legend.len))
 		len <- legend.y[2]
 		legend.y <- seq(0, maxbin.num, len)
@@ -375,12 +382,12 @@ CMplot <- function(
 			if(file=="jpg")	jpeg(paste("Circular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = 8*dpi,height=8*dpi,res=dpi,quality = 100)
 			if(file=="pdf")	pdf(paste("Circular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = 10,height=10)
 			if(file=="tiff")	tiff(paste("Circular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = 8*dpi,height=8*dpi,res=dpi)
-		}
-		if(!file.output){
-			if(!is.null(dev.list()))	dev.new(width=8, height=8)
 			par(pty="s", xpd=TRUE, mar=c(1,1,1,1))
 		}
-		par(pty="s", xpd=TRUE, mar=c(1,1,1,1))
+		if(!file.output){
+			if(is.null(dev.list()))	dev.new(width=8, height=8)
+			par(pty="s", xpd=TRUE)
+		}
 		RR <- r+H*R+cir.band*R
 		if(cir.density){
 			plot(NULL,xlim=c(1.05*(-RR-4*cir.chr.h),1.1*(RR+4*cir.chr.h)),ylim=c(1.05*(-RR-4*cir.chr.h),1.1*(RR+4*cir.chr.h)),axes=FALSE,xlab="",ylab="")
@@ -497,7 +504,7 @@ CMplot <- function(
 				#plot the legend for each trait
 				if(cir.legend==TRUE){
 					#try to get the number after radix point
-					if(Max<=1) {
+					if(Max<1) {
 						round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
 					}else{
 						round.n=2
@@ -692,7 +699,7 @@ CMplot <- function(
 				if(cir.legend==TRUE){
 					
 					#try to get the number after radix point
-					if(Max<=1) {
+					if(Max<1) {
 						round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
 					}else{
 						round.n=2
@@ -1175,7 +1182,7 @@ CMplot <- function(
 				par(mar = c(5,6,4,3),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
 			}
 			if(!file.output){
-				dev.new(width = 15, height = 6)
+				if(is.null(dev.list()))	dev.new(width = 15, height = 6)
 				par(xpd=TRUE)
 			}
 			
