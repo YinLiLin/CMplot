@@ -1278,7 +1278,9 @@ CMplot <- function(
 			for(l in 1:R){
 				sam.index[[l]] <- 1:nrow(Pmap)
 			}
-			sam.num <- 1000
+			
+			#change the sample number according to Pmap
+			sam.num <- ceiling(nrow(Pmap)/30)
 			print("Multraits_Rectangular Plotting...")
 			while(do){
 				for(i in 1:R){
