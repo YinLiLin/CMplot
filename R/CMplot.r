@@ -427,7 +427,7 @@ CMplot <- function(
 				Max <- ylim[2]
 				Min <- ylim[1]
 			}
-			Cpvalue <- (H*(logpvalue-Min))/(Max-Min))
+			Cpvalue <- (H*(logpvalue-Min))/(Max-Min)
 			if(outward==TRUE){
 				if(cir.chr==TRUE){
 					
