@@ -1,7 +1,7 @@
 CMplot [![](https://img.shields.io/badge/Issues-50%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![](https://img.shields.io/badge/Release-v3.3.3-red.svg)](https://cran.r-project.org/web/packages/CMplot/)
 =========
 
-## A high-quality drawing tool designed for genome-wide association study
+## A high-quality drawing tool designed for Manhattan plot of genome analyze
 
 ### Installation
 
@@ -44,6 +44,8 @@ There are two example datasets attached in **CMplot**, users can export and view
 ```
 As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the res of columns are the pvalues of GWAS or effects of GS/GP for traits,  the number of traits is unlimited.
 Note: if plotting SNP_Density, only the first three columns are needed.
+
+Now **CMplot** could handle not only Genome-wide association study results, but also SNP effects, Fst, tajima's D and so on.
 
 ---
 
