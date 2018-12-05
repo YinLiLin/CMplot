@@ -1,9 +1,5 @@
-#Version:3.3.2
-#Data: 2018/11/11
-#Author: Lilin Yin
-
-#Version:3.3.1
-#Data: 2018/01/01
+#Version:3.3.3
+#Data: 2018/12/11
 #Author: Lilin Yin
 
 CMplot <- function(
@@ -420,8 +416,9 @@ CMplot <- function(
 					Min <- 0
 				}else{
 					Max <- ceiling(max(pvalue[pvalue!=Inf]))
-					if(Max<=1)	Max <- max(pvalue[pvalue!=Inf])
+					if(abs(Max)<=1)	Max <- max(pvalue[pvalue!=Inf])
 					Min <- floor(min(pvalue[pvalue!=Inf]))
+					if(abs(Min)<=1)	Min <- min(pvalue[pvalue!=Inf])
 				}
 			}else{
 				Max <- ylim[2]
@@ -502,6 +499,10 @@ CMplot <- function(
 
 				}
 				
+				X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN-round(band/2))/TotalN)
+				Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN-round(band/2))/TotalN)
+				points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
+				
 				#plot the legend for each trait
 				if(cir.legend==TRUE){
 					#try to get the number after radix point
@@ -521,14 +522,12 @@ CMplot <- function(
 					circle.plot(myr=r+H*(i-0.25)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					circle.plot(myr=r+H*(i-0)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+					text(-r/15,r+H*(i-0.94)+cir.band*(i-1),round(Min+(Max-Min)*0,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Min+(Max-Min)*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Min+(Max-Min)*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Min+(Max-Min)*0.75,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-					text(-r/15,r+H*(i-0)+cir.band*(i-1),round(Min+(Max-Min)*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.06)+cir.band*(i-1),round(Min+(Max-Min)*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 				}
-				X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN-round(band/2))/TotalN)
-				Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN-round(band/2))/TotalN)
-				points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
 				
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
@@ -696,8 +695,12 @@ CMplot <- function(
 					}
 
 				}
-
-				if(cir.legend==TRUE){
+				
+				X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN-round(band/2))/TotalN)
+				Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN-round(band/2))/TotalN)
+				points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
+				
+								if(cir.legend==TRUE){
 					
 					#try to get the number after radix point
 					if((Max-Min)<=1) {
@@ -716,15 +719,12 @@ CMplot <- function(
 					circle.plot(myr=r+H*(i-0.25)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
 					segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 					circle.plot(myr=r+H*(i-0)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+					text(-r/15,r+H*(i-0.06)+cir.band*(i-1),round(Min+(Max-Min)*0,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Min+(Max-Min)*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Min+(Max-Min)*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 					text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Min+(Max-Min)*0.75,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-					text(-r/15,r+H*(i-1)+cir.band*(i-1),round(Min+(Max-Min)*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+					text(-r/15,r+H*(i-0.94)+cir.band*(i-1),round(Min+(Max-Min)*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
 				}
-				
-				X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN-round(band/2))/TotalN)
-				Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN-round(band/2))/TotalN)
-				points(X,Y,pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]]))
 				
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
@@ -854,17 +854,19 @@ CMplot <- function(
 									Min <- 0
 								}else{
 									Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(threshold))
-									if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
+									if(abs(Max)<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
 									Min <- min(floor(min(pvalue[pvalue!=Inf])),min(threshold))
+									if(abs(Min)<=1)	Min=min(min(pvalue[pvalue!=Inf]),min(threshold))
 								}
 							}else{
 								if(LOG10){
 									Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 									Min<-0
 								}else{
-									Max=max(pvalue[pvalue!=Inf])
-									if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]))
-									Min<-min(pvalue[pvalue!=Inf])
+									Max=ceiling(max(pvalue[pvalue!=Inf]))
+									if(abs(Max)<=1)	Max=max(max(pvalue[pvalue!=Inf]))
+									Min<-floor(min(pvalue[pvalue!=Inf]))
+									if(abs(Min)<=1)	Min=min(pvalue[pvalue!=Inf])
 									# }else{
 										# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 									# }
@@ -875,9 +877,10 @@ CMplot <- function(
 								Max=max(ceiling(-log10(min(pvalue[pvalue!=0]))))
 								Min=0
 							}else{
-								Max=max(pvalue[pvalue!=Inf])
-								if(Max<=1)	Max=max(pvalue[pvalue!=Inf])
-								Min=min(pvalue[pvalue!=Inf])
+								Max=ceiling(max(pvalue[pvalue!=Inf]))
+								if(abs(Max)<=1)	Max=max(pvalue[pvalue!=Inf])
+								Min=floor(min(pvalue[pvalue!=Inf]))
+								if(abs(Min)<=1)	Min=min(pvalue[pvalue!=Inf])
 								# }else{
 									# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 								# }
@@ -885,18 +888,18 @@ CMplot <- function(
 						}
 						if((Max-Min)<=1){
 							if(cir.density){
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max+10^(-ceiling(-log10(abs(Max))))),ylab=ylab,
 									cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 							}else{
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(Min,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(Min,Max+10^(-ceiling(-log10(abs(Max))))),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 							}
 						}else{
 							if(cir.density){
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max+1),ylab=ylab,
+								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,1.01*max(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 							}else{
-								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(Min,Max+1),ylab=ylab,
+								plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)),ylim=c(Min,Max),ylab=ylab,
 								cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 							}
 						}
@@ -911,7 +914,10 @@ CMplot <- function(
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 						}
 					}
-					
+					Max1 <- Max
+					Min1 <- Min
+					if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
+					if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
 					if(is.null(chr.labels)){
 						axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
 					}else{
@@ -919,19 +925,18 @@ CMplot <- function(
 					}
 					if(is.null(ylim)){
 						if((Max-Min)>1){
-							#print(seq(0,(Max+1),ceiling((Max+1)/10)))
-							axis(2,at=seq(Min,(Max+1),ceiling((Max-Min+1)/10)),cex.axis=cex.axis,font=2,labels=seq(Min,(Max+1),ceiling((Max-Min+1)/10)))
-							legend.y <- tail(seq(Min,(Max+1),ceiling((Max-Min+1)/10)), 1)
+							axis(2,at=seq(Min,(Max),ceiling((Max-Min)/10)),cex.axis=cex.axis,font=2,labels=round(seq(Min,(Max),ceiling((Max-Min)/10)), 2))
+							legend.y <- tail(round(seq(Min,(Max),ceiling((Max-Min)/10)), 2), 1)
 						}else{
-							axis(2,at=seq(Min,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(Min,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
-							legend.y <- tail(seq(Min,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))), 1)
+							axis(2,at=seq(Min,Max+10^(-ceiling(-log10(abs(Max)))),10^(-ceiling(-log10(max(abs(c(Max, Min))))))),cex.axis=cex.axis,font=2,labels=seq(Min,Max+10^(-ceiling(-log10(abs(Max)))),10^(-ceiling(-log10(max(abs(c(Max, Min))))))))
+							legend.y <- tail(seq(Min,Max+10^(-ceiling(-log10(abs(Max)))),10^(-ceiling(-log10(max(abs(c(Max, Min))))))), 1)
 						}
 					}else{
 						if(ylim[2]>1){
-							axis(2,at=seq(min(ylim),ylim[2],ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)))
+							axis(2,at=seq(min(ylim),ylim[2],ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=round(seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)), 2))
 							legend.y <- tail(ylim[2], 1)
 						}else{
-							axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))))
+							axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(max(abs(ylim)))))),cex.axis=cex.axis,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(max(abs(ylim)))))))
 							legend.y <- tail(ylim[2], 1)
 						}
 					}
@@ -994,20 +999,20 @@ CMplot <- function(
 							}
 						}
 					}
-					if(is.null(ylim)){ymin <- Min}else{ymin <- min(ylim)}
+					if(is.null(ylim)){ymin <- Min1}else{ymin <- min(ylim)}
 					if(cir.density){
 						for(yll in 1:length(pvalue.posN.list)){
 							polygon(c(min(pvalue.posN.list[[yll]]), min(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]])), 
-								c(ymin-0.5*Max/den.fold, ymin-1.5*Max/den.fold, 
-								ymin-1.5*Max/den.fold, ymin-0.5*Max/den.fold), 
+								c(ymin-0.5*(Max-Min)/den.fold, ymin-1.5*(Max-Min)/den.fold, 
+								ymin-1.5*(Max-Min)/den.fold, ymin-0.5*(Max-Min)/den.fold), 
 								col="grey", border="grey")
 						}
 						
 						segments(
 							pvalue.posN,
-							ymin-0.5*Max/den.fold,
+							ymin-0.5*(Max-Min)/den.fold,
 							pvalue.posN,
-							ymin-1.5*Max/den.fold,
+							ymin-1.5*(Max-Min)/den.fold,
 							col=density.list$den.col, lwd=0.1
 						)
 						legend(
@@ -1053,8 +1058,9 @@ CMplot <- function(
 								Min <- 0
 							}else{
 								Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(threshold))
-								if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
+								if(abs(Max)<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
 								Min<-min(floor(min(pvalue[pvalue!=Inf])),min(threshold))
+								if(abs(Min)<=1)	Min=min(min(pvalue[pvalue!=Inf]),min(threshold))
 							}
 						}else{
 							if(LOG10){
@@ -1062,8 +1068,9 @@ CMplot <- function(
 								Min<-0
 							}else{
 								Max=max(ceiling(max(pvalue[pvalue!=Inf])))
-								if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]))
+								if(abs(Max)<=1)	Max=max(max(pvalue[pvalue!=Inf]))
 								Min=min(floor(min(pvalue[pvalue!=Inf])))
+								if(abs(Min)<=1)	Min=min(min(pvalue[pvalue!=Inf]))
 								# }else{
 									# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 								# }
@@ -1075,8 +1082,9 @@ CMplot <- function(
 							Min=0
 						}else{
 							Max=max(ceiling(max(pvalue[pvalue!=Inf])))
-							if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]))
+							if(abs(Max)<=1)	Max=max(max(pvalue[pvalue!=Inf]))
 							Min <- min(ceiling(min(pvalue[pvalue!=Inf])))
+							if(abs(Min)<=1)	Min=min(min(pvalue[pvalue!=Inf]))
 							# }else{
 								# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 							# }
@@ -1084,22 +1092,27 @@ CMplot <- function(
 					}
 					xn <- ifelse(R == 1, R, R * 2/3)
 					if((Max-Min)<=1){
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(Min,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(Min,Max+10^(-ceiling(-log10(abs(Max))))),ylab=ylab,
 							cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 					}else{
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(Min,Max+1),ylab=ylab,
+						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]]),xlim=c(0,max(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
 							cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 					}
 				}else{
 					xn <- ifelse(R == 1, R, R * 2/3)
 					Max <- max(ylim)
+					Min <- min(ylim)
 					plot(pvalue.posN[logpvalue>=min(ylim)],logpvalue[logpvalue>=min(ylim)],pch=pch,cex=cex[2]*xn,col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min(ylim)],xlim=c(0,max(pvalue.posN)+band),ylim=ylim,ylab=ylab,
 						cex.axis=cex.axis*xn,cex.lab=2*xn,font=2,axes=FALSE)
 				}
+				Max1 <- Max
+				Min1 <- Min
+				if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
+				if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
 				
 				#add the names of traits on plot 
 				if((Max-Min)<=1){
-					text(ticks[1],Max+10^(-ceiling(-log10(Max))),labels=taxa[i],adj=0,font=3,cex=xn)
+					text(ticks[1],Max+10^(-ceiling(-log10(abs(Max)))),labels=taxa[i],adj=0,font=3,cex=xn)
 				}else{
 					text(ticks[1],Max+1,labels=taxa[i],adj=0,font=3,cex=xn)
 				}
@@ -1113,15 +1126,15 @@ CMplot <- function(
 				#if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=xn)
 				if(is.null(ylim)){
 					if((Max-Min)>1){
-						axis(2,at=seq(Min,(Max+1),ceiling((Max-Min+1)/10)),cex.axis=cex.axis*xn,font=2,labels=seq(Min,(Max+1),ceiling((Max-Min+1)/10)))
+						axis(2,at=seq(Min,(Max),ceiling((Max-Min)/10)),cex.axis=cex.axis*xn,font=2,labels=round(seq(Min,(Max),ceiling((Max-Min)/10)), 2))
 					}else{
-						axis(2,at=seq(Min,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis*xn,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
+						axis(2,at=seq(Min,Max+10^(-ceiling(-log10(abs(Max)))),10^(-ceiling(-log10(max(abs(c(Max, Min))))))),cex.axis=cex.axis*xn,font=2,labels=seq(0,Max+10^(-ceiling(-log10(abs(Max)))),10^(-ceiling(-log10(max(abs(c(Max, Min))))))))
 					}
 				}else{
 					if(ylim[2]>1){
-						axis(2,at=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis*xn,font=2,labels=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)))
+						axis(2,at=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis*xn,font=2,labels=round(seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)), 2))
 					}else{
-						axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis*xn,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))))
+						axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(max(abs(ylim)))))),cex.axis=cex.axis*xn,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(max(abs(ylim)))))))
 					}
 				}
 				if(!is.null(threshold)){
@@ -1205,8 +1218,9 @@ CMplot <- function(
 							Min<-0
 						}else{
 							Max=max(ceiling(max(pvalue[pvalue!=Inf])),max(threshold))
-							if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
+							if(abs(Max)<=1)	Max=max(max(pvalue[pvalue!=Inf]),max(threshold))
 							Min <- min(floor(min(pvalue[pvalue!=Inf])),min(threshold))
+							if(abs(Min)<=1)	Min=min(min(pvalue[pvalue!=Inf]),min(threshold))
 						}
 					}else{
 						if(LOG10){
@@ -1214,8 +1228,9 @@ CMplot <- function(
 							Min=0
 						}else{
 							Max=max(ceiling(max(pvalue[pvalue!=Inf])))
-							if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]))
+							if(abs(Max)<=1)	Max=max(max(pvalue[pvalue!=Inf]))
 							Min<- min(floor(min(pvalue[pvalue!=Inf])))
+							if(abs(Min)<=1)	Min=min(min(pvalue[pvalue!=Inf]))
 							# }else{
 								# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 							# }
@@ -1229,8 +1244,10 @@ CMplot <- function(
 						Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 						
 						#{
-						if(Max<=1)	Max=max(max(pvalue[pvalue!=Inf]))
+						if(abs(Max)<=1)	Max=max(max(pvalue[pvalue!=Inf]))
 						Min<- min(floor(min(pvalue[pvalue!=Inf])))
+						if(abs(Min)<=1)	Min=min(min(pvalue[pvalue!=Inf]))
+						
 						# }else{
 							# Max=max(ceiling(max(pvalue[pvalue!=Inf])))
 						# }
@@ -1238,31 +1255,36 @@ CMplot <- function(
 				}
 				if((Max-Min)<=1){
 					if(cir.density){
-						plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+						plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max+10^(-ceiling(-log10(abs(Max))))),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 					}else{
-						plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(Min,Max+10^(-ceiling(-log10(Max)))),ylab=ylab,
+						plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(Min,Max+10^(-ceiling(-log10(abs(Max))))),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 					}
 				}else{
 					if(cir.density){
-						plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max+1),ylab=ylab,
+						plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 					}else{
-						plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(Min,Max+1),ylab=ylab,
+						plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=c(Min,Max),ylab=ylab,
 							cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="")
 					}
 				}
 			}else{
 				Max <- max(ylim)
+				Min <- min(ylim)
 				if(cir.density){
-					plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(min(ylim)-Max/den.fold,Max+1),ylab=ylab,
+					plot(NULL,xlim=c(0,1.01*max(pvalue.posN)),ylim=c(min(ylim)-Max/den.fold,Max),ylab=ylab,
 						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
 				}else{
 					plot(NULL,xlim=c(0,max(pvalue.posN)),ylim=ylim,ylab=ylab,
 						cex.axis=cex.axis,cex.lab=2,font=2,axes=FALSE,xlab=xlab,main="Manhattan plot of")
 				}
 			}
+			Max1 <- Max
+			Min1 <- Min
+			if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
+			if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
 			legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
 			if(is.null(chr.labels)){
 				axis(1, at=c(0,ticks),cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
@@ -1272,18 +1294,18 @@ CMplot <- function(
 			if(is.null(ylim)){
 				if((Max-Min)>1){
 					#print(seq(0,(Max+1),ceiling((Max+1)/10)))
-					axis(2,at=seq(Min,(Max+1),ceiling((Max-Min+1)/10)),cex.axis=cex.axis,font=2,labels=seq(Min,(Max+1),ceiling((Max-Min+1)/10)))
-					legend.y <- tail(seq(0,(Max+1),ceiling((Max+1)/10)), 1)
+					axis(2,at=seq(Min,(Max),ceiling((Max-Min)/10)),cex.axis=cex.axis,font=2,labels=round(seq(Min,(Max),ceiling((Max-Min)/10)),2))
+					legend.y <- tail(round(seq(0,(Max),ceiling((Max)/10)),2), 1)
 				}else{
-					axis(2,at=seq(Min,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))))
-					legend.y <- tail(seq(0,Max+10^(-ceiling(-log10(Max))),10^(-ceiling(-log10(Max)))), 1)
+					axis(2,at=seq(Min,Max+10^(-ceiling(-log10(abs(Max)))),10^(-ceiling(-log10(max(abs(c(Max, Min))))))),cex.axis=cex.axis,font=2,labels=seq(0,Max+10^(-ceiling(-log10(abs(Max)))),10^(-ceiling(-log10(max(abs(c(Max, Min))))))))
+					legend.y <- tail(seq(0,Max+10^(-ceiling(-log10(abs(Max)))),10^(-ceiling(-log10(max(abs(c(Max, Min))))))), 1)
 				}
 			}else{
 				if(ylim[2]>1){
-					axis(2,at=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)))
+					axis(2,at=seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)),cex.axis=cex.axis,font=2,labels=round(seq(min(ylim),(ylim[2]),ceiling((ylim[2])/10)),2))
 					legend.y <- tail(ylim[2], 1)
 				}else{
-					axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))),cex.axis=cex.axis,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(ylim[2])))))
+					axis(2,at=seq(min(ylim),ylim[2],10^(-ceiling(-log10(max(abs(ylim)))))),cex.axis=cex.axis,font=2,labels=seq(min(ylim),ylim[2],10^(-ceiling(-log10(max(abs(ylim)))))))
 					legend.y <- tail(ylim[2], 1)
 				}
 			}
@@ -1325,20 +1347,20 @@ CMplot <- function(
 					}
 				}
 			}
-			if(is.null(ylim)){ymin <- Min}else{ymin <- min(ylim)}
+			if(is.null(ylim)){ymin <- Min1}else{ymin <- min(ylim)}
 			if(cir.density){
 						for(yll in 1:length(pvalue.posN.list)){
 							polygon(c(min(pvalue.posN.list[[yll]]), min(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]]), max(pvalue.posN.list[[yll]])), 
-								c(ymin-0.5*Max/den.fold, ymin-1.5*Max/den.fold, 
-								ymin-1.5*Max/den.fold, ymin-0.5*Max/den.fold), 
+								c(ymin-0.5*(Max-Min)/den.fold, ymin-1.5*(Max-Min)/den.fold, 
+								ymin-1.5*(Max-Min)/den.fold, ymin-0.5*(Max-Min)/den.fold), 
 								col="grey", border="grey")
 						}
 						
 						segments(
 							pvalue.posN,
-							ymin-0.5*Max/den.fold,
+							ymin-0.5*(Max-Min)/den.fold,
 							pvalue.posN,
-							ymin-1.5*Max/den.fold,
+							ymin-1.5*(Max-Min)/den.fold,
 							col=density.list$den.col, lwd=0.1
 						)
 						legend(
