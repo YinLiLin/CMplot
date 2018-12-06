@@ -44,7 +44,8 @@ CMplot <- function(
 	file.output=TRUE,
 	file="jpg",
 	dpi=300,
-	memo=""
+	memo="",
+	verbose=TRUE
 )
 {	
 
@@ -188,7 +189,7 @@ CMplot <- function(
 
 	#SNP-Density plot
 	if("d" %in% plot.type){
-		print("SNP_Density Plotting...")
+		if(verbose)	print("SNP_Density Plotting...")
 		if(file.output){
 			if(file=="jpg")	jpeg(paste("SNP_Density.",paste(taxa,collapse="."),".jpg",sep=""), width = 9*dpi,height=7*dpi,res=dpi,quality = 100)
 			if(file=="pdf")	pdf(paste("SNP_Density.",paste(taxa,collapse="."),".pdf",sep=""), width = 9,height=7)
@@ -407,7 +408,7 @@ CMplot <- function(
 			#debug
 			#print(colx)
 			
-			print(paste("Circular_Manhattan Plotting ",taxa[i],"...",sep=""))
+			if(verbose)	print(paste("Circular_Manhattan Plotting ",taxa[i],"...",sep=""))
 			pvalue <- pvalueT[,i]
 			logpvalue <- logpvalueT[,i]
 			if(is.null(ylim)){
@@ -832,7 +833,7 @@ CMplot <- function(
 			for(i in 1:R){
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
-				print(paste("Rectangular_Manhattan Plotting ",taxa[i],"...",sep=""))
+				if(verbose)	print(paste("Rectangular_Manhattan Plotting ",taxa[i],"...",sep=""))
 					if(file.output){
 						if(file=="jpg")	jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = 14*dpi,height=5*dpi,res=dpi,quality = 100)
 						if(file=="pdf")	pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = 15,height=6)
@@ -1045,7 +1046,7 @@ CMplot <- function(
 				par(xpd=TRUE)
 			}
 			for(i in 1:R){
-				print(paste("Multracks_Rectangular Plotting ",taxa[i],"...",sep=""))
+				if(verbose)	print(paste("Multracks_Rectangular Plotting ",taxa[i],"...",sep=""))
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
 				pvalue=pvalueT[,i]
@@ -1317,7 +1318,7 @@ CMplot <- function(
 			
 			#change the sample number according to Pmap
 			sam.num <- ceiling(nrow(Pmap)/30)
-			print("Multraits_Rectangular Plotting...")
+			if(verbose)	print("Multraits_Rectangular Plotting...")
 			while(do){
 				for(i in 1:R){
 					if(length(sam.index[[i]]) < sam.num){
@@ -1392,7 +1393,7 @@ CMplot <- function(
 				par(xpd=TRUE)
 			}
 			for(i in 1:R){
-				print(paste("Multracks_QQ Plotting ",taxa[i],"...",sep=""))		
+				if(verbose)	print(paste("Multracks_QQ Plotting ",taxa[i],"...",sep=""))		
 				P.values=as.numeric(Pmap[,i+2])
 				P.values=P.values[!is.na(P.values)]
 				if(LOG10){
@@ -1501,7 +1502,7 @@ CMplot <- function(
 				if(conf.int)	polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col,border=conf.int.col)
 				
 				for(i in 1:R){
-					print(paste("Multraits_QQ Plotting ",taxa[i],"...",sep=""))
+					if(verbose)	print(paste("Multraits_QQ Plotting ",taxa[i],"...",sep=""))
 					P.values=as.numeric(Pmap[,i+2])
 					P.values=P.values[!is.na(P.values)]
 					if(LOG10){
@@ -1547,7 +1548,7 @@ CMplot <- function(
 			}
 		}else{
 			for(i in 1:R){
-				print(paste("Q_Q Plotting ",taxa[i],"...",sep=""))
+				if(verbose)	print(paste("Q_Q Plotting ",taxa[i],"...",sep=""))
 				if(file.output){
 					if(file=="jpg")	jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = 5.5*dpi,height=5.5*dpi,res=dpi,quality = 100)
 					if(file=="pdf")	pdf(paste("QQplot.",taxa[i],".pdf",sep=""), width = 5.5,height=5.5)
@@ -1626,5 +1627,5 @@ CMplot <- function(
 			}
 		}
 	}
-	if(file.output)	print(paste("Plots are stored in: ", getwd(), sep=""))
+	if(file.output & verbose)	print(paste("Plots are stored in: ", getwd(), sep=""))
 }
