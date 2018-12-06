@@ -59,7 +59,8 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ### SNP-density plot
 
 ```r
-> CMplot(pig60K,plot.type="d",bin.size=1e6,col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="d",bin.size=1e6,col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300,
+    file.output=TRUE, verbose=TRUE)
 # users can personally set the windowsize and the max of legend by:
 # bin.size=1e6
 # bin.max=N
@@ -81,7 +82,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 ```r
 > CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
         outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
-        memo="",dpi=300)
+        memo="",dpi=300,file.output=TRUE,verbose=TRUE)
 ```
 
 <p align="center">
@@ -94,7 +95,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 > CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
-      bin.size=1e6,outward=FALSE,file="jpg",memo="",dpi=300)
+      bin.size=1e6,outward=FALSE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
@@ -115,7 +116,7 @@ Total 40 parameters are available in **CMplot**, typing ```?CMplot``` can get th
 > CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("#4DAF4A",NA,NA,"dodgerblue4",
          "deepskyblue",NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),
          chr.labels=paste("Chr",c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,
-         cir.band=1,file="jpg", memo="",dpi=300,chr.den.col="black")
+         cir.band=1,file="jpg", memo="",dpi=300,chr.den.col="black",file.output=TRUE,verbose=TRUE)
         
 #Note: 
 Parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
@@ -134,7 +135,8 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,chr.den.col=NULL,file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,chr.den.col=NULL,file="jpg",memo="",dpi=300,
+    ,file.output=TRUE,verbose=TRUE)
 ```
 
 <p align="center">
@@ -147,7 +149,7 @@ Parameter 'col' can be either vector or matrix, if a matrix, each trait can be 
 > CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=c(2,12), threshold=c(1e-6,1e-4),
         threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),
-        file="jpg",memo="",dpi=300)
+        file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
 
 #Note:
 if the ylim is setted, then CMplot will only plot the ponits which among this interval.
@@ -161,9 +163,9 @@ if the ylim is setted, then CMplot will only plot the ponits which among this in
 
 ```r
 > CMplot(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
-        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
-        chr.den.col=c("darkgreen", "yellow", "red"),bin.size=1e6,signal.col=c("red","green"),
-        signal.cex=c(1,1),signal.pch=c(19,19),file="jpg",memo="",dpi=300)
+        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
+        chr.den.col=c("darkgreen", "yellow", "red"),signal.col=c("red","green"),signal.cex=c(1,1),
+        signal.pch=c(19,19),file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
         
 #Note:
 if the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts 
@@ -179,9 +181,9 @@ if the length of parameter 'chr.den.col' is bigger than 1, SNP density that coun
 #### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
-> CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
-        threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, signal.col=NULL,
-        chr.den.col=NULL, file="jpg",memo="",dpi=300)
+> CMplot(cattle50K, plot.type="m", band=0.5, LOG10=FALSE, ylab="SNP effect",threshold=c(-0.015, 0.015),
+        threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=FALSE,
+        chr.den.col=NULL, file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,cex=0.8)
 
 #Note: 
 if signal.col=NULL, the significant SNPs will be plotted with original colors.
@@ -193,13 +195,29 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 </a>
 </p>
 
+```r
+> cattle50K[,4:ncol(cattle50K)] <- apply(cattle50K[,4:ncol(cattle50K)], 2, 
+         function(x) x*sample(c(1,-1), length(x), rep=TRUE))
+> CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="Abs(SNP effect)",threshold=0.015,
+        threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, signal.col=NULL,
+        chr.den.col=NULL, file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
+
+#Note: Positive and negative values are acceptable.
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/PN.jpg">
+<img src="Figure/PN.jpg" height="300px" width="900px">
+</a>
+</p>
+
 ### Multi_tracks Rectangular-Manhattan plot
 
 ```r
 > CMplot(pig60K, plot.type="m", multracks=TRUE, threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),signal.cex=c(1,1),
-        file="jpg",memo="",dpi=300)
+        file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
 ```
 
 #### a. all traits in a axes:
@@ -223,7 +241,8 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ### Single_track Q-Q plot
 
 ```r
-> CMplot(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300)
+> CMplot(pig60K,plot.type="q",conf.int.col=NULL,box=TRUE,file="jpg",memo="",dpi=300,
+    ,file.output=TRUE,verbose=TRUE)
 ```
 
 <p align="center">
@@ -237,7 +256,7 @@ if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```r
 > CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e6,
         signal.pch=19,signal.cex=1.5,signal.col="red",conf.int.col="grey",box=FALSE,multracks=
-        TRUE,file="jpg",memo="",dpi=300)
+        TRUE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
 ```
 
 #### a. all traits in a axes:
@@ -346,6 +365,8 @@ file: a character, users can choose the different output formats of plot, so for
 dpi: a number, the picture element for .jpg and .tiff files. The default is 300.
 
 memo: add a character to the output file name.
+
+verbose: whether print the reminder.
 
 ```
 
