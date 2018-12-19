@@ -1561,7 +1561,7 @@ CMplot <- function(
 				P.values=as.numeric(Pmap[,i+2])
 				P.values=P.values[!is.na(P.values)]
 				if(LOG10){
-					P.values=P.values[P.values>0]
+					P.values=P.values[P.values>=0]
 					P.values=P.values[P.values<=1]
 					N=length(P.values)
 					P.values=P.values[order(P.values)]
