@@ -1479,15 +1479,15 @@ CMplot <- function(
 				log.Quantiles <- -log10(p_value_quantiles)
 											
 				# calculate the confidence interval of QQ-plot
-				if((i == 1) & conf.int){
+				if(conf.int){
 					N1=length(log.Quantiles)
 					c95 <- rep(NA,N1)
 					c05 <- rep(NA,N1)
 					for(j in 1:N1){
-						xi=ceiling((10^-log.Quantiles[j])*N)
+						xi=ceiling((10^-log.Quantiles[j])*N1)
 						if(xi==0)xi=1
-						c95[j] <- qbeta(0.95,xi,N-xi+1)
-						c05[j] <- qbeta(0.05,xi,N-xi+1)
+						c95[j] <- qbeta(0.95,xi,N1-xi+1)
+						c05[j] <- qbeta(0.05,xi,N1-xi+1)
 					}
 					index=length(c95):1
 				}
