@@ -1393,6 +1393,7 @@ CMplot <- function(
 				if(is.null(dev.list()))	dev.new(width = 2.5*R, height = 5.5)
 				par(xpd=TRUE)
 			}
+			log.Quantiles.max <- NULL
 			for(i in 1:R){
 				if(verbose)	print(paste("Multracks_QQ Plotting ",taxa[i],"...",sep=""))		
 				P.values=as.numeric(Pmap[,i+2])
@@ -1408,6 +1409,7 @@ CMplot <- function(
 				}
 				p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
 				log.Quantiles <- -log10(p_value_quantiles)
+				log.Quantiles.max <- c(log.Quantiles.max, max(log.Quantiles))
 				if(LOG10){
 					log.P.values <- -log10(P.values)
 				}else{
@@ -1494,9 +1496,9 @@ CMplot <- function(
 				
 				Pmap.min <- Pmap[,3:(R+2)]
 				YlimMax <- max(floor(max(max(-log10(c05)), max(-log10(c95)))+1), -log10(min(Pmap.min[Pmap.min > 0])))
-				plot(NULL, xlim = c(0,floor(max(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
+				plot(NULL, xlim = c(0,floor(max(log.Quantiles.max)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=1.2,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
 				legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
-				axis(1, at=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), labels=seq(0,floor(max(log.Quantiles)+1),ceiling((max(log.Quantiles)+1)/10)), cex.axis=cex.axis)
+				axis(1, at=seq(0,floor(max(log.Quantiles.max)+1),ceiling((max(log.Quantiles.max)+1)/10)), labels=seq(0,floor(max(log.Quantiles.max)+1),ceiling((max(log.Quantiles.max)+1)/10)), cex.axis=cex.axis)
 				axis(2, at=seq(0,floor(YlimMax+1),ceiling((YlimMax+1)/10)), labels=seq(0,floor((YlimMax+1)),ceiling((YlimMax+1)/10)), cex.axis=cex.axis)
 				
 				# plot the confidence interval of QQ-plot
@@ -1515,6 +1517,8 @@ CMplot <- function(
 						N=length(P.values)
 						P.values=P.values[order(P.values,decreasing=TRUE)]
 					}
+					p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
+					log.Quantiles <- -log10(p_value_quantiles)
 					if(LOG10){
 						log.P.values <- -log10(P.values)
 					}else{
