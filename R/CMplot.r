@@ -148,7 +148,7 @@ CMplot <- function(
 		if(maxbin.num <= legend.len)	legend.len <- maxbin.num		
 		
 		legend.y <- round(seq(0, maxbin.num, length=legend.len))
-		len <- legend.y[2]
+		len <- ifelse(length(legend.y)==1, 1, legend.y[2])
 		legend.y <- seq(0, maxbin.num, len)
 		if(!is.null(legend.max)){
 			if(legend.max < Maxbin.num){
