@@ -1481,7 +1481,7 @@ CMplot <- function(
 			}
 			
 			#change the sample number according to Pmap
-			sam.num <- ceiling(nrow(Pmap)/100)
+			sam.num <- 1000
 			if(verbose)	print("Multraits_Rectangular Plotting...")
 			while(do){
 				for(i in 1:R){
