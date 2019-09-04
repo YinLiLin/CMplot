@@ -106,7 +106,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/10.jpg">
-<img src="Figure/10.jpg" height="400px" width="400px">
+<img src="Figure/10.jpg" height="400px" width="460px">
 </a>
 </p>
 
