@@ -219,7 +219,7 @@ CMplot <- function(
 
 	#SNP-Density plot
 	if("d" %in% plot.type){
-		if(verbose)	print("SNP_Density Plotting...")
+		if(verbose)	cat(" SNP_Density Plotting...\n")
 		if(file.output){
 			ht=ifelse(is.null(height), 7, height)
 			wh=ifelse(is.null(width), 9, width)
@@ -478,7 +478,7 @@ CMplot <- function(
 			#debug
 			#print(colx)
 			
-			if(verbose)	print(paste("Circular_Manhattan Plotting ",taxa[i],"...",sep=""))
+			if(verbose)	cat(paste(" Circular_Manhattan Plotting ",taxa[i],"...\n",sep=""))
 			pvalue <- pvalueT[,i]
 			logpvalue <- logpvalueT[,i]
 			if(is.null(ylim)){
@@ -940,7 +940,7 @@ CMplot <- function(
 			for(i in 1:R){
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
-				if(verbose)	print(paste("Rectangular_Manhattan Plotting ",taxa[i],"...",sep=""))
+				if(verbose)	cat(paste(" Rectangular_Manhattan Plotting ",taxa[i],"...\n",sep=""))
 					if(file.output){
 						ht=ifelse(is.null(height), 6, height)
 						wh=ifelse(is.null(width), 14, width)
@@ -967,7 +967,7 @@ CMplot <- function(
 								}else{
 									Max=max_no_na(c(ceiling(max_no_na(pvalue)),max_no_na(threshold)))
 									if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-									Min <- min_no_na(floor(min_no_na(pvalue)),min_no_na(threshold))
+									Min <- min_no_na(c(floor(min_no_na(pvalue)),min_no_na(threshold)))
 									if(abs(Min)<=1)	Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
 								}
 							}else{
@@ -1044,21 +1044,21 @@ CMplot <- function(
 					axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
 					if(is.null(ylim)){
 						if((Max-Min)>1){
-							axis(2,at=seq(Min,(Max),ceiling((Max-Min)/10)), las=1, lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=round(seq(Min,(Max),ceiling((Max-Min)/10)), 2))
+							axis(2, las=1, lwd=lwd.axis,cex.axis=cex.axis,font=2,ceiling((Max-Min)/10))
 							axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
 							legend.y <- tail(round(seq(Min,(Max),ceiling((Max-Min)/10)), 2), 1)
 						}else{
-							axis(2,at=seq(Min,Max,10^(-ceiling(-log10(max_no_na(abs(c(Max, Min))))))), las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=seq(Min,Max,10^(-ceiling(-log10(max_no_na(abs(c(Max, Min))))))))
+							axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
 							axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
 							legend.y <- tail(seq(Min,Max,10^(-ceiling(-log10(max_no_na(abs(c(Max, Min))))))), 1)
 						}
 					}else{
 						if(ylim[2]>1){
-							axis(2,at=seq(min_no_na(ylim),ylim[2],ceiling((ylim[2])/10)), las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=round(seq(min_no_na(ylim),(ylim[2]),ceiling((ylim[2])/10)), 2))
+							axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
 							axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
 							legend.y <- tail(ylim[2], 1)
 						}else{
-							axis(2,at=seq(min_no_na(ylim),ylim[2],10^(-ceiling(-log10(max_no_na(abs(ylim)))))), las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=seq(min_no_na(ylim),ylim[2],10^(-ceiling(-log10(max_no_na(abs(ylim)))))))
+							axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
 							axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
 							legend.y <- tail(ylim[2], 1)
 						}
@@ -1179,7 +1179,7 @@ CMplot <- function(
 				par(xpd=TRUE)
 			}
 			for(i in 1:R){
-				if(verbose)	print(paste("Multracks_Rectangular Plotting ",taxa[i],"...",sep=""))
+				if(verbose)	cat(paste(" Multracks_Rectangular Plotting ",taxa[i],"...\n",sep=""))
 				colx=col[i,]
 				colx=colx[!is.na(colx)]
 				pvalue=pvalueT[,i]
@@ -1193,7 +1193,7 @@ CMplot <- function(
 							}else{
 								Max=max_no_na(c(ceiling(max_no_na(pvalue)),max_no_na(threshold)))
 								if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-								Min<-min_no_na(floor(min_no_na(pvalue)),min_no_na(threshold))
+								Min<-min_no_na(c(floor(min_no_na(pvalue)),min_no_na(threshold)))
 								if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue),min_no_na(threshold))
 							}
 						}else{
@@ -1225,16 +1225,16 @@ CMplot <- function(
 						}
 					}
 					if((Max-Min)<=1){
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
+						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
 							cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=2,axes=FALSE,xlab="")
 					}else{
-						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
+						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
 							cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=2,axes=FALSE,xlab="")
 					}
 				}else{
 					Max <- max_no_na(ylim)
 					Min <- min_no_na(ylim)
-					plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,cex=cex[2]*R,col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ylab=ylab,
+					plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ylab=ylab,
 						cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=1,axes=FALSE,xlab="")
 				}
 				Max1 <- Max
@@ -1248,34 +1248,34 @@ CMplot <- function(
 		
 				if(i == R){
 					if(is.null(chr.labels)){
-						axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis,cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.ori),padj=1)
-						axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
+						axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.ori),padj=1)
+						axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
 					}else{
 						if(Nchr == 1){
-							axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis*(R/2),font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
-							axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
+							axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2), cex.axis=cex.axis*(R/2),font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
+							axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
 						}else{
-							axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.labels))
-							axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
+							axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2), cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.labels))
+							axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
 						}
 					}
 				}
 				#if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=xn)
 				if(is.null(ylim)){
 					if((Max-Min)>1){
-						axis(2,at=seq(Min,(Max),ceiling((Max-Min)/10)), las=1,lwd=lwd.axis,cex.axis=cex.axis*(R/2),font=2,labels=round(seq(Min,(Max),ceiling((Max-Min)/10)), 2))
-						axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis)
+						axis(2, las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+						axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
 					}else{
-						axis(2,at=seq(Min,Max,10^(-ceiling(-log10(max_no_na(abs(c(Max, Min))))))),las=1,lwd=lwd.axis,cex.axis=cex.axis*(R/2),font=2,labels=seq(0,Max,10^(-ceiling(-log10(max_no_na(abs(c(Max, Min))))))))
-						axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis)
+						axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+						axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
 					}
 				}else{
 					if(ylim[2]>1){
-						axis(2,at=seq(min_no_na(ylim),(ylim[2]),ceiling((ylim[2])/10)),las=1,lwd=lwd.axis,cex.axis=cex.axis*(R/2),font=2,labels=round(seq(min_no_na(ylim),(ylim[2]),ceiling((ylim[2])/10)), 2))
-						axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
+						axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+						axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
 					}else{
-						axis(2,at=seq(min_no_na(ylim),ylim[2],10^(-ceiling(-log10(max_no_na(abs(ylim)))))),las=1,lwd=lwd.axis,cex.axis=cex.axis*(R/2),font=2,labels=seq(min_no_na(ylim),ylim[2],10^(-ceiling(-log10(max_no_na(abs(ylim)))))))
-						axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
+						axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+						axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
 					}
 				}
 				if(!is.null(threshold)){
@@ -1455,21 +1455,21 @@ CMplot <- function(
 			if(is.null(ylim)){
 				if((Max-Min)>1){
 					#print(seq(0,(Max+1),ceiling((Max+1)/10)))
-					axis(2,at=seq(Min,(Max),ceiling((Max-Min)/10)),las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=round(seq(Min,(Max),ceiling((Max-Min)/10)),2))
+					axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
 					axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
 					legend.y <- tail(round(seq(0,(Max),ceiling((Max)/10)),2), 1)
 				}else{
-					axis(2,at=seq(Min,Max,10^(-ceiling(-log10(max_no_na(abs(c(Max, Min))))))),las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=seq(0,Max,10^(-ceiling(-log10(max_no_na(abs(c(Max, Min))))))))
+					axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
 					axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
 					legend.y <- tail(seq(0,Max,10^(-ceiling(-log10(max_no_na(abs(c(Max, Min))))))), 1)
 				}
 			}else{
 				if(ylim[2]>1){
-					axis(2,at=seq(min_no_na(ylim),(ylim[2]),ceiling((ylim[2])/10)),las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=round(seq(min_no_na(ylim),(ylim[2]),ceiling((ylim[2])/10)),2))
+					axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
 					axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
 					legend.y <- tail(ylim[2], 1)
 				}else{
-					axis(2,at=seq(min_no_na(ylim),ylim[2],10^(-ceiling(-log10(max_no_na(abs(ylim)))))),las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=seq(min_no_na(ylim),ylim[2],10^(-ceiling(-log10(max_no_na(abs(ylim)))))))
+					axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
 					axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
 					legend.y <- tail(ylim[2], 1)
 				}
@@ -1481,8 +1481,9 @@ CMplot <- function(
 			}
 			
 			#change the sample number according to Pmap
+			#sam.num <- ceiling(nrow(Pmap)/100)
 			sam.num <- 1000
-			if(verbose)	print("Multraits_Rectangular Plotting...")
+			cat_bar <- seq(1, 100, 1)
 			while(do){
 				for(i in 1:R){
 					if(length(sam.index[[i]]) < sam.num){
@@ -1495,6 +1496,14 @@ CMplot <- function(
 					if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim)}else{indexx <- 1:length(logpvalue)}
 					points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
 					#if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))	abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
+				}
+				if(verbose){
+					progress <- round((nrow(Pmap) - length(sam.index[[i]])) * 100 / nrow(Pmap))
+					if(progress %in% cat_bar){
+						cat(" Multraits_Rectangular Plotting...(finished ", progress, "%)\r", sep="")
+						cat_bar <- cat_bar[cat_bar != progress]
+						if(progress == 100)	cat("\n")
+					}
 				}
 				if(length(sam.index[[i]]) == 0) do <- FALSE
 			}
@@ -1562,7 +1571,7 @@ CMplot <- function(
 			}
 			log.Quantiles.max_no_na <- NULL
 			for(i in 1:R){
-				if(verbose)	print(paste("Multracks_QQ Plotting ",taxa[i],"...",sep=""))		
+				if(verbose)	cat(paste(" Multracks_QQ Plotting ",taxa[i],"...\n",sep=""))		
 				P.values=as.numeric(Pmap[,i+2])
 				P.values=P.values[!is.na(P.values)]
 				if(LOG10){
@@ -1601,9 +1610,13 @@ CMplot <- function(
 				}
 				
 				YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), floor(max_no_na(log.P.values)+1)))
-				plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab ="", ylab="", main = taxa[i])
+				if(is.null(ylim)){
+					plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab ="", ylab="", main = taxa[i])
+				}else{
+					plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim)),xlab ="", ylab="", main = taxa[i])
+				}
 				axis(1, at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
-				axis(2, at=seq(0,YlimMax,ceiling(YlimMax/10)), las=1,labels=seq(0,YlimMax,ceiling(YlimMax/10)), lwd=lwd.axis,cex.axis=cex.axis)
+				axis(2, las=1, lwd=lwd.axis,cex.axis=cex.axis)
 				
 				#plot the confidence interval of QQ-plot
 				if(conf.int)	polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255),border=t(col)[i])
@@ -1665,15 +1678,19 @@ CMplot <- function(
 				
 				if(!conf.int){c05 <- 1; c95 <- 1}
 				
-				Pmap.min_no_na <- Pmap[,3:(R+2)]
-				YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), -log10(min_no_na(Pmap.min_no_na[Pmap.min_no_na > 0]))))
-				plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
+				if(is.null(ylim)){
+					Pmap.min_no_na <- Pmap[,3:(R+2)]
+					YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), -log10(min_no_na(Pmap.min_no_na[Pmap.min_no_na > 0]))))
+					plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
+				}else{
+					plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, max(ylim)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot")
+				}
 				legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA)
 				axis(1, at=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), cex.axis=cex.axis)
-				axis(2, at=seq(0,floor(YlimMax+1),ceiling((YlimMax+1)/10)), las=1,lwd=lwd.axis,labels=seq(0,floor((YlimMax+1)),ceiling((YlimMax+1)/10)), cex.axis=cex.axis)
+				axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
 				
 				for(i in 1:R){
-					if(verbose)	print(paste("Multraits_QQ Plotting ",taxa[i],"...",sep=""))
+					if(verbose)	cat(paste(" Multraits_QQ Plotting ",taxa[i],"...\n",sep=""))
 					P.values=as.numeric(Pmap[,i+2])
 					P.values=P.values[!is.na(P.values)]
 					if(LOG10){
@@ -1741,7 +1758,7 @@ CMplot <- function(
 			}
 		}else{
 			for(i in 1:R){
-				if(verbose)	print(paste("Q_Q Plotting ",taxa[i],"...",sep=""))
+				if(verbose)	cat(paste(" Q_Q Plotting ",taxa[i],"...\n",sep=""))
 				if(file.output){
 					ht=ifelse(is.null(height), 5.5, height)
 					wh=ifelse(is.null(width), 5.5, width)
@@ -1790,10 +1807,14 @@ CMplot <- function(
 					c05 <- 1
 					c95 <- 1
 				}
-				YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), floor(max_no_na(log.P.values)+1)))
-				plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = paste("QQplot of",taxa[i]))
+				if(is.null(ylim)){
+					YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), floor(max_no_na(log.P.values)+1)))
+					plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = paste("QQplot of",taxa[i]))
+				}else{
+					plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = paste("QQplot of",taxa[i]))		
+				}
 				axis(1, at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
-				axis(2, at=seq(0,YlimMax,ceiling(YlimMax/10)), labels=seq(0,YlimMax,ceiling(YlimMax/10)), las=1,lwd=lwd.axis,cex.axis=cex.axis)
+				axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
 				
 				#plot the confidence interval of QQ-plot
 				if(conf.int)	polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255),border=t(col)[i])
@@ -1824,5 +1845,5 @@ CMplot <- function(
 			}
 		}
 	}
-	if(file.output & verbose)	print(paste("Plots are stored in: ", getwd(), sep=""))
+	if(file.output & verbose)	cat(paste(" Plots are stored in: ", getwd(), sep=""), "\n")
 }
