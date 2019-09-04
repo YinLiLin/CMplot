@@ -88,7 +88,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/9.jpg">
-<img src="Figure/9.jpg" height="400px" width="400px">
+<img src="Figure/9.jpg" height="450px" width="450px">
 </a>
 </p>
 
@@ -106,7 +106,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/10.jpg">
-<img src="Figure/10.jpg" height="400px" width="460px">
+<img src="Figure/10.jpg" height="460px" width="460px">
 </a>
 </p>
 
@@ -249,7 +249,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 ### Multi_tracks Rectangular-Manhattan plot
 
 ```r
-> CMplot(pig60K, plot.type="m", multracks=TRUE, threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
+> CMplot(pig60K, plot.type="m",pch=1:3,multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),signal.cex=c(1,1),
         file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
@@ -258,7 +258,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 #### a. all traits in a axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
 <img src="Figure/5.jpg" height="330px" width="900px">
 </a>
 </p>
@@ -266,7 +266,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 #### b. all traits in separated axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
 <img src="Figure/4.jpg" height="900px" width="840px">
 </a>
 </p>
@@ -308,7 +308,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
-<img src="Figure/7.jpg" height="450px" width="1250px">
+<img src="Figure/7.jpg" height="450px" width="1450px">
 </a>
 </p>
 
