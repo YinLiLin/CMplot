@@ -258,16 +258,16 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 #### a. all traits in a axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
-<img src="Figure/5.jpg" height="330px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
+<img src="Figure/4.jpg" height="330px" width="900px">
 </a>
 </p>
 
 #### b. all traits in separated axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
-<img src="Figure/4.jpg" height="900px" width="840px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
+<img src="Figure/5.jpg" height="900px" width="840px">
 </a>
 </p>
 
@@ -308,7 +308,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
-<img src="Figure/7.jpg" height="450px" width="1450px">
+<img src="Figure/7.jpg" height="300px" width="1450px">
 </a>
 </p>
 
