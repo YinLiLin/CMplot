@@ -142,7 +142,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/1.jpg">
-<img src="Figure/1.jpg" height="300px" width="900px">
+<img src="Figure/1.jpg" height="330px" width="900px">
 </a>
 </p>
 
@@ -226,7 +226,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/3.jpg">
-<img src="Figure/3.jpg" height="300px" width="900px">
+<img src="Figure/3.jpg" height="330px" width="900px">
 </a>
 </p>
 
@@ -242,7 +242,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/PN.jpg">
-<img src="Figure/PN.jpg" height="300px" width="900px">
+<img src="Figure/PN.jpg" height="330px" width="900px">
 </a>
 </p>
 
@@ -267,7 +267,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5.jpg">
-<img src="Figure/5.jpg" height="900px" width="840px">
+<img src="Figure/5.jpg" height="900px" width="640px">
 </a>
 </p>
 
