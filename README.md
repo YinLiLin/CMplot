@@ -142,7 +142,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/1.jpg">
-<img src="Figure/1.jpg" height="400px" width="900px">
+<img src="Figure/1.jpg" height="385px" width="900px">
 </a>
 </p>
 
@@ -179,7 +179,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 </p>
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_2.jpg">
-<img src="Figure/2_2.jpg" height="370px" width="900px">
+<img src="Figure/2_2.jpg" height="385px" width="900px">
 </a>
 
 #### Highlight a group of SNPs on pch, cex and col
@@ -196,7 +196,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 </p>
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_3.jpg">
-<img src="Figure/2_3.jpg" height="370px" width="900px">
+<img src="Figure/2_3.jpg" height="385px" width="900px">
 </a>
 
 #### Visualize only one chromosome
@@ -226,7 +226,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/3.jpg">
-<img src="Figure/3.jpg" height="370px" width="900px">
+<img src="Figure/3.jpg" height="385px" width="900px">
 </a>
 </p>
 
@@ -242,7 +242,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/PN.jpg">
-<img src="Figure/PN.jpg" height="370px" width="900px">
+<img src="Figure/PN.jpg" height="385px" width="900px">
 </a>
 </p>
 
@@ -259,7 +259,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
-<img src="Figure/4.jpg" height="370px" width="900px">
+<img src="Figure/4.jpg" height="385px" width="900px">
 </a>
 </p>
 
