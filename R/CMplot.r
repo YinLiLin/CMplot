@@ -64,6 +64,36 @@ CMplot <- function(
 		curve(-sqrt(myr^2-x^2),xlim=c(-myr,myr),n=n.point,ylim=c(-myr,myr),type=type,lty=lty,col=col,lwd=lwd,add=TRUE)
 	}
 	
+	max_ylim <- function(x){
+		if(x == 0) return(x)
+		if(abs(x) >= 1){
+			return(ceiling(x))
+		}else{
+			if(x < 0){
+				digit <- 10^(-ceiling(-log10(abs(x))))
+				return(-(floor(abs(x) / digit - 1) * digit))
+			}else{
+				digit <- 10^(-ceiling(-log10(x)))
+				return((floor(x / digit + 1) * digit))
+			}
+		}
+	}
+
+	min_ylim <- function(x){
+		if(x == 0) return(x)
+		if(abs(x) >= 1){
+			return(floor(x))
+		}else{
+			if(x < 0){
+				digit <- 10^(-ceiling(-log10(abs(x))))
+				return(-(floor(abs(x) / digit + 1) * digit))
+			}else{
+				digit <- 10^(-ceiling(-log10(x)))
+				return((floor(x / digit - 1) * digit))
+			}
+		}
+	}
+
 	min_no_na <- function(x){
 		return(min(x, na.rm=TRUE))
 	}
@@ -483,13 +513,13 @@ CMplot <- function(
 			logpvalue <- logpvalueT[,i]
 			if(is.null(ylim)){
 				if(LOG10){
-					Max <- ceiling(-log10(min_no_na(pvalue)))
+					Max <- max_ylim(-log10(min_no_na(pvalue)))
 					Min <- 0
 				}else{
-					Max <- ceiling(max_no_na(pvalue))
-					if(abs(Max)<=1)	Max <- max_no_na(pvalue)
-					Min <- floor(min_no_na(pvalue))
-					if(abs(Min)<=1)	Min <- min_no_na(pvalue)
+					Max <- max_ylim(max_no_na(pvalue))
+					#if(abs(Max)<=1)	Max <- max_no_na(pvalue)
+					Min <- min_ylim(min_no_na(pvalue))
+					#if(abs(Min)<=1)	Min <- min_no_na(pvalue)
 				}
 			}else{
 				Max <- ylim[2]
@@ -962,23 +992,23 @@ CMplot <- function(
 						if(!is.null(threshold)){
 							if(sum(threshold!=0)==length(threshold)){
 								if(LOG10 == TRUE){
-									Max=max_no_na(c(ceiling(-log10(min_no_na(pvalue))),ceiling(-log10(min_no_na(threshold)))))
+									Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),(-log10(min_no_na(threshold))))))
 									Min <- 0
 								}else{
-									Max=max_no_na(c(ceiling(max_no_na(pvalue)),max_no_na(threshold)))
-									if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-									Min <- min_no_na(c(floor(min_no_na(pvalue)),min_no_na(threshold)))
-									if(abs(Min)<=1)	Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
+									Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
+									#if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
+									Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold))))
+									#if(abs(Min)<=1)	Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
 								}
 							}else{
 								if(LOG10){
-									Max=max_no_na(ceiling(-log10(min_no_na(pvalue))))
+									Max=max_ylim(-log10(min_no_na(pvalue)))
 									Min<-0
 								}else{
-									Max=ceiling(max_no_na(pvalue))
-									if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue)))
-									Min<-floor(min_no_na(pvalue))
-									if(abs(Min)<=1)	Min=min_no_na(pvalue)
+									Max=max_ylim(max_no_na(pvalue))
+									#if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue)))
+									Min<-min_ylim(min_no_na(pvalue))
+									#if(abs(Min)<=1)	Min=min_no_na(pvalue)
 									# }else{
 										# Max=max_no_na(ceiling(max_no_na(pvalue)))
 									# }
@@ -986,16 +1016,16 @@ CMplot <- function(
 							}
 						}else{
 							if(LOG10){
-								Max=max_no_na(ceiling(-log10(min_no_na(pvalue))))
-								Min=0
+									Max=max_ylim(-log10(min_no_na(pvalue)))
+									Min<-0
 							}else{
-								Max=ceiling(max_no_na(pvalue))
-								if(abs(Max)<=1)	Max=max_no_na(pvalue)
-								Min=floor(min_no_na(pvalue))
-								if(abs(Min)<=1)	Min=min_no_na(pvalue)
-								# }else{
-									# Max=max_no_na(ceiling(max_no_na(pvalue)))
-								# }
+									Max=max_ylim(max_no_na(pvalue))
+									#if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue)))
+									Min<-min_ylim(min_no_na(pvalue))
+									#if(abs(Min)<=1)	Min=min_no_na(pvalue)
+									# }else{
+										# Max=max_no_na(ceiling(max_no_na(pvalue)))
+									# }
 							}
 						}
 						if((Max-Min)<=1){
@@ -1026,10 +1056,10 @@ CMplot <- function(
 							cex.axis=cex.axis,cex.lab=cex.lab,font=2,axes=FALSE,xlab=xlab,main="")
 						}
 					}
-					Max1 <- Max
-					Min1 <- Min
-					if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
-					if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
+					# Max1 <- Max
+					# Min1 <- Min
+					# if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
+					# if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
 					if(!is.null(chr.labels)){
 						if(Nchr == 1){
 							axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
@@ -1044,7 +1074,7 @@ CMplot <- function(
 					axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
 					if(is.null(ylim)){
 						if((Max-Min)>1){
-							axis(2, las=1, lwd=lwd.axis,cex.axis=cex.axis,font=2,ceiling((Max-Min)/10))
+							axis(2, las=1, lwd=lwd.axis,cex.axis=cex.axis,font=2)
 							axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
 							legend.y <- tail(round(seq(Min,(Max),ceiling((Max-Min)/10)), 2), 1)
 						}else{
@@ -1129,7 +1159,7 @@ CMplot <- function(
 
 					#if(!is.null(threshold) & !is.null(signal.line))	abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
 			
-					if(is.null(ylim)){ymin <- Min1}else{ymin <- min_no_na(ylim)}
+					if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(ylim)}
 					if(cir.density){
 						for(yll in 1:length(pvalue.posN.list)){
 							polygon(c(min_no_na(pvalue.posN.list[[yll]]), min_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]])), 
@@ -1188,23 +1218,23 @@ CMplot <- function(
 					if(!is.null(threshold)){
 						if(sum(threshold!=0)==length(threshold)){
 							if(LOG10){
-								Max=max_no_na(c(ceiling(-log10(min_no_na(pvalue))),-log10(min_no_na(threshold))))
+								Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold)))))
 								Min <- 0
 							}else{
-								Max=max_no_na(c(ceiling(max_no_na(pvalue)),max_no_na(threshold)))
-								if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-								Min<-min_no_na(c(floor(min_no_na(pvalue)),min_no_na(threshold)))
-								if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue),min_no_na(threshold))
+								Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
+								#if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
+								Min<-min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold))))
+								#if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue),min_no_na(threshold))
 							}
 						}else{
 							if(LOG10){
-								Max=max_no_na(ceiling(-log10(min_no_na(pvalue))))
+								Max=max_ylim((-log10(min_no_na(pvalue))))
 								Min<-0
 							}else{
-								Max=max_no_na(ceiling(max_no_na(pvalue)))
-								if(abs(Max)<=1)	Max=max_no_na(max_no_na(pvalue))
-								Min=min_no_na(floor(min_no_na(pvalue)))
-								if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue))
+								Max=max_ylim((max_no_na(pvalue)))
+								#if(abs(Max)<=1)	Max=max_no_na(max_no_na(pvalue))
+								Min=min_ylim((min_no_na(pvalue)))
+								#if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue))
 								# }else{
 									# Max=max_no_na(ceiling(max_no_na(pvalue)))
 								# }
@@ -1212,16 +1242,16 @@ CMplot <- function(
 						}
 					}else{
 						if(LOG10){
-							Max=max_no_na(ceiling(-log10(min_no_na(pvalue))))
-							Min=0
+								Max=max_ylim((-log10(min_no_na(pvalue))))
+								Min<-0
 						}else{
-							Max=max_no_na(ceiling(max_no_na(pvalue)))
-							if(abs(Max)<=1)	Max=max_no_na(max_no_na(pvalue))
-							Min <- min_no_na(ceiling(min_no_na(pvalue)))
-							if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue))
-							# }else{
-								# Max=max_no_na(ceiling(max_no_na(pvalue)))
-							# }
+								Max=max_ylim((max_no_na(pvalue)))
+								#if(abs(Max)<=1)	Max=max_no_na(max_no_na(pvalue))
+								Min=min_ylim((min_no_na(pvalue)))
+								#if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue))
+								# }else{
+									# Max=max_no_na(ceiling(max_no_na(pvalue)))
+								# }
 						}
 					}
 					if((Max-Min)<=1){
@@ -1237,10 +1267,10 @@ CMplot <- function(
 					plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ylab=ylab,
 						cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=1,axes=FALSE,xlab="")
 				}
-				Max1 <- Max
-				Min1 <- Min
-				if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
-				if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
+				# Max1 <- Max
+				# Min1 <- Min
+				# if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
+				# if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
 				
 				#add the names of traits on plot 
 	
@@ -1364,23 +1394,23 @@ CMplot <- function(
 				if(!is.null(threshold)){
 					if(sum(threshold!=0)==length(threshold)){
 						if(LOG10){
-							Max=max_no_na(c(ceiling(-log10(min_no_na(pvalue))),-log10(min_no_na(threshold))))
+							Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold)))))
 							Min<-0
 						}else{
-							Max=max_no_na(c(ceiling(max_no_na(pvalue)),max_no_na(threshold)))
-							if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-							Min <- min_no_na(c(floor(min_no_na(pvalue)),min_no_na(threshold)))
-							if(abs(Min)<=1)	Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
+							Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
+							# if(abs(Max)<=1)	Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
+							Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold))))
+							# if(abs(Min)<=1)	Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
 						}
 					}else{
 						if(LOG10){
-							Max=max_no_na(ceiling(-log10(min_no_na(pvalue))))
+							Max=max_ylim((-log10(min_no_na(pvalue))))
 							Min=0
 						}else{
-							Max=max_no_na(ceiling(max_no_na(pvalue)))
-							if(abs(Max)<=1)	Max=max_no_na(max_no_na(pvalue))
-							Min<- min_no_na(floor(min_no_na(pvalue)))
-							if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue))
+							Max=max_ylim((max_no_na(pvalue)))
+							# if(abs(Max)<=1)	Max=max_no_na(max_no_na(pvalue))
+							Min<- min_ylim((min_no_na(pvalue)))
+							# if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue))
 							# }else{
 								# Max=max_no_na(ceiling(max_no_na(pvalue)))
 							# }
@@ -1388,19 +1418,15 @@ CMplot <- function(
 					}
 				}else{
 					if(LOG10){
-						Max=max_no_na(ceiling(-log10(min_no_na(pvalue))))
-						Min=0
+							Max=max_ylim((-log10(min_no_na(pvalue))))
+							Min=0
 					}else{
-						Max=max_no_na(ceiling(max_no_na(pvalue)))
-						
-						#{
-						if(abs(Max)<=1)	Max=max_no_na(max_no_na(pvalue))
-						Min<- min_no_na(floor(min_no_na(pvalue)))
-						if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue))
-						
-						# }else{
-							# Max=max_no_na(ceiling(max_no_na(pvalue)))
-						# }
+							Max=max_ylim((max_no_na(pvalue)))
+							# if(abs(Max)<=1)	Max=max_no_na(max_no_na(pvalue))
+							Min<- min_ylim((min_no_na(pvalue)))
+							# if(abs(Min)<=1)	Min=min_no_na(min_no_na(pvalue))
+							# }else{
+								# Max=max_no_na(ceiling(max_no_na(pvalue)))
 					}
 				}
 				if((Max-Min)<=1){
@@ -1431,10 +1457,10 @@ CMplot <- function(
 						cex.axis=cex.axis,cex.lab=cex.lab,font=2,axes=FALSE,xlab=xlab,main="")
 				}
 			}
-			Max1 <- Max
-			Min1 <- Min
-			if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
-			if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
+			# Max1 <- Max
+			# Min1 <- Min
+			# if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
+			# if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
 			if(!is.null(ylim)){
 				legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,ylim[2]*1.2,taxa,col=t(col)[1:R],pch=pch,text.font=6,box.col=NA,horiz=TRUE,xjust=0.5)
 			}else{
@@ -1521,7 +1547,7 @@ CMplot <- function(
 					}
 				}
 			}
-			if(is.null(ylim)){ymin <- Min1}else{ymin <- min_no_na(ylim)}
+			if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(ylim)}
 			if(cir.density){
 						for(yll in 1:length(pvalue.posN.list)){
 							polygon(c(min_no_na(pvalue.posN.list[[yll]]), min_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]])), 
