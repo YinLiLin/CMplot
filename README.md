@@ -53,7 +53,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 ---
 ### Citation
-**waiting for updating...**<br>
+**Please cite the website https://github.com/YinLiLin/R-CMplot**<br>
 
 ---
 ### SNP-density plot
