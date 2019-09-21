@@ -127,9 +127,9 @@ CMplot <- function(
 		map <- map[!is.na(as.numeric(map[, 3])), ]
 		map <- map[map[, 2] != 0, ]
 		#map <- map[map[, 3] != 0, ]
-		suppressWarnings(max.chr <- max(suppressWarnings(as.numeric(map[, 2])), na.rm=TRUE))
+		suppressWarnings(max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE))
 		if(is.infinite(max.chr))	max.chr <- 0
-		map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0 : max.chr))
+		suppressWarnings(map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0 : max.chr)))
 		if(length(map.xy.index) != 0){
 			chr.xy <- unique(map[map.xy.index, 2])
 			for(i in 1:length(chr.xy)){
