@@ -141,6 +141,9 @@ CMplot <- function(
 		pos <- as.numeric(map[, 3])
 		chr.num <- unique(chr)
 		chorm.maxlen <- max(pos)
+		bp <- ifelse(chorm.maxlen < 1e6, 1e3, 1e6)
+		bp_label <- ifelse(bp == 1e3, "Kb", "Mb")
+		main <- paste("The number of SNPs within ", round(bin / bp), bp_label, " window size", sep="")
 		if(plot)	plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/10), ylim=c(0, length(chr.num) * band + band), main=main,axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
 		pos.x <- list()
 		col.index <- list()
@@ -193,8 +196,6 @@ CMplot <- function(
 				if(max.chr != 0)	mtext(at=seq(band, length(chr.num) * band, band),text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=cex.axis*0.6, line=0.2)
 			}
 		}
-		bp <- ifelse(chorm.maxlen < 1e6, 1e3, 1e6)
-		bp_label <- ifelse(bp == 1e3, "Kb", "Mb")
 		if(plot)	axis(3, at=seq(0, chorm.maxlen, length=10), labels=paste(round((seq(0, chorm.maxlen, length=10)) / bp, 1), bp_label, sep=""),
 			font=1, cex.axis=cex.axis*0.8, tck=0.01, lwd=2, padj=1.2)
 		# image(c(chorm.maxlen-chorm.maxlen * legend.width / 20 , chorm.maxlen), 
@@ -268,7 +269,7 @@ CMplot <- function(
 			if(length(bin.range) != 2)	stop("Two values (min and max) should be provided for bin.range!")
 			if(bin.range[1] == 0)	stop("Min value of bin.range should be more than 1!")
 		}
-		Densitplot(map=Pmap[,c(1:3)], chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2], main=paste("The number of SNPs within ", bin.size/1e6, "Mb window size", sep=""))
+		Densitplot(map=Pmap[,c(1:3)], chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2])
 		if(file.output)	dev.off()
 	}
 
