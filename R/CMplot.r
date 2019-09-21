@@ -193,7 +193,9 @@ CMplot <- function(
 				if(max.chr != 0)	mtext(at=seq(band, length(chr.num) * band, band),text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=cex.axis*0.6, line=0.2)
 			}
 		}
-		if(plot)	axis(3, at=seq(0, chorm.maxlen, length=10), labels=paste(round((seq(0, chorm.maxlen, length=10)) / 1e6, 0), "Mb", sep=""),
+		bp <- ifelse(chorm.maxlen < 1e6, 1e3, 1e6)
+		bp_label <- ifelse(bp == 1e3, "Kb", "Mb")
+		if(plot)	axis(3, at=seq(0, chorm.maxlen, length=10), labels=paste(round((seq(0, chorm.maxlen, length=10)) / bp, 1), bp_label, sep=""),
 			font=1, cex.axis=cex.axis*0.8, tck=0.01, lwd=2, padj=1.2)
 		# image(c(chorm.maxlen-chorm.maxlen * legend.width / 20 , chorm.maxlen), 
 		# round(seq(band - width/5, (length(chr.num) * band + band) * legend.height / 2 , length=maxbin.num+1), 2), 
