@@ -10,8 +10,9 @@ CMplot [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://gi
 ```r
 > install.packages("CMplot")
 > library("CMplot")
-#(optional)if you want to use the latest version:
-#source("https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/R/CMplot.r")
+
+# if you want to use the latest version:
+> source("https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/R/CMplot.r")
 ```
 
 ---
