@@ -238,8 +238,8 @@ highlight.text.yadj: value or vecter, same as above, -1(down), 0(center), 1(up)
 
 </p>
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_5.jpg">
-<img src="Figure/2_5.jpg" height="385px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2-5.jpg">
+<img src="Figure/2-5.jpg" height="385px" width="900px">
 </a>
  
 #### Genomic Selection/Prediction(GS/GP) or other none p-values
