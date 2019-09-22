@@ -222,7 +222,7 @@ each SNPs have its special colour, size and shape.
 ```r
 > SNPs <- pig60K[pig60K[,5] < (0.05 / nrow(pig60K)), 1]
 > genes <- paste("GENE", 1:length(SNPs), sep="_")
-> set.seed(12345)
+> set.seed(666666)
 > CMplot(pig60K[,c(1:3,5)], plot.type="m",LOG10=TRUE,col=c("grey30","grey60"),highlight=SNPs,
         highlight.col=c("red","blue","green"),highlight.cex=1,highlight.pch=c(15:17), highlight.text=genes,      
         highlight.text.col=c("red","blue","green"),threshold=0.05/nrow(pig60K),threshold.lty=2,   
