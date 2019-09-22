@@ -144,7 +144,7 @@ CMplot <- function(
           x1 <- xo <- x[i]
           y1 <- yo <- y[i]
           wid <- strwidth(words[i], cex = cex[i])
-          ht <- strheight(words[i], cex = cex[i])
+          ht <- 1.5 * strheight(words[i], cex = cex[i])
           #mind your ps and qs
           if (grepl(tails, words[i]))
             ht <- ht + ht * .2
