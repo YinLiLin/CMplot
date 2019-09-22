@@ -191,6 +191,9 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 > CMplot(pig60K, plot.type="m",LOG10=TRUE,col=c("grey30","grey60"),highlight=SNPs,
         highlight.col="green",highlight.cex=1,highlight.pch=19,file="jpg",memo="",
         dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+#Note:
+highlight.col, highlight.cex, highlight.pch can be value or vecter, if its length equals to the length of highlighted SNPs,
+each SNPs have its special colour, size and shape.
 ```
 
 </p>
@@ -214,6 +217,29 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 <img src="Figure/2_4.jpg" height="460px" width="680px">
 </a>
 
+#### add genes or SNP names around the highlighted SNPs
+
+```r
+> SNPs <- pig60K[pig60K[,5] < (0.05 / nrow(pig60K)), 1]
+> set.seed(12345)
+> CMplot(pig60K[,c(1:3,5)], plot.type="m",LOG10=TRUE,col=c("grey30","grey60"),highlight=SNPs,
+        highlight.col=c("red","blue","green"),highlight.cex=1,highlight.pch=c(15:17), highlight.text=SNPs,          
+        highlight.text.col=c("red","blue","green"), file="jpg",memo="",dpi=300,file.output=TRUE,
+        verbose=TRUE,width=14,height=6)
+#Note:
+highlight.text.cex: value or vecter, control the size of added text
+highlight.text.font: value or vecter, control the font of added text
+highlight.text.xadj: value or vecter, -1, 0, 1 limited, control the position of text around the highlighted SNPs,
+                     -1(left), 0(center), 1(right)
+highlight.text.yadj: value or vecter, same as above, -1(down), 0(center), 1(up)
+```
+
+</p>
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_5.jpg">
+<img src="Figure/2_5.jpg" height="385px" width="900px">
+</a>
+ 
 #### Genomic Selection/Prediction(GS/GP) or other none p-values
 
 ```r
