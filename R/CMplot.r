@@ -1,5 +1,5 @@
-#Version:3.4.0
-#Data: 2019/09/01
+#Version:3.5.0
+#Data: 2019/10/01
 #Author: Lilin Yin
 
 CMplot <- function(
@@ -33,9 +33,15 @@ CMplot <- function(
 	signal.col="red",
 	signal.line=1,
 	highlight=NULL,
-	highlight.cex=1.5,
+	highlight.cex=1.3,
 	highlight.pch=19,
-	highlight.col="green",
+	highlight.col="red",
+	highlight.text=NULL,
+	highlight.text.col="black",
+	highlight.text.cex=NULL,
+	highlight.text.xadj=NULL,
+	highlight.text.yadj=NULL,
+	highlight.text.font=3,
 	chr.labels=NULL,
 	chr.den.col="black",
 	cir.band=1,
@@ -63,7 +69,189 @@ CMplot <- function(
 		curve(sqrt(myr^2-x^2),xlim=c(-myr,myr),n=n.point,ylim=c(-myr,myr),type=type,lty=lty,col=col,lwd=lwd,add=add)
 		curve(-sqrt(myr^2-x^2),xlim=c(-myr,myr),n=n.point,ylim=c(-myr,myr),type=type,lty=lty,col=col,lwd=lwd,add=TRUE)
 	}
-	
+
+    highlight_text <- function(
+        x,
+        y,
+        xadj=NULL,
+        yadj=NULL,
+        words=NULL,
+        point.cex = 1,
+        text.cex = 1,
+        pch = 19,
+        point.col = "red",
+        text.col = "black",
+        text.font = 3
+    )
+    {
+	    overlap <- function(x1, y1, sw1, sh1, boxes) {
+	      s <- 0
+	      last <- 1
+	      if (length(boxes) == 0)
+	        return(FALSE)
+	      for (i in c(last, 1:length(boxes))) {
+	        bnds <- boxes[[i]]
+	        x2 <- bnds[1]
+	        y2 <- bnds[2]
+	        sw2 <- bnds[3]
+	        sh2 <- bnds[4]
+	        if (x1 < x2)
+	          overlap <- x1 + sw1 > x2 - s
+	        else
+	          overlap <- x2 + sw2 > x1 - s
+	        
+	        if (y1 < y2)
+	          overlap <- overlap && (y1 + sh1 > y2 - s)
+	        else
+	          overlap <- overlap && (y2 + sh2 > y1 - s)
+	        if (overlap) {
+	          last <<- i
+	          return(TRUE)
+	        }
+	      }
+	      FALSE
+	    }
+    
+        layout <- function(x,
+                           y,
+                           words,
+                           cex = 1,
+                           rotate90 = FALSE,
+                           xlim = c(-Inf, Inf),
+                           ylim = c(-Inf, Inf),
+                           tstep = .1,
+                           rstep = .1)
+        {
+          tails <- "g|j|p|q|y"
+          n <- length(words)
+          sdx <- sd(x, na.rm = TRUE)
+          sdy <- sd(y, na.rm = TRUE)
+          if (sdx == 0)
+          sdx <- 1
+          if (sdy == 0)
+          sdy <- 1
+          if (length(cex) == 1)
+          cex <- rep(cex, n)
+          if (length(rotate90) == 1)
+          rotate90 <- rep(rotate90, n)
+
+
+          boxes <- list()
+          for (i in 1:length(words)) {
+          rotWord <- rotate90[i]
+          r <- 0
+          theta <- runif(1, 0, 2 * pi)
+          x1 <- xo <- x[i]
+          y1 <- yo <- y[i]
+          wid <- strwidth(words[i], cex = cex[i])
+          ht <- strheight(words[i], cex = cex[i])
+          #mind your ps and qs
+          if (grepl(tails, words[i]))
+            ht <- ht + ht * .2
+          if (rotWord) {
+            tmp <- ht
+            ht <- wid
+            wid <- tmp
+          }
+          isOverlaped <- TRUE
+          while (isOverlaped) {
+            if (!overlap(x1 - .5 * wid, y1 - .5 * ht, wid, ht, boxes) &&
+                x1 - .5 * wid > xlim[1] && y1 - .5 * ht > ylim[1] &&
+                x1 + .5 * wid < xlim[2] && y1 + .5 * ht < ylim[2]) {
+              boxes[[length(boxes) + 1]] <- c(x1 - .5 * wid, y1 - .5 * ht, wid, ht)
+              isOverlaped <- FALSE
+            } else{
+              theta <- theta + tstep
+              r <- r + rstep * tstep / (2 * pi)
+              x1 <- xo + sdx * r * cos(theta)
+              y1 <- yo + sdy * r * sin(theta)
+            }
+          }
+          }
+          result <- do.call(rbind, boxes)
+          colnames(result) <- c("x", "y", "width", "ht")
+          rownames(result) <- words
+          result
+        }
+
+        n <- length(x)
+        xlim <- c(min(x), max(x))
+        ylim <- c(min(y), max(y))
+        indx <- order(y, decreasing = TRUE)
+        x <- x[indx]
+        y <- y[indx]
+        if(length(point.cex)!=1){point.cex = rep(point.cex, n); point.cex = point.cex[indx]}
+        if(length(pch)!=1){pch = rep(pch, n); pch = pch[indx]}
+        if(length(point.col)!=1){point.col = rep(point.col, n); point.col = point.col[indx]}
+        if(length(text.col)!=1){text.col = rep(text.col, n); text.col = text.col[indx]}
+        if(length(text.cex)!=1){text.cex = rep(text.cex, n); text.cex = text.cex[indx]}   
+        x1=x; y1=y
+        if(!is.null(words)){
+            words <- words[indx]
+            if(is.null(xadj)){
+                xadj = sample(c(1.5, -0.5), n, replace = TRUE)
+            }else{
+                if(length(xadj) != n)   stop("length of xadj not equals to length of x")
+                if(sum(!xadj %in% c(-1,0,1)) > 0)   stop("-1, 0, 1 limited for xadj")
+                xadj[xadj==-1] = 1.5
+                xadj[xadj==1] = -0.5
+                xadj = xadj[indx]
+            }
+            if(is.null(yadj)){
+                yadj = rep(-0.5, n)
+            }else{
+                if(length(yadj) != n)   stop("length of yadj not equals to length of y")
+                if(sum(!yadj %in% c(-1,0,1)) > 0)   stop("-1, 0, 1 limited for yadj")
+                yadj[yadj==-1] = 1.5
+                yadj[yadj==1] = -0.5
+                yadj = yadj[indx]
+            }
+            for(i in 1:n){
+                if(xadj[i] == 0){
+                    if(yadj[i] == -0.5) y[i] = y[i] + 1.5*strheight(words[i],cex=text.cex)
+                    if(yadj[i] == 1.5)  y[i] = y[i] - 1.5*strheight(words[i],cex=text.cex)
+                }else{
+                    if(yadj[i] == -0.5) y[i] = y[i] + strheight(words[i],cex=text.cex)
+                    if(yadj[i] == 1.5)  y[i] = y[i] - strheight(words[i],cex=text.cex)
+                }
+                if(yadj[i] == 0){
+                    if(xadj[i] == 1.5) x[i] = x[i] - 0.7*strwidth(words[i],cex=text.cex)
+                    if(xadj[i] == -0.5) x[i] = x[i] + 0.7*strwidth(words[i],cex=text.cex)
+                }else{
+                    if(xadj[i] == 1.5) x[i] = x[i] - 0.7*strwidth(words[i],cex=text.cex)
+                    if(xadj[i] == -0.5) x[i] = x[i] + 0.7*strwidth(words[i],cex=text.cex)
+                }
+            }
+            x <- c(x1,x)
+            y <- c(y1,y)
+            words <- c(rep("OOO", n), as.character(words))
+            lay <- layout(x,y,words,cex=text.cex,xlim=xlim,ylim=ylim)
+            indd <- (n+1):length(x)
+            for(i in indd){
+                xl <- lay[i,1]
+                yl <- lay[i,2]
+                w <- lay[i,3]
+                h <- lay[i,4]
+                nx <- xl+.5*w
+                ny <- yl+.5*h
+                if((nx + 0.5 * strwidth(words[i],cex=text.cex)) < x1[i-n]){
+                    nx = nx + 0.5 * strwidth(words[i],cex=text.cex)
+                }else if((nx - 0.5 * strwidth(words[i],cex=text.cex)) > x1[i-n]){
+                    nx = nx - 0.5 * strwidth(words[i],cex=text.cex)
+                }
+                if((ny + strheight(words[i],cex=text.cex)) < y1[i-n]){
+                    ny = ny + 0.5 * strheight(words[i],cex=text.cex)
+                }else if((ny - strheight(words[i],cex=text.cex)) > y1[i-n]){
+                    ny = ny - 0.5 * strheight(words[i],cex=text.cex)
+                }
+                arrows(x1[i-n], y1[i-n], nx, ny, length=.08, angle=15, code=2, col="grey", lwd=2)
+                # segments(x1[i], y1[i], nx, ny, col="grey", lwd=2)
+            }
+        }
+        points(x1,y1,pch = pch,col = point.col,cex = point.cex)
+        if(!is.null(words)) text(lay[indd,1]+.5*lay[indd,3],lay[indd,2]+.5*lay[indd,4],words[indd],cex = text.cex,col=text.col,font=text.font)
+    }
+
 	max_ylim <- function(x){
 		if(x == 0) return(x)
 		if(abs(x) >= 1){
@@ -700,6 +888,7 @@ CMplot <- function(
 				}
 
 				if(!is.null(highlight)){
+					points(X[highlight_index],X[highlight_index],pch=19,cex=cex[1],col="white")
 					points(X[highlight_index],Y[highlight_index],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
 				}
 
@@ -912,6 +1101,7 @@ CMplot <- function(
 				}
 				
 				if(!is.null(highlight)){
+					points(X[highlight_index],X[highlight_index],pch=19,cex=cex[1],col="white")
 					points(X[highlight_index],Y[highlight_index],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
 				}
 
@@ -1156,7 +1346,8 @@ CMplot <- function(
 					}
 
 					if(!is.null(highlight)){
-						points(pvalue.posN[highlight_index],logpvalue[highlight_index],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
+						points(x=pvalue.posN[highlight_index],y=logpvalue[highlight_index],pch=pch,cex=cex[2],col="white")
+						highlight_text(x=pvalue.posN[highlight_index],y=logpvalue[highlight_index],xadj=highlight.text.xadj,yadj=highlight.text.yadj,words=highlight.text,point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
 					}
 
 					#if(!is.null(threshold) & !is.null(signal.line))	abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
@@ -1202,7 +1393,7 @@ CMplot <- function(
 				if(file=="jpg")	jpeg(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi,quality = 100)
 				if(file=="pdf")	pdf(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht*R)
 				if(file=="tiff")	tiff(paste("Multracks.Rectangular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi)
-				par(mfcol=c(R,1),mar=c(0+cex.lab, 6+cex.lab, 0, 2+cex.lab),oma=c(4,0,4,0),xaxs=xaxs,yaxs=yaxs,xpd=TRUE)
+				par(mfcol=c(R,1),mar=c(0+cex.lab, 6+cex.lab, 0, 2+cex.lab),oma=c(4,0,4,0), xaxs=xaxs,xpd=TRUE)
 			}
 			if(!file.output){
 				ht=ifelse(is.null(height), 6, height)
@@ -1258,17 +1449,18 @@ CMplot <- function(
 					}
 					if((Max-Min)<=1){
 						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
-							cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=2,axes=FALSE,xlab="")
+							cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=2,axes=FALSE,xlab="",yaxs=yaxs)
 					}else{
 						plot(pvalue.posN,logpvalue,pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ylab=ylab,
-							cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=2,axes=FALSE,xlab="")
+							cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=2,axes=FALSE,xlab="",yaxs=yaxs)
 					}
 				}else{
 					Max <- max_no_na(ylim)
 					Min <- min_no_na(ylim)
 					plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ylab=ylab,
-						cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=1,axes=FALSE,xlab="")
+						cex.axis=cex.axis*(R/2),cex.lab=cex.lab*(R/2),font=1,axes=FALSE,xlab="",yaxs=yaxs)
 				}
+
 				# Max1 <- Max
 				# Min1 <- Min
 				# if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
@@ -1366,6 +1558,7 @@ CMplot <- function(
 				}
 
 				if(!is.null(highlight)){
+					points(pvalue.posN[highlight_index],logpvalue[highlight_index],pch=pch,cex=cex[2]*R,col="white")
 					points(pvalue.posN[highlight_index],logpvalue[highlight_index],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
 				}
 
