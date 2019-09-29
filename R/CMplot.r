@@ -357,9 +357,12 @@ CMplot <- function(
 		col=colorRampPalette(col)(maxbin.num - legend.min + 1)
 		col.seg=NULL
 		for(i in 1 : length(chr.num)){
-			if(plot)	polygon(c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])), 
+			if(plot){
+				polygon(c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])), 
 				c(-width/5 - band * (i - length(chr.num) - 1), width/5 - band * (i - length(chr.num) - 1), 
-				width/5 - band * (i - length(chr.num) - 1), -width/5 - band * (i - length(chr.num) - 1)), col="grey", border="grey")
+				width/5 - band * (i - length(chr.num) - 1), -width/5 - band * (i - length(chr.num) - 1)), col="grey95", border="grey95")
+				rect(xleft = 0, ybottom = -width/5 - band * (i - length(chr.num) - 1), xright = max(pos.x[[i]]), ytop = width/5 - band * (i - length(chr.num) - 1), border="grey80")
+			}
 			if(!is.null(legend.max)){
 				if(legend.max < Maxbin.num){
 					col.index[[i]][col.index[[i]] > legend.max] <- legend.max
@@ -424,7 +427,7 @@ CMplot <- function(
 		}
 		legend.y <- c(0, legend.y)
 		legend.y.col <- as.numeric(legend.y.col)
-		legend.col <- c("grey", col[round(legend.y.col * length(col) / (maxbin.num - legend.min + 1)) - legend.min + 1])
+		legend.col <- c("grey95", col[round(legend.y.col * length(col) / (maxbin.num - legend.min + 1)) - legend.min + 1])
 		if(plot)	legend(x=(chorm.maxlen + chorm.maxlen/100), y=( -width/2.5 - band * (length(chr.num) - length(chr.num) - 1)), title="", legend=legend.y, pch=15, pt.cex = legend.pt.cex, col=legend.col,
 			cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=legend.x.intersp, yjust=0, xjust=0, xpd=TRUE)
 		if(!plot)	return(list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y))
