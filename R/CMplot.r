@@ -1,5 +1,5 @@
 #Version:3.5.0
-#Data: 2019/10/10
+#Data: 2019/10/01
 #Author: Lilin Yin
 
 CMplot <- function(
@@ -30,15 +30,15 @@ CMplot <- function(
     amplify= TRUE,
     signal.cex = 1.5,
     signal.pch = 19,
-    signal.col="red",
+    signal.col=NULL,
     signal.line=1,
     highlight=NULL,
-    highlight.cex=1.3,
+    highlight.cex=1,
     highlight.pch=19,
     highlight.col="red",
     highlight.text=NULL,
     highlight.text.col="black",
-    highlight.text.cex=NULL,
+    highlight.text.cex=1,
     highlight.text.xadj=NULL,
     highlight.text.yadj=NULL,
     highlight.text.font=3,
@@ -533,10 +533,38 @@ CMplot <- function(
         SNP_id <- SNP_id[order_index]
 
         if(!is.null(highlight)){
-            highlight <- as.character(as.matrix(highlight))
-            highlight_index <- match(highlight, SNP_id)
-            if(all(is.na(highlight_index))) stop("No shared SNPs between Pmap and highlight!")
-            highlight_index <- na.omit(highlight_index)
+            highlight_index[[i]] <- list()
+            length(highlight_index[[i]]) <- R
+            if(!is.list(highlight)){
+                highlight <- list(highlight)
+                for(i in 1:R){highlight[[i]] = highlight[[1]]}
+            }
+            for(i in 1:length(highlight)){
+                highlight_index[[i]] <- match(as.character(as.matrix(highlight[[i]])), SNP_id)
+                if(all(is.na(highlight_index[[i]]))) stop("No shared SNPs between Pmap and highlight!")
+                highlight_index[[i]] <- na.omit(highlight_index[[i]])
+            }
+        }
+
+        if(!is.null(highlight.text)){
+            if(!is.list(highlight.text)){
+                highlight.text <- list(highlight.text)
+                for(i in 1:R){highlight.text[[i]] = highlight.text[[1]]}
+            }  
+        }
+
+        if(!is.null(highlight.text.xadj)){
+            if(!is.list(highlight.text.xadj)){
+                highlight.text.xadj <- list(highlight.text.xadj)
+                for(i in 1:R){highlight.text.xadj[[i]] = highlight.text.xadj[[1]]}
+            }  
+        }
+
+        if(!is.null(highlight.text.yadj)){
+            if(!is.list(highlight.text.yadj)){
+                highlight.text.yadj <- list(highlight.text.yadj)
+                for(i in 1:R){highlight.text.yadj[[i]] = highlight.text.yadj[[1]]}
+            }  
         }
 
         #get the index of chromosome
@@ -899,28 +927,29 @@ CMplot <- function(
                 }
 
                 if(!is.null(highlight)){
-                    points(X[highlight_index],X[highlight_index],pch=19,cex=cex[1],col="white")
-                    points(X[highlight_index],Y[highlight_index],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
+                    points(X[highlight_index[[i]]],X[highlight_index[[i]]],pch=19,cex=cex[1],col="white")
+                    if(is.null(highlight.col))  highlight.col = rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]]
+                    points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
                 }
 
                 if(cir.chr==TRUE){
                     ticks1=(RR+2*cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
                     ticks2=(RR+2*cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
-                        for(i in 1:length(ticks)){
-                            angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                            text(ticks1[i],ticks2[i],chr.ori[i],srt=angle,font=2,cex=cex.axis)
+                        for(t in 1:length(ticks)){
+                            angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis)
                         }
                     }else{
                         if(Nchr == 1){
-                            for(i in 1:length(ticks)){
-                                angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                                text(ticks1[i],ticks2[i],paste(chr.labels[i], "Mb", sep=""),srt=angle,font=2,cex=cex.axis)
+                            for(t in 1:length(ticks)){
+                                angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb", sep=""),srt=angle,font=2,cex=cex.axis)
                             }
                         }else{
-                            for(i in 1:length(ticks)){
-                                angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                                text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
+                            for(t in 1:length(ticks)){
+                                angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis)
                             }
                         }
                     }
@@ -928,20 +957,20 @@ CMplot <- function(
                     ticks1=(0.9*r)*sin(2*pi*(ticks-round(band/2))/TotalN)
                     ticks2=(0.9*r)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
-                        for(i in 1:length(ticks)){
-                        angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                        text(ticks1[i],ticks2[i],chr.ori[i],srt=angle,font=2,cex=cex.axis)
+                        for(t in 1:length(ticks)){
+                        angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                        text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis)
                         }
                     }else{
                         if(Nchr == 1){
-                            for(i in 1:length(ticks)){
-                                angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                                text(ticks1[i],ticks2[i],paste(chr.labels[i], "Mb", sep=""),srt=angle,font=2,cex=cex.axis)
+                            for(t in 1:length(ticks)){
+                                angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb", sep=""),srt=angle,font=2,cex=cex.axis)
                             }
                         }else{
-                            for(i in 1:length(ticks)){
-                                angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                                text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
+                            for(t in 1:length(ticks)){
+                                angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis)
                             }
                         }
                     }
@@ -1112,28 +1141,29 @@ CMplot <- function(
                 }
                 
                 if(!is.null(highlight)){
-                    points(X[highlight_index],X[highlight_index],pch=19,cex=cex[1],col="white")
-                    points(X[highlight_index],Y[highlight_index],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
+                    points(X[highlight_index[[i]]],X[highlight_index[[i]]],pch=19,cex=cex[1],col="white")
+                    if(is.null(highlight.col))  highlight.col = rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]]
+                    points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
                 }
 
                 if(cir.chr==TRUE){
                     ticks1=(RR+2*cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
                     ticks2=(RR+2*cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
-                        for(i in 1:length(ticks)){
-                          angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                          text(ticks1[i],ticks2[i],chr.ori[i],srt=angle,font=2,cex=cex.axis)
+                        for(t in 1:length(ticks)){
+                          angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                          text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis)
                         }
                     }else{
                         if(Nchr == 1){
-                            for(i in 1:length(ticks)){
-                                angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                                text(ticks1[i],ticks2[i],paste(chr.labels[i], "Mb",sep=""),srt=angle,font=2,cex=cex.axis)
+                            for(t in 1:length(ticks)){
+                                angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb",sep=""),srt=angle,font=2,cex=cex.axis)
                             }
                         }else{
-                            for(i in 1:length(ticks)){
-                                angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                                text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
+                            for(t in 1:length(ticks)){
+                                angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis)
                             }
                         }
                     }
@@ -1141,22 +1171,22 @@ CMplot <- function(
                     ticks1=RR*sin(2*pi*(ticks-round(band/2))/TotalN)
                     ticks2=RR*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
-                        for(i in 1:length(ticks)){
+                        for(t in 1:length(ticks)){
                         
                             #adjust the angle of labels of circle plot
-                            angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                            text(ticks1[i],ticks2[i],chr.ori[i],srt=angle,font=2,cex=cex.axis)
+                            angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis)
                         }
                     }else{
                         if(Nchr == 1){
-                            for(i in 1:length(ticks)){
-                                angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                                text(ticks1[i],ticks2[i],paste(chr.labels[i], "Mb",sep=""),srt=angle,font=2,cex=cex.axis)
+                            for(t in 1:length(ticks)){
+                                angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb",sep=""),srt=angle,font=2,cex=cex.axis)
                             }
                         }else{
-                            for(i in 1:length(ticks)){
-                                angle=360*(1-(ticks-round(band/2))[i]/TotalN)
-                                text(ticks1[i],ticks2[i],chr.labels[i],srt=angle,font=2,cex=cex.axis)
+                            for(t in 1:length(ticks)){
+                                angle=360*(1-(ticks-round(band/2))[t]/TotalN)
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis)
                             }
                         }
                     }   
@@ -1357,8 +1387,9 @@ CMplot <- function(
                     }
 
                     if(!is.null(highlight)){
-                        points(x=pvalue.posN[highlight_index],y=logpvalue[highlight_index],pch=pch,cex=cex[2],col="white")
-                        highlight_text(x=pvalue.posN[highlight_index],y=logpvalue[highlight_index],xadj=highlight.text.xadj,yadj=highlight.text.yadj,words=highlight.text,point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
+                        points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2],col="white")
+                        if(is.null(highlight.col))  highlight.col = rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]]
+                        highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
                     }
 
                     #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
@@ -1520,57 +1551,58 @@ CMplot <- function(
                             segments(0, h, max_no_na(pvalue.posN), h, col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
                         }
                         if(amplify==TRUE){
-                                if(LOG10){
-                                    threshold <- sort(threshold)
-                                    sgline1=-log10(max_no_na(threshold))
+                            if(LOG10){
+                                threshold <- sort(threshold)
+                                sgline1=-log10(max_no_na(threshold))
+                            }else{
+                                threshold <- sort(threshold, decreasing=TRUE)
+                                sgline1=min_no_na(threshold)
+                            }
+                            sgindex=which(logpvalue>=sgline1)
+                            HY1=logpvalue[sgindex]
+                            HX1=pvalue.posN[sgindex]
+                            
+                            #cover the points that exceed the threshold with the color "white"
+                            points(HX1,HY1,pch=pch,cex=cex[2]*R,col="white")
+                            
+                            for(ll in 1:length(threshold)){
+                                if(ll == 1){
+                                    if(LOG10){
+                                        sgline1=-log10(threshold[ll])
+                                    }else{
+                                        sgline1=threshold[ll]
+                                    }
+                                    sgindex=which(logpvalue>=sgline1)
+                                    HY1=logpvalue[sgindex]
+                                    HX1=pvalue.posN[sgindex]
                                 }else{
-                                    threshold <- sort(threshold, decreasing=TRUE)
-                                    sgline1=min_no_na(threshold)
-                                }
-                                sgindex=which(logpvalue>=sgline1)
-                                HY1=logpvalue[sgindex]
-                                HX1=pvalue.posN[sgindex]
-                                
-                                #cover the points that exceed the threshold with the color "white"
-                                points(HX1,HY1,pch=pch,cex=cex[2]*R,col="white")
-                                
-                                for(ll in 1:length(threshold)){
-                                    if(ll == 1){
-                                        if(LOG10){
-                                            sgline1=-log10(threshold[ll])
-                                        }else{
-                                            sgline1=threshold[ll]
-                                        }
-                                        sgindex=which(logpvalue>=sgline1)
-                                        HY1=logpvalue[sgindex]
-                                        HX1=pvalue.posN[sgindex]
+                                    if(LOG10){
+                                        sgline0=-log10(threshold[ll-1])
+                                        sgline1=-log10(threshold[ll])
                                     }else{
-                                        if(LOG10){
-                                            sgline0=-log10(threshold[ll-1])
-                                            sgline1=-log10(threshold[ll])
-                                        }else{
-                                            sgline0=threshold[ll-1]
-                                            sgline1=threshold[ll]
-                                        }
-                                        sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
-                                        HY1=logpvalue[sgindex]
-                                        HX1=pvalue.posN[sgindex]
+                                        sgline0=threshold[ll-1]
+                                        sgline1=threshold[ll]
                                     }
+                                    sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
+                                    HY1=logpvalue[sgindex]
+                                    HX1=pvalue.posN[sgindex]
+                                }
 
-                                    if(is.null(signal.col)){
-                                        points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2]*R,col=rep(rep(colx,N[i]),add[[i]])[sgindex])
-                                    }else{
-                                        points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2]*R,col=signal.col[ll])
-                                    }
-                                    
+                                if(is.null(signal.col)){
+                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2]*R,col=rep(rep(colx,N[i]),add[[i]])[sgindex])
+                                }else{
+                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*cex[2]*R,col=signal.col[ll])
                                 }
+                                
+                            }
                         }
                     }
                 }
 
                 if(!is.null(highlight)){
-                    points(pvalue.posN[highlight_index],logpvalue[highlight_index],pch=pch,cex=cex[2]*R,col="white")
-                    points(pvalue.posN[highlight_index],logpvalue[highlight_index],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
+                    points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2]*(R/2),col="white")
+                    if(is.null(highlight.col))  highlight.col = rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]]
+                    highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*(R/2),text.cex=highlight.text.cex*(R/2), pch=highlight.pch,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
                 }
 
                 #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
@@ -1739,20 +1771,32 @@ CMplot <- function(
                 }
                 if(length(sam.index[[i]]) == 0) do <- FALSE
             }
-            
-            # for(i in 1:R){
-                # logpvalue=logpvalueT[,i]
-                # points(pvalue.posN,logpvalue,pch=pch,cex=cex[2],col=t(col)[i])
-            # }
-            
+
             if(!is.null(threshold)){
                 if(sum(threshold!=0)==length(threshold)){
+                    for(i in 1:R){
+                        logpvalue=logpvalueT[, i]
+                        if(LOG10){
+                            sgindex = which(logpvalue > -log10(min(threshold)))
+                        }else{
+                            sgindex = which(logpvalue > max(threshold))
+                        }
+                        HY1=logpvalue[sgindex]
+                        HX1=pvalue.posN[sgindex]
+                        points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
+                        if(!is.null(signal.col)){
+                            points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rep(signal.col, R)[i])
+                        }else{
+                            points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
+                        }
+                    }
                     for(thr in 1:length(threshold)){
                         h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
                         segments(0, h, max_no_na(pvalue.posN), h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
                     }
                 }
             }
+
             if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(ylim)}
             if(cir.density){
                         for(yll in 1:length(pvalue.posN.list)){
