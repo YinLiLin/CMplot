@@ -278,17 +278,18 @@ highlight.text.yadj: value or vecter, same as above, -1(down), 0(center), 1(up)
 ### Multi_tracks Rectangular-Manhattan plot
 
 ```r
-> CMplot(pig60K, plot.type="m",pch=1:3,multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
+> CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
-        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),signal.cex=c(1,1),
+        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green","blue"),signal.cex=1.5,
         file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
+#Note: if you are not supposed to change the color of signal, please set signal.col=NULL.
 ```
 
-#### a. all traits in a axes:
+#### a. all traits in one axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4.jpg">
-<img src="Figure/4.jpg" height="385px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4_1.jpg">
+<img src="Figure/4_1.jpg" height="385px" width="900px">
 </a>
 </p>
 
