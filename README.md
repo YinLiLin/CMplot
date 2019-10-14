@@ -193,6 +193,8 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
         highlight.col="green",highlight.cex=1,highlight.pch=19,file="jpg",memo="",
         dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 #Note:
+'highlight' could be vector or list, if it is a vector, all traits will use the same highlighted SNPs index, 
+if it is a list, the length of the list should equal to the number of traits.
 highlight.col, highlight.cex, highlight.pch can be value or vecter, if its length equals to the length of highlighted SNPs,
 each SNPs have its special colour, size and shape.
 ```
@@ -229,12 +231,14 @@ each SNPs have its special colour, size and shape.
         highlight.text.col=c("red","blue","green"),threshold=0.05/nrow(pig60K),threshold.lty=2,   
         amplify=FALSE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 #Note:
+'highlight', 'highlight.text', 'highlight.text.xadj', 'highlight.text.yadj' could be vector or list, if it is a vector, 
+all traits will use the same highlighted SNPs index and text, if it is a list, the length of the list should equal to the number of traits.
 the order of 'highlight.text' must be consistent with 'highlight'
 highlight.text.cex: value or vecter, control the size of added text
 highlight.text.font: value or vecter, control the font of added text
-highlight.text.xadj: value or vecter, -1, 0, 1 limited, control the position of text around the highlighted SNPs,
+highlight.text.xadj: value or vecter or list for multiple traits, -1, 0, 1 limited, control the position of text around the highlighted SNPs,
                      -1(left), 0(center), 1(right)
-highlight.text.yadj: value or vecter, same as above, -1(down), 0(center), 1(up)
+highlight.text.yadj: value or vecter or list for multiple traits, same as above, -1(down), 0(center), 1(up)
 ```
 
 </p>
