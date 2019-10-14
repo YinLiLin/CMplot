@@ -331,7 +331,7 @@ CMplot <- function(
         chorm.maxlen <- max(pos)
         bp <- ifelse(chorm.maxlen < 1e6, 1e3, 1e6)
         bp_label <- ifelse(bp == 1e3, "Kb", "Mb")
-        main <- paste("The number of SNPs within ", round(bin / bp), bp_label, " window size", sep="")
+        main <- paste("The number of SNPs within ", bin / bp, bp_label, " window size", sep="")
         if(plot)    plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/10), ylim=c(0, length(chr.num) * band + band), main=main,axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
         pos.x <- list()
         col.index <- list()
