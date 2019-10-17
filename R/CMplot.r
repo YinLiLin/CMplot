@@ -54,7 +54,7 @@ CMplot <- function(
     box=FALSE,
     conf.int=TRUE,
     file.output=TRUE,
-    file="jpg",
+    file=c("jpg","pdf","tiff"),
     dpi=300,
     height=NULL,
     width=NULL,
@@ -442,7 +442,7 @@ CMplot <- function(
     }
 
     if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
-
+    file=match.arg(file)
     taxa=colnames(Pmap)[-c(1:3)]
     if(!is.null(memo) && memo != "")    memo <- paste("_", memo, sep="")
     if(length(taxa) == 0)   taxa <- paste("Col", 1:(ncol(Pmap)-3), sep="")
