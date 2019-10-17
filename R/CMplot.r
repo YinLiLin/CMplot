@@ -533,8 +533,7 @@ CMplot <- function(
         SNP_id <- SNP_id[order_index]
 
         if(!is.null(highlight)){
-            highlight_index[[i]] <- list()
-            length(highlight_index[[i]]) <- R
+            highlight_index <- list()
             if(!is.list(highlight)){
                 highlight <- list(highlight)
                 for(i in 1:R){highlight[[i]] = highlight[[1]]}
