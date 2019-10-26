@@ -43,7 +43,7 @@ There are two example datasets attached in **CMplot**, users can export and view
 6 SNP6   1 354493        0.000110681 0.000342628    0.000105792
 
 ```
-As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the res of columns are the pvalues of GWAS or effects of GS/GP for traits,  the number of traits is unlimited.
+As the example datasets, the first three columns are names, chromosome, position of SNPs respectively, the rest of columns are the pvalues of GWAS or effects of GS/GP for traits,  the number of traits is unlimited.
 Note: if plotting SNP_Density, only the first three columns are needed.
 
 Now **CMplot** could handle not only Genome-wide association study results, but also SNP effects, Fst, tajima's D and so on.
@@ -155,7 +155,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
         chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),
         file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 
-#Note: if the ylim is setted, then CMplot will only plot the ponits which among this interval.
+#Note: if the ylim is setted, then CMplot will only plot the points which among this interval.
 ```
 
 <p align="center">
@@ -195,7 +195,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 #Note:
 'highlight' could be vector or list, if it is a vector, all traits will use the same highlighted SNPs index, 
 if it is a list, the length of the list should equal to the number of traits.
-highlight.col, highlight.cex, highlight.pch can be value or vecter, if its length equals to the length of highlighted SNPs,
+highlight.col, highlight.cex, highlight.pch can be value or vector, if its length equals to the length of highlighted SNPs,
 each SNPs have its special colour, size and shape.
 ```
 
@@ -238,7 +238,7 @@ highlight.text.cex: value or vecter, control the size of added text
 highlight.text.font: value or vecter, control the font of added text
 highlight.text.xadj: value or vecter or list for multiple traits, -1, 0, 1 limited, control the position of text around the highlighted SNPs,
                      -1(left), 0(center), 1(right)
-highlight.text.yadj: value or vecter or list for multiple traits, same as above, -1(down), 0(center), 1(up)
+highlight.text.yadj: value or vector or list for multiple traits, same as above, -1(down), 0(center), 1(up)
 ```
 
 </p>
