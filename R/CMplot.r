@@ -1,5 +1,5 @@
-#Version:3.5.0
-#Data: 2019/10/01
+#Version:3.5.1
+#Data: 2019/11/01
 #Author: Lilin Yin
 
 CMplot <- function(
@@ -184,7 +184,7 @@ CMplot <- function(
         }
 
         n <- length(x)
-        indx <- order(x, decreasing = FALSE)
+        indx <- order(y, decreasing = TRUE)
         x <- x[indx]
         y <- y[indx]
         if(length(point.cex)!=1){point.cex = rep(point.cex, n); point.cex = point.cex[indx]}
@@ -196,9 +196,7 @@ CMplot <- function(
         if(!is.null(words)){
             words <- words[indx]
             if(is.null(xadj)){
-                xadj = rep(NA, n)
-                xadj[x<=median(x)] = 1.5
-                xadj[x>median(x)] = -0.5
+                xadj = sample(c(1.5, 0, -0.5), n, rep=TRUE)
             }else{
                 if(length(xadj) != n)   stop("length of xadj not equals to length of x")
                 if(sum(!xadj %in% c(-1,0,1)) > 0)   stop("-1, 0, 1 limited for xadj")
@@ -207,9 +205,9 @@ CMplot <- function(
                 xadj = xadj[indx]
             }
             if(is.null(yadj)){
-                yadj = rep(NA, n)
-                yadj[y<=median(y)] = 1.5
-                yadj[y>median(y)] = -0.5
+                yadj = rep(-0.5, n)
+                # yadj[y<=median(y)] = 1.5
+                # yadj[y>median(y)] = -0.5
             }else{
                 if(length(yadj) != n)   stop("length of yadj not equals to length of y")
                 if(sum(!yadj %in% c(-1,0,1)) > 0)   stop("-1, 0, 1 limited for yadj")
@@ -219,9 +217,22 @@ CMplot <- function(
             }
             for(i in 1:n){
                 if(xadj[i] == 0){
-                    if(yadj[i] == -0.5) y[i] = y[i] + 1.5*strheight(words[i],cex=text.cex)
+                    if(yadj[i] == -0.5){
+                        if((y[i] + 2*strheight(words[i],cex=text.cex)) > max(ylim)){
+                            y[i] = y[i] - 1.5*strheight(words[i],cex=text.cex)
+                        }else{
+                            y[i] = y[i] + 1.5*strheight(words[i],cex=text.cex)
+                        }
+                    }
                     if(yadj[i] == 1.5)  y[i] = y[i] - 1.5*strheight(words[i],cex=text.cex)
                 }else{
+                    if(yadj[i] == -0.5){
+                        if((y[i] + 1.5*strheight(words[i],cex=text.cex)) > max(ylim)){
+                            y[i] = y[i] - strheight(words[i],cex=text.cex)
+                        }else{
+                            y[i] = y[i] + strheight(words[i],cex=text.cex)
+                        }
+                    }
                     if(yadj[i] == -0.5) y[i] = y[i] + strheight(words[i],cex=text.cex)
                     if(yadj[i] == 1.5)  y[i] = y[i] - strheight(words[i],cex=text.cex)
                 }
@@ -267,7 +278,7 @@ CMplot <- function(
             }
         }
         points(x1,y1,pch = pch,col = point.col,cex = point.cex)
-        if(!is.null(words)) text(lay[indd,1]+.5*lay[indd,3],lay[indd,2]+.5*lay[indd,4],words[indd],cex = text.cex,col=text.col,font=text.font)
+        if(!is.null(words)) text(lay[indd,1]+.5*lay[indd,3],lay[indd,2]+.5*lay[indd,4],words[indd],xpd=TRUE,cex = text.cex,col=text.col,font=text.font)
     }
 
     max_ylim <- function(x){
@@ -1405,8 +1416,11 @@ CMplot <- function(
 
                     if(!is.null(highlight)){
                         points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2],col="white")
-                        if(is.null(highlight.col))  highlight.col = rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]]
-                        highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
+                        if(is.null(highlight.col)){
+                            highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
+                        }else{
+                            highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
+                        }
                     }
 
                     #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
@@ -1617,9 +1631,12 @@ CMplot <- function(
                 }
 
                 if(!is.null(highlight)){
-                    points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2]*(R/2),col="white")
-                    if(is.null(highlight.col))  highlight.col = rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]]
-                    highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*(R/2),text.cex=highlight.text.cex*(R/2), pch=highlight.pch,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
+                    points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2]*R,col="white")
+                    if(is.null(highlight.col)){
+                        highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
+                    }else{
+                        highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
+                    }
                 }
 
                 #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
