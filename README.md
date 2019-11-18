@@ -214,7 +214,7 @@ each SNPs have its special colour, size and shape.
 
 </p>
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_3.jpg">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_6.jpg">
 <img src="Figure/2_6.jpg" height="385px" width="900px">
 </a>
 
