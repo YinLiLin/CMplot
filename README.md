@@ -60,7 +60,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 ### SNP-density plot
 
 ```r
-> CMplot(pig60K,plot.type="d",bin.size=1e6,chr.den.col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300,
+> CMplot(pig60K,type="p",plot.type="d",bin.size=1e6,chr.den.col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300,
     file.output=TRUE,verbose=TRUE,width=9,height=6)
 # users can personally set the windowsize and the min/max of legend by:
 # bin.size=1e6
@@ -82,7 +82,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
+> CMplot(pig60K,type="p",plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
         outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
         memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
 ```
@@ -94,7 +94,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 </p>
 
 ```r
-> CMplot(pig60K,plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
+> CMplot(pig60K,type="p",plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
       bin.size=1e6,outward=FALSE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
@@ -115,7 +115,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 #### (2) Genomic Selection/Prediction(GS/GP)
 
 ```r
-> CMplot(cattle50K,plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("#4DAF4A",NA,NA,"dodgerblue4",
+> CMplot(cattle50K,type="p",plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("#4DAF4A",NA,NA,"dodgerblue4",
          "deepskyblue",NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),
          chr.labels=paste("Chr",c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,
          cir.band=1,file="jpg", memo="",dpi=300,chr.den.col="black",file.output=TRUE,verbose=TRUE,
@@ -137,7 +137,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 #### Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,plot.type="m",LOG10=TRUE,threshold=NULL,file="jpg",memo="",dpi=300,
+> CMplot(pig60K,type="p",plot.type="m",LOG10=TRUE,threshold=NULL,file="jpg",memo="",dpi=300,
     file.output=TRUE,verbose=TRUE,width=14,height=6)
 ```
 
@@ -203,6 +203,19 @@ each SNPs have its special colour, size and shape.
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_3.jpg">
 <img src="Figure/2_3.jpg" height="385px" width="900px">
+</a>
+
+#### Highlight all SNPs
+```r
+> CMplot(pig60K,type="h",plot.type="m",LOG10=TRUE,highlight=pig60K[,1],
+        highlight.col=NULL,highlight.cex=1.2,highlight.pch=19,file="jpg",memo="",
+        dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+```
+
+</p>
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_3.jpg">
+<img src="Figure/2_6.jpg" height="385px" width="900px">
 </a>
 
 #### Visualize only one chromosome
