@@ -574,6 +574,8 @@ CMplot <- function(
             if(!is.list(highlight)){
                 highlight <- list(highlight)
                 for(i in 1:R){highlight[[i]] = highlight[[1]]}
+            }else{
+                if(length(highlight) != R){stop("length of 'highlight' not equals to the number of traits.")}  
             }
             length(highlight_index) <- length(highlight)
             for(i in 1:length(highlight)){
@@ -592,6 +594,8 @@ CMplot <- function(
             if(!is.list(highlight.text)){
                 highlight.text <- list(highlight.text)
                 for(i in 1:R){highlight.text[[i]] = highlight.text[[1]]}
+            }else{
+                if(length(highlight.text) != R){stop("length of 'highlight.text' not equals to the number of traits.")}  
             }
             for(i in 1:length(highlight.text)){
                 highlight.text[[i]] <- highlight.text[[i]][!is.na(highlight.text[[i]])]
@@ -602,6 +606,8 @@ CMplot <- function(
             if(!is.list(highlight.text.xadj)){
                 highlight.text.xadj <- list(highlight.text.xadj)
                 for(i in 1:R){highlight.text.xadj[[i]] = highlight.text.xadj[[1]]}
+            }else{
+                if(length(highlight.text.xadj) != R){stop("length of 'highlight.text.xadj' not equals to the number of traits.")}  
             }  
         }
 
@@ -609,6 +615,8 @@ CMplot <- function(
             if(!is.list(highlight.text.yadj)){
                 highlight.text.yadj <- list(highlight.text.yadj)
                 for(i in 1:R){highlight.text.yadj[[i]] = highlight.text.yadj[[1]]}
+            }else{
+                if(length(highlight.text.yadj) != R){stop("length of 'highlight.text.yadj' not equals to the number of traits.")}  
             }  
         }
 
