@@ -1316,18 +1316,18 @@ CMplot <- function(
                         }
                         if((Max-Min)<=1){
                             if(cir.density){
-                                plot(pvalue.posN,logpvalue,pch=pch,type=type,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ann=FALSE,
+                                plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ann=FALSE,
                                     cex.axis=cex.axis,font=2,axes=FALSE,main="")
                             }else{
-                                plot(pvalue.posN,logpvalue,pch=pch,type=type,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
+                                plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
                                 cex.axis=cex.axis,font=2,axes=FALSE,main="")
                             }
                         }else{
                             if(cir.density){
-                                plot(pvalue.posN,logpvalue,pch=pch,type=type,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ann=FALSE,
+                                plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ann=FALSE,
                                 cex.axis=cex.axis,font=2,axes=FALSE,main="")
                             }else{
-                                plot(pvalue.posN,logpvalue,pch=pch,type=type,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
+                                plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
                                 cex.axis=cex.axis,font=2,axes=FALSE,main="")
                             }
                         }
@@ -1337,10 +1337,10 @@ CMplot <- function(
                         Max <- max_no_na(ylim)
                         Min <- min_no_na(ylim)
                         if(cir.density){
-                            plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,type=type,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim)-(Max-Min)/den.fold, max_no_na(ylim)),ann=FALSE,
+                            plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim)-(Max-Min)/den.fold, max_no_na(ylim)),ann=FALSE,
                             cex.axis=cex.axis,font=2,axes=FALSE,main="")
                         }else{
-                            plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,type=type,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=ylim,ann=FALSE,
+                            plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=ylim,ann=FALSE,
                             cex.axis=cex.axis,font=2,axes=FALSE,main="")
                         }
                         mtext(side = 1, text = xlab, line = xline, cex=cex.lab, font=1)
@@ -1551,17 +1551,17 @@ CMplot <- function(
                         }
                     }
                     if((Max-Min)<=1){
-                        plot(pvalue.posN,logpvalue,pch=pch,type=type,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ann=FALSE,
+                        plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ann=FALSE,
                             cex.axis=cex.axis*(R/2),font=2,axes=FALSE,yaxs=yaxs)
                     }else{
-                        plot(pvalue.posN,logpvalue,pch=pch,type=type,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ann=FALSE,
+                        plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ann=FALSE,
                             cex.axis=cex.axis*(R/2),font=2,axes=FALSE,yaxs=yaxs)
                     }
                     mtext(side = 2, text = ylab, line = yline, cex=cex.lab*(R/2), font=1)
                 }else{
                     Max <- max_no_na(ylim)
                     Min <- min_no_na(ylim)
-                    plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,type=type,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ann=FALSE,
+                    plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,type=type,lwd=2,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ann=FALSE,
                         cex.axis=cex.axis*(R/2),font=1,axes=FALSE,yaxs=yaxs)
                     mtext(side = 2, text = ylab, line = yline, cex=cex.lab*(R/2), font=1)
                 }
@@ -1829,7 +1829,7 @@ CMplot <- function(
                     sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
                     logpvalue=logpvalueT[plot.index,i]
                     if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim)}else{indexx <- 1:length(logpvalue)}
-                    points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
+                    points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=2,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
                     #if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))   abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
                 }
                 if(verbose){
