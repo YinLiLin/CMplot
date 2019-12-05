@@ -373,4 +373,4 @@ Questions, suggestions, and bug reports are welcome and appreciated.
 - **Author:** Lilin Yin
 - **Contact:** ylilin@163.com
 - **QQ group:** 166305848
-- **Institution:** [*Huazhong agricultural university*](http://www.hzau.edu.cn/2014/ch/)
+- **Institution:** [*Huazhong agricultural university*](http://www.hzau.edu.cn/en/HOME.htm)
