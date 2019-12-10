@@ -279,7 +279,7 @@ highlight.text.yadj: value or vector or list for multiple traits, same as above,
 ```r
 > cattle50K[,4:ncol(cattle50K)] <- apply(cattle50K[,4:ncol(cattle50K)], 2, 
          function(x) x*sample(c(1,-1), length(x), rep=TRUE))
-> CMplot(cattle50K, plot.type="m", band=0, LOG10=FALSE, ylab="SNP effect",ylim=c(-0.02,0.02),
+> CMplot(cattle50K, type="h",plot.type="m", band=0.5, LOG10=FALSE, ylab="SNP effect",ylim=c(-0.02,0.02),
         threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=FALSE,cex=0.6,
         chr.den.col=NULL, file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
 
@@ -287,8 +287,8 @@ highlight.text.yadj: value or vector or list for multiple traits, same as above,
 ```
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/PN.jpg">
-<img src="Figure/PN.jpg" height="385px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/PN_1.jpg">
+<img src="Figure/PN_1.jpg" height="385px" width="900px">
 </a>
 </p>
 
