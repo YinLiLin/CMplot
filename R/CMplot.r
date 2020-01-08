@@ -62,6 +62,7 @@ CMplot <- function(
     height=NULL,
     width=NULL,
     memo="",
+    main="",
     verbose=TRUE
 )
 {   
@@ -1317,18 +1318,18 @@ CMplot <- function(
                         if((Max-Min)<=1){
                             if(cir.density){
                                 plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ann=FALSE,
-                                    cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                                    cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                             }else{
                                 plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
-                                cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                                cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                             }
                         }else{
                             if(cir.density){
                                 plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ann=FALSE,
-                                cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                                cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                             }else{
                                 plot(pvalue.posN,logpvalue,pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]]),xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
-                                cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                                cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                             }
                         }
                         mtext(side = 1, text = xlab, line = xline, cex=cex.lab, font=1)
@@ -1338,10 +1339,10 @@ CMplot <- function(
                         Min <- min_no_na(ylim)
                         if(cir.density){
                             plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim)-(Max-Min)/den.fold, max_no_na(ylim)),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                            cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                         }else{
                             plot(pvalue.posN[logpvalue>=min_no_na(ylim)],logpvalue[logpvalue>=min_no_na(ylim)],pch=pch,type=type,lwd=2,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim)],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=ylim,ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                            cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                         }
                         mtext(side = 1, text = xlab, line = xline, cex=cex.lab, font=1)
                         mtext(side = 2, text = ylab, line = yline, cex=cex.lab, font=1)
@@ -1737,18 +1738,18 @@ CMplot <- function(
                 if((Max-Min)<=1){
                     if(cir.density){
                         plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                            cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                     }else{
                         plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                            cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                     }
                 }else{
                     if(cir.density){
                         plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                            cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                     }else{
                         plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                            cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                     }
                 }
                 mtext(side = 1, text = xlab, line = xline, cex=cex.lab, font=1)
@@ -1758,10 +1759,10 @@ CMplot <- function(
                 Min <- min_no_na(ylim)
                 if(cir.density){
                     plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,1.05*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim)-Max/den.fold,Max),ann=FALSE,
-                        cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                        cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                 }else{
                     plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=ylim,ann=FALSE,
-                        cex.axis=cex.axis,font=2,axes=FALSE,main="")
+                        cex.axis=cex.axis,font=2,axes=FALSE,main=main)
                 }
                 mtext(side = 1, text = xlab, line = xline, cex=cex.lab, font=1)
                 mtext(side = 2, text = ylab, line = yline, cex=cex.lab, font=1)
