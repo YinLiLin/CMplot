@@ -580,7 +580,7 @@ CMplot <- function(
             }
             length(highlight_index) <- length(highlight)
             for(i in 1:length(highlight)){
-                if(sum(!is.na(highlight[[i]])) == 0){
+                if(sum(!is.na(highlight[[i]])) == 0 | length(highlight[[i]]) == 0){
                     highlight_index[[i]] <- NA
                 }else{
                     highlight[[i]] <- highlight[[i]][!is.na(highlight[[i]])]
