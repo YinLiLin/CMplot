@@ -95,7 +95,7 @@ CMplot <- function(
           last <- 1
           if (length(boxes) == 0)
             return(FALSE)
-          for (i in c(last, 1:length(boxes))) {
+          for (i in c(1:length(boxes))) {
             bnds <- boxes[[i]]
             x2 <- bnds[1]
             y2 <- bnds[2]
@@ -111,7 +111,6 @@ CMplot <- function(
             else
               overlap <- overlap && (y2 + sh2 > y1 - s)
             if (overlap) {
-              last <<- i
               return(TRUE)
             }
           }
