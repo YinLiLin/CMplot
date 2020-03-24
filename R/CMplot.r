@@ -1973,7 +1973,7 @@ CMplot <- function(
                         polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col[i],border=conf.int.col[i])
                     }
                 }
-                par(xpd=FALSE); abline(a = 0, b = 1, col = "red", lwd=2); par(xpd=TRUE)
+                if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
                 points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
                 if(!is.null(threshold)){
                     # if(sum(threshold!=0)==length(threshold)){
@@ -2093,7 +2093,7 @@ CMplot <- function(
                         }
                     }
                        
-                    if((i == R)){par(xpd=FALSE); abline(a = 0, b = 1, col = "red", lwd=2); par(xpd=TRUE)}
+                    if((i == R) & !is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
                     points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
                         
                     if(!is.null(threshold)){
@@ -2187,7 +2187,7 @@ CMplot <- function(
                     }
                 }
 
-                par(xpd=FALSE); abline(a = 0, b = 1, col = "red", lwd=2); par(xpd=TRUE)
+                if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1, col = threshold.col[1],lwd=2); par(xpd=TRUE)}
                 points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
                 
                 if(!is.null(threshold)){
