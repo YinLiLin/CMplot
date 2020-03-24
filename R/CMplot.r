@@ -1575,7 +1575,7 @@ CMplot <- function(
                 
                 #add the names of traits on plot 
     
-                text(ticks[length(ticks)],Max,labels=taxa[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE)
+                text(max_no_na(pvalue.posN),Max,labels=taxa[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE)
         
                 if(i == R){
                     if(is.null(chr.labels)){
