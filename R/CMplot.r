@@ -1368,16 +1368,16 @@ CMplot <- function(
                     axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis,labels=FALSE)
                     if(!is.null(chr.labels)){
                         if(Nchr == 1){
-                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis, font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %% 90 == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                         }else{
                             # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=)
                             #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
-                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis, font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %%90== 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                         }
                     }else{
                         # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
                         #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
-                        text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis, font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                        text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %%90== 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                     }
                     axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
                     if(is.null(ylim)){
@@ -1391,15 +1391,8 @@ CMplot <- function(
                             legend.y <- Max
                         }
                     }else{
-                        if(ylim[2]>1){
-                            axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                            axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
-                            legend.y <- tail(ylim[2], 1)
-                        }else{
-                            axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                            axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
-                            legend.y <- tail(ylim[2], 1)
-                        }
+                        axis(2, at = seq(ylim[1], ylim[2], length=5), labels = seq(ylim[1], ylim[2], length=5), las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
+                        legend.y <- tail(ylim[2], 1)
                     }
                     if(!is.null(threshold)){
                         for(thr in 1:length(threshold)){
@@ -1479,7 +1472,7 @@ CMplot <- function(
                             polygon(c(min_no_na(pvalue.posN.list[[yll]]), min_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]])), 
                                 c(ymin-0.5*(Max-Min)/den.fold, ymin-1.5*(Max-Min)/den.fold, 
                                 ymin-1.5*(Max-Min)/den.fold, ymin-0.5*(Max-Min)/den.fold), 
-                                col="grey", border="grey")
+                                col="grey", border="grey", xpd=TRUE)
                         }
                         
                         segments(
@@ -1487,7 +1480,7 @@ CMplot <- function(
                             ymin-0.5*(Max-Min)/den.fold,
                             pvalue.posN,
                             ymin-1.5*(Max-Min)/den.fold,
-                            col=density.list$den.col, lwd=0.1
+                            col=density.list$den.col, lwd=0.1,xpd=TRUE
                         )
                         legend(
                             x=max_no_na(pvalue.posN)+band,
@@ -1600,15 +1593,15 @@ CMplot <- function(
                 if(i == R){
                     axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2),labels=FALSE)
                     if(is.null(chr.labels)){
-                        text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis*(R/2), font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                        text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis*(R/2), font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %% 90 == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                         # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis,cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.ori),padj=1)
                     }else{
                         if(Nchr == 1){
                             # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2), cex.axis=cex.axis*(R/2),font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
-                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis*(R/2), font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis*(R/2), font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %% 90 == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                         }else{
                             # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2), cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.labels))
-                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis*(R/2), font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis*(R/2), font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %% 90 == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                         }
                     }
                     axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
@@ -1623,13 +1616,15 @@ CMplot <- function(
                         axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
                     }
                 }else{
-                    if(ylim[2]>1){
-                        axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
-                        axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-                    }else{
-                        axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
-                        axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-                    }
+                    axis(2, at = seq(ylim[1], ylim[2], length=5), labels = seq(ylim[1], ylim[2], length=5), las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+
+                    # if(ylim[2]>1){
+                    #     axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+                    #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
+                    # }else{
+                    #     axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+                    #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
+                    # }
                 }
                 if(!is.null(threshold)){
                     for(thr in 1:length(threshold)){
@@ -1799,14 +1794,14 @@ CMplot <- function(
             }
             axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis,labels=FALSE)
             if(is.null(chr.labels)){
-                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis, font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %% 90== 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                 # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks),lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori)) 
             }else{
                 if(Nchr == 1){
-                    text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis, font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                    text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %% 90== 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                     # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
                 }else{
-                    text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3] - ifelse(chr.labels.angle == 0, 0.5, 0.3), cex=cex.axis, font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), ifelse((chr.labels.angle %% 90 == 0), 0.5, 1)))
+                    text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle %%90 == 0, 0.5, ifelse(chr.labels.angle > 0, 1, 0)), 1))
                     # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c("Chr",chr.labels))
                 }
             }
@@ -1823,15 +1818,17 @@ CMplot <- function(
                     legend.y <- Max
                 }
             }else{
-                if(ylim[2]>1){
-                    axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                    axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
-                    legend.y <- tail(ylim[2], 1)
-                }else{
-                    axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                    axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
-                    legend.y <- tail(ylim[2], 1)
-                }
+                axis(2, at = seq(ylim[1], ylim[2], length=5), labels = seq(ylim[1], ylim[2], length=5), las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
+                legend.y <- tail(ylim[2], 1)
+                # if(ylim[2]>1){
+                #     axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
+                #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
+                #     legend.y <- tail(ylim[2], 1)
+                # }else{
+                #     axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
+                #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
+                #     legend.y <- tail(ylim[2], 1)
+                # }
             }
             do <- TRUE
             sam.index <- list()
