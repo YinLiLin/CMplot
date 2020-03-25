@@ -138,7 +138,8 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 ```r
 > CMplot(pig60K,type="p",plot.type="m",LOG10=TRUE,threshold=NULL,file="jpg",memo="",dpi=300,
-    file.output=TRUE,verbose=TRUE,width=14,height=6)
+    file.output=TRUE,verbose=TRUE,width=14,height=6,chr.labels.angle=45)
+# 'chr.labels.angle': adjust the angle of labels of x-axis (-90 < chr.labels.angle < 90).
 ```
 
 <p align="center">
@@ -152,7 +153,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 ```r
 > CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=c(2,12), threshold=c(1e-6,1e-4),
         threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
-        chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1,1),signal.pch=c(19,19),
+        chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1.5,1.5),signal.pch=c(19,19),
         file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 
 #Note: if the ylim is setted, then CMplot will only plot the points which among this interval.
@@ -169,7 +170,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 ```r
 > CMplot(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
-        chr.den.col=c("darkgreen", "yellow", "red"),signal.col=c("red","green"),signal.cex=c(1,1),
+        chr.den.col=c("darkgreen", "yellow", "red"),signal.col=c("red","green"),signal.cex=c(1.5,1.5),
         signal.pch=c(19,19),file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,
         width=14,height=6)
         
@@ -183,7 +184,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 <img src="Figure/2_2.jpg" height="385px" width="900px">
 </a>
 
-#### Highlight a group of SNPs on pch, cex and col
+#### Highlight a group of SNPs on pch, cex, type, and col
 
 ```r
 > signal <- pig60K$Position[which.min(pig60K$trait2)]
@@ -205,19 +206,32 @@ each SNPs have its special colour, size and shape.
 <img src="Figure/2_3.jpg" height="385px" width="900px">
 </a>
 
-#### Highlight all SNPs
 ```r
-> CMplot(pig60K,type="h",plot.type="m",LOG10=TRUE,highlight=pig60K[,1],
+> SNPs <-  pig60K[pig60K$trait2 < 1e-4, 1]
+> CMplot(pig60K,type="h",plot.type="m",LOG10=TRUE,highlight=SNPs,highlight.type="p",
         highlight.col=NULL,highlight.cex=1.2,highlight.pch=19,file="jpg",memo="",
-        dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+        dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6,band=0.6)
 ```
 
 </p>
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2-6.jpg">
-<img src="Figure/2-6.jpg" height="385px" width="900px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_6.jpg">
+<img src="Figure/2_6.jpg" height="385px" width="900px">
 </a>
 
+```r
+> SNPs <-  pig60K[pig60K$trait2 < 1e-4, 1]
+> CMplot(pig60K,type="p",plot.type="m",LOG10=TRUE,highlight=SNPs,highlight.type="h",
+        col=c("grey30","grey60"),highlight.col="darkgreen",highlight.cex=1.2,highlight.pch=19,
+        file="jpg",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+```
+
+</p>
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_6_1.jpg">
+<img src="Figure/2_6_1.jpg" height="385px" width="900px">
+</a>
+	
 #### Visualize only one chromosome
 
 ```r
@@ -330,8 +344,9 @@ CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty
 ### Single_track Q-Q plot
 
 ```r
-> CMplot(pig60K,plot.type="q",conf.int=TRUE,box=FALSE,file="jpg",memo="",dpi=300,
-    ,file.output=TRUE,verbose=TRUE,width=5,height=5)
+> CMplot(pig60K,plot.type="q",box=FALSE,file="jpg",memo="",dpi=300,
+    conf.int=TRUE,conf.int.col=NULL,threshold.col="red",threshold.lty=2,
+    file.output=TRUE,verbose=TRUE,width=5,height=5)
 ```
 
 <p align="center">
@@ -346,7 +361,7 @@ CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty
 > pig60K$trait1[sample(1:nrow(pig60K), round(nrow(pig60K)*0.80))] <- NA
 > pig60K$trait2[sample(1:nrow(pig60K), round(nrow(pig60K)*0.25))] <- NA
 > CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e-6,
-        signal.pch=19,signal.cex=1.5,signal.col="red",conf.int=TRUE,box=FALSE,multracks=
+        signal.pch=c(19,6,4),signal.cex=1.2,signal.col="red",conf.int=TRUE,box=FALSE,multracks=
         TRUE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,ylim=c(0,8),width=5,height=5)
 ```
 
