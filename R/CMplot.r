@@ -1,5 +1,5 @@
 #Version:3.5.2
-#Data: 2020/03/22
+#Data: 2020/03/25
 #Author: Lilin Yin
 
 CMplot <- function(
@@ -1935,7 +1935,7 @@ CMplot <- function(
                 if(file=="jpg") jpeg(paste("Multracks.QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi,quality = 100)
                 if(file=="pdf") pdf(paste("Multracks.QQplot.",paste(taxa,collapse="."),".pdf",sep=""), width = R*wh,height=ht)
                 if(file=="tiff")    tiff(paste("Multracks.QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi)
-                par(mfcol=c(1,R),mar = c(0,1,4,1.5),oma=c(3,5,0,0),xpd=TRUE)
+                par(mfcol=c(1,R),xpd=TRUE)
             }else{
                 ht=ifelse(is.null(height), 5.5, height)
                 wh=ifelse(is.null(width), 2.5, width)
@@ -1944,6 +1944,9 @@ CMplot <- function(
             }
             log.Quantiles.max_no_na <- NULL
             for(i in 1:R){
+                if(i == 1)  par(mar=c(mar[2], mar[2], mar[3], 0))
+                if(i == R)  par(mar=c(mar[2], 1.5, mar[3], mar[4]))
+                if(i != 1 & i != R) par(mar=c(mar[2], 1.5, mar[3], 0))
                 if(verbose) cat(paste(" Multracks_QQ Plotting ",taxa[i],".\n",sep=""))        
                 P.values=as.numeric(Pmap[,i+2])
                 P.values=P.values[!is.na(P.values)]
@@ -1988,7 +1991,7 @@ CMplot <- function(
                 }else{
                     plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim)),xlab ="", ylab="")
                 }
-                axis(1, at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
+                axis(1, mgp=c(3,cex.axis*0.8,0), at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
                 axis(2, las=1, lwd=lwd.axis,cex.axis=cex.axis)
                 
                 #plot the confidence interval of QQ-plot
@@ -2031,6 +2034,8 @@ CMplot <- function(
                 }else{
                     title(main = taxa[i], cex.main = main.cex, font.main= main.font) 
                 }
+                mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+2, cex=cex.lab, font=1, xpd=TRUE)
+                if(i == 1)  mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
             }
             if(box) box(lwd=lwd.axis)
             if(file.output) dev.off()
@@ -2042,7 +2047,7 @@ CMplot <- function(
                     if(file=="jpg") jpeg(paste("Multraits.QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
                     if(file=="pdf") pdf(paste("Multraits.QQplot.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
                     if(file=="tiff")    tiff(paste("Multraits.QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-                    par(mar = c(5,5,4,2),xpd=TRUE)
+                    par(mar = c(mar[2],mar[2],mar[3],mar[4]),xpd=TRUE)
                 }else{  
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
@@ -2071,13 +2076,16 @@ CMplot <- function(
                 if(is.null(ylim)){
                     Pmap.min_no_na <- Pmap[,3:(R+2)]
                     YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), -log10(min_no_na(Pmap.min_no_na[Pmap.min_no_na > 0]))))
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, floor(YlimMax+1)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot", cex.main=main.cex, font.main=main.font)
+                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, floor(YlimMax+1)), main = "QQplot", cex.main=main.cex, font.main=main.font)
                 }else{
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, max(ylim)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))), main = "QQplot", cex.main=main.cex, font.main=main.font)
+                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, max(ylim)),main = "QQplot", cex.main=main.cex, font.main=main.font)
                 }
                 legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA, xpd=TRUE)
-                axis(1, at=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), cex.axis=cex.axis)
+                axis(1, mgp=c(3,cex.axis*0.8,0), at=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), cex.axis=cex.axis)
                 axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
+
+                mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+1, cex=cex.lab, font=1, xpd=TRUE)
+                mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
                 
                 for(i in 1:R){
                     if(verbose) cat(paste(" Multraits_QQ Plotting ",taxa[i],".\n",sep=""))
@@ -2167,7 +2175,7 @@ CMplot <- function(
                     if(file=="jpg") jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
                     if(file=="pdf") pdf(paste("QQplot.",taxa[i],".pdf",sep=""), width = wh,height=ht)
                     if(file=="tiff")    tiff(paste("QQplot.",taxa[i],".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-                    par(mar = c(5,5,4,2),xpd=TRUE)
+                     par(mar = c(mar[2],mar[2],mar[3],mar[4]),xpd=TRUE)
                 }else{
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
@@ -2211,12 +2219,14 @@ CMplot <- function(
                 }
                 if(is.null(ylim)){
                     YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), floor(max_no_na(log.P.values)+1)))
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))))
+                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab="",ylab="")
                 }else{
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim)),xlab =expression(Expected~~-log[10](italic(p))), ylab = expression(Observed~~-log[10](italic(p))))      
+                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim)),xlab="",ylab="")      
                 }
-                axis(1, at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
+                axis(1, mgp=c(3,cex.axis*0.8,0),at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
                 axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
+                mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+1, cex=cex.lab, font=1, xpd=TRUE)
+                mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
                 
                 #plot the confidence interval of QQ-plot
                 if(conf.int){
