@@ -377,7 +377,7 @@ CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
-<img src="Figure/7.jpg" height="280px" width="1450px">
+<img src="Figure/7.jpg" height="280px" width="1400px">
 </a>
 </p>
 
