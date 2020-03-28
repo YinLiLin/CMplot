@@ -19,10 +19,10 @@ CMplot <- function(
     multracks=FALSE,
     cex=c(0.5,1,1),
     r=0.3,
+    outward=FALSE,
     ylab=expression(-log[10](italic(p))),
     ylab.pos=3,
     mar = c(3,6,3,3),
-    outward=FALSE,
     threshold = NULL, 
     threshold.col="red",
     threshold.lwd=1,
@@ -202,7 +202,7 @@ CMplot <- function(
             if(length(x) != length(words))  stop("highlighted genes not equal to the highlighted SNPs.")
             words <- words[indx]
             if(is.null(xadj)){
-                xadj = sample(c(1.5, 0, -0.5), n, rep=TRUE)
+                xadj = sample(c(1.5, 0, -0.5), n, replace=TRUE)
             }else{
                 if(length(xadj) != n)   stop("length of xadj not equals to length of x")
                 if(sum(!xadj %in% c(-1,0,1)) > 0)   stop("-1, 0, 1 limited for xadj")
