@@ -1601,9 +1601,23 @@ CMplot <- function(
                 # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
                 
                 #add the names of traits on plot 
-    
-                text(max_no_na(pvalue.posN),Max,labels=taxa[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE)
-      
+                if(!is.null(threshold)){
+                    if(LOG10){
+                        threshold.max <- -log10(min(threshold))
+                    }else{
+                        threshold.max <- max(threshold)
+                    }
+                    if(threshold.max == Max){
+                        text(max_no_na(pvalue.posN),Max*0.98,labels=taxa[i],adj=c(1, 1),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                    }else if((threshold.max + 0.5 * strheight(taxa[i], cex=cex.lab*(R/2))) >= Max){
+                        text(max_no_na(pvalue.posN),threshold.max*1.02,labels=taxa[i],adj=c(1, 0),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                    }else{
+                        text(max_no_na(pvalue.posN),Max,labels=taxa[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                    }
+                }else{
+                   text(max_no_na(pvalue.posN),Max,labels=taxa[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                }
+                
                 if(i == R){
                     if(chr.labels.angle == 0){
                         if(is.null(chr.labels)){
