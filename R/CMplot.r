@@ -1003,44 +1003,46 @@ CMplot <- function(
                 }
 
                 if(cir.chr==TRUE){
-                    ticks1=(RR+2*cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
-                    ticks2=(RR+2*cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks1=(RR+1.5*cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks2=(RR+1.5*cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                             angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis)
+                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis, adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb", sep=""),srt=angle,font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb", sep=""),srt=angle, adj=c(0.5, 0),font=2,cex=cex.axis)
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis, adj=c(0.5, 0))
                             }
                         }
                     }
                 }else{
-                    ticks1=(0.9*r)*sin(2*pi*(ticks-round(band/2))/TotalN)
-                    ticks2=(0.9*r)*cos(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks1=1.01*RR*sin(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks2=1.01*RR*cos(2*pi*(ticks-round(band/2))/TotalN)
+                    # ticks1=(0.9*r)*sin(2*pi*(ticks-round(band/2))/TotalN)
+                    # ticks2=(0.9*r)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                         angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                        text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis)
+                        text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb", sep=""),srt=angle,font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb", sep=""),srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                             }
                         }
                     }
@@ -1217,46 +1219,48 @@ CMplot <- function(
                 }
 
                 if(cir.chr==TRUE){
-                    ticks1=(RR+2*cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
-                    ticks2=(RR+2*cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks1=(RR+1.5*cir.chr.h)*sin(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks2=(RR+1.5*cir.chr.h)*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                           angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                          text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis)
+                          text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb",sep=""),srt=angle,font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb",sep=""),srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                             }
                         }
                     }
                 }else{
-                    ticks1=RR*sin(2*pi*(ticks-round(band/2))/TotalN)
-                    ticks2=RR*cos(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks1=1.01*RR*sin(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks2=1.01*RR*cos(2*pi*(ticks-round(band/2))/TotalN)
+                    # ticks1=RR*sin(2*pi*(ticks-round(band/2))/TotalN)
+                    # ticks2=RR*cos(2*pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                         
                             #adjust the angle of labels of circle plot
                             angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis)
+                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb",sep=""),srt=angle,font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], "Mb",sep=""),srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2))[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
                             }
                         }
                     }   
