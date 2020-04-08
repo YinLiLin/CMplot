@@ -1,4 +1,4 @@
-CMplot [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-3.6.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=green) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <img src="https://ga-beacon.appspot.com/UA-132438702-1/R-CMplot/readme" height="19.5px" width="92px">
+CMplot [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-3.6.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=green) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot)
 =========
 
 ## A high-quality drawing tool designed for Manhattan plot of genomic analysis
@@ -389,3 +389,10 @@ Questions, suggestions, and bug reports are welcome and appreciated.
 - **Contact:** ylilin@163.com
 - **QQ group:** 166305848
 - **Institution:** [*Huazhong agricultural university*](http://www.hzau.edu.cn/en/HOME.htm)
+
+<p align="center">
+<a href="https://ga-beacon.appspot.com/UA-132438702-1/R-CMplot/readme?pixel">
+<img src="https://ga-beacon.appspot.com/UA-132438702-1/R-CMplot/readme?pixel">
+</a>
+</p>
+
