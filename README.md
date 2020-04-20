@@ -1,4 +1,4 @@
-CMplot [![](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=brightgreen&label=Issues)](https://github.com/YinLiLin/R-CMplot/issues) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-3.6.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot)
+CMplot [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://github.com/YinLiLin/R-CMplot/issues) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-3.6.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot)
 =========
 
 ## A high-quality drawing tool designed for Manhattan plot of genomic analysis
