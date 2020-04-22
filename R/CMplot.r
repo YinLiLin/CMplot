@@ -65,6 +65,7 @@ CMplot <- function(
     main="",
     main.cex=1.5,
     main.font=2,
+    legend.ncol=NULL,
     verbose=TRUE
 )
 {   
@@ -1832,9 +1833,17 @@ CMplot <- function(
             # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
             # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
             if(!is.null(ylim)){
-                legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,ylim[2]*1.15,taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5, xpd=TRUE)
+                if(is.null(legend.ncol)){
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,ylim[2]*1.15,taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5, xpd=TRUE)
+                }else{
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,ylim[2]*1.15,taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=FALSE,ncol=legend.ncol,xjust=0.5, xpd=TRUE)
+                }
             }else{
-                legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max*1.15,taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5, xpd=TRUE)
+                if(is.null(legend.ncol)){
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max*1.15,taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5, xpd=TRUE)
+                }else{
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max*1.15,taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=FALSE,ncol=legend.ncol,xjust=0.5, xpd=TRUE)
+                }
             }
             if(chr.labels.angle == 0){
                 if(is.null(chr.labels)){
