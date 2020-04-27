@@ -1,4 +1,4 @@
-#Version:3.5.2
+#Version:3.6.1
 #Data: 2020/03/22
 #Author: Lilin Yin
 
@@ -562,12 +562,10 @@ CMplot <- function(
         pch=rep(pch, R)
 
         #replace the non-euchromosome
-        options(warn = -1)
-        numeric.chr <- as.numeric(Pmap[, 2])
-        options(warn = 0)
-        max.chr <- max(numeric.chr, na.rm=TRUE)
+        suppressWarnings(numeric.chr <- as.numeric(Pmap[, 2]))
+        suppressWarnings(max.chr <- max(numeric.chr, na.rm=TRUE))
         if(is.infinite(max.chr))    max.chr <- 0
-        map.xy.index <- which(!numeric.chr %in% c(0:max.chr))
+        suppressWarnings(map.xy.index <- which(!numeric.chr %in% c(0:max.chr)))
         if(length(map.xy.index) != 0){
             chr.xy <- unique(Pmap[map.xy.index, 2])
             for(i in 1:length(chr.xy)){
@@ -720,6 +718,18 @@ CMplot <- function(
                     pvalue.posN <- c(pvalue.posN, max_no_na(pvalue.posN) + band + pvalue.pos.list[[i+1]])
                     ticks[i+1] <- max_no_na(pvalue.posN)-floor(max_no_na(pvalue.pos.list[[i+1]])/2)
                 }
+            }
+        }
+        
+        if(!is.null(chr.labels)){
+            if(length(chr.labels) != Nchr)  stop("length of 'chr.labels' should equal to the number of chromosomes.")
+            ticks.logi <- rep(TRUE, length(ticks))
+            for(ti in 1:Nchr){
+                if(chr.labels[ti] == "")    ticks.logi[ti] <- FALSE
+            }
+            if(!all(ticks.logi)){
+                chr.labels <- chr.labels[ticks.logi]
+                ticks <- ticks[ticks.logi]
             }
         }
 
