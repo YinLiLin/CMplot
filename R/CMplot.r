@@ -489,6 +489,7 @@ CMplot <- function(
         if(!plot)   return(list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y))
     }
 
+    if(!all(plot.type %in% c("c","m","q","d"))) stop("unknown 'plot.type'.")
     if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
     file=match.arg(file)
     taxa=colnames(Pmap)[-c(1:3)]
