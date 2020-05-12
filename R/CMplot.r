@@ -667,10 +667,10 @@ CMplot <- function(
 
         pvalueT <- as.matrix(Pmap[,-c(1:2)])
         pvalue.pos <- Pmap[, 2]
-        p0.index <- Pmap[, 1] == 0
-        if(sum(p0.index) != 0){
-            pvalue.pos[p0.index] <- 1:sum(p0.index)
-        }
+        # p0.index <- Pmap[, 1] == 0
+        # if(sum(p0.index) != 0){
+            # pvalue.pos[p0.index] <- 1:sum(p0.index)
+        # }
         pvalue.pos.list <- tapply(pvalue.pos, Pmap[, 1], list)
         
         #scale the space parameter between chromosomes
