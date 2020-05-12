@@ -369,10 +369,10 @@ CMplot <- function(
     {
         if(is.null(legend.min)) legend.min = 1
         if(is.null(col) | length(col) == 1){col=c("darkgreen", "yellow", "red")}
+        map <- map[map[, 2] != "0", ]
         map <- as.matrix(map)
         map <- map[!is.na(map[, 2]), ]
-        map <- map[!is.na(as.numeric(map[, 3])), ]
-        map <- map[as.numeric(map[, 2]) != 0, ]
+        suppressWarnings(map <- map[!is.na(as.numeric(map[, 3])), ])
         #map <- map[map[, 3] != 0, ]
         suppressWarnings(max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE))
         if(is.infinite(max.chr))    max.chr <- 0
@@ -542,10 +542,10 @@ CMplot <- function(
     
         #order Pmap by the name of SNP
         #Pmap=Pmap[order(Pmap[,1]),]
+        suppressWarnings(Pmap <- Pmap[Pmap[, 2] != "0", ])
         Pmap <- as.matrix(Pmap)
         Pmap <- Pmap[!is.na(Pmap[, 2]), ]
-        Pmap <- Pmap[!is.na(as.numeric(Pmap[, 3])), ]
-        Pmap <- Pmap[as.numeric(Pmap[, 2]) != 0, ]
+        suppressWarnings(Pmap <- Pmap[!is.na(as.numeric(Pmap[, 3])), ])
 
         #scale and adjust the parameters
         cir.chr.h <- cir.chr.h/5
