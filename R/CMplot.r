@@ -508,10 +508,10 @@ CMplot <- function(
     if(!all(plot.type %in% c("b","c","m","q","d"))) stop("unknown 'plot.type'.")
     if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
     file=match.arg(file)
-    taxa=colnames(Pmap)[-c(1:3)]
+    trait=colnames(Pmap)[-c(1:3)]
     if(!is.null(memo) && memo != "")    memo <- paste("_", memo, sep="")
-    if(length(taxa) == 0)   taxa <- paste("Col", 1:(ncol(Pmap)-3), sep="")
-    taxa <- paste(taxa, memo, sep="")
+    if(length(trait) == 0)   trait <- paste("Col", 1:(ncol(Pmap)-3), sep="")
+    taxa <- paste(trait, memo, sep="")
 
     #SNP-Density plot
     if("d" %in% plot.type){
@@ -562,13 +562,29 @@ CMplot <- function(
             signal.cex <- rep(signal.cex,length(threshold))
         }
         if(length(cex)!=3) cex <- rep(cex,3)
-        if(!is.null(ylim)){
-            if(length(ylim)==1) ylim <- c(0,ylim)
-        }
-        
+
         #get the number of traits
         R=ncol(Pmap)-3
 
+        if(!is.null(ylim)){
+            if(!is.list(ylim)){
+                cat(" (warning: all phenotypes will use the same ylim.)\n")
+                if(length(ylim)!=2) stop("ylim for each phenotype should be assigned two values.")
+                if(ylim[2] <= ylim[1])  stop("second value should be larger than the first in ylim.")
+                ylimlist <- list()
+                for(i in 1:R){
+                    ylimlist[[i]]  <- ylim
+                }
+                ylim <- ylimlist
+            }else{
+                if(length(ylim)!=R) stop("length of list of ylim should equal to the number of phenotype.")
+                for(i in 1:R){
+                    if(length(ylim[[i]])!=2) stop("ylim for each phenotype should be assigned two values.") 
+                    if(ylim[[i]][2] <= ylim[[i]][1])  stop("second value should be larger than the first in ylim.")
+                }
+            }
+        }
+        
         if(!is.null(conf.int.col)) conf.int.col <- rep(conf.int.col, R)
         if(all(main != "")) main <- rep(main, R)
         if(length(mar) != 4)    stop("length of 'mar' shoud equal to 4.")
@@ -839,13 +855,13 @@ CMplot <- function(
             #debug
             #print(colx)
             
-            if(verbose) cat(paste(" Circular-Manhattan Plotting ",taxa[i],".\n",sep=""))
+            if(verbose) cat(paste(" Circular-Manhattan Plotting ",trait[i],".\n",sep=""))
             pvalue <- pvalueT[,i]
             logpvalue <- logpvalueT[,i]
             if(is.null(ylim)){
                 if(LOG10){
                     Max <- max_ylim(-log10(min_no_na(pvalue)))
-                    Min <- 0
+                    Min <- min_ylim(-log10(max_no_na(pvalue)))
                 }else{
                     Max <- max_ylim(max_no_na(pvalue))
                     #if(abs(Max)<=1)    Max <- max_no_na(pvalue)
@@ -853,10 +869,11 @@ CMplot <- function(
                     #if(abs(Min)<=1)    Min <- min_no_na(pvalue)
                 }
             }else{
-                Max <- ylim[2]
-                Min <- ylim[1]
+                Max <- ylim[[i]][2]
+                Min <- ylim[[i]][1]
             }
             Cpvalue <- (H*(logpvalue-Min))/(Max-Min)
+            ylimIndx <- logpvalue >= Min & logpvalue <= Max
             if(outward==TRUE){
                 if(cir.chr==TRUE & i == 1){
                     
@@ -936,14 +953,23 @@ CMplot <- function(
 
                 }
                 
-                X=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN-round(band/2))/TotalN)
-                Y=(Cpvalue+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN-round(band/2))/TotalN)
+                X=(Cpvalue[ylimIndx]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[ylimIndx]-round(band/2))/TotalN)
+                Y=(Cpvalue[ylimIndx]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[ylimIndx]-round(band/2))/TotalN)
                 if(file.output){
                     is_visable <- filter.points(X, Y, wh, ht, dpi = dpi)
                 }else{
                     is_visable <- rep(TRUE, length(X))
                 }
-                points(X[is_visable],Y[is_visable],pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]])[is_visable])
+
+                if(cir.legend==TRUE){
+                    circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                    circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                    circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                    circle.plot(myr=r+H*(i-0.25)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                    circle.plot(myr=r+H*(i-0)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                }
+
+                points(X[is_visable],Y[is_visable],pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]])[ylimIndx][is_visable])
                 
                 #plot the legend for each trait
                 if(cir.legend==TRUE){
@@ -955,15 +981,10 @@ CMplot <- function(
                     }
                     segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     segments(0,r+H*(i-0.75)+cir.band*(i-1),H/20,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-0.25)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-0)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     text(-r/15,r+H*(i-0.94)+cir.band*(i-1),round(Min+(Max-Min)*0,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                     text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Min+(Max-Min)*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                     text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Min+(Max-Min)*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
@@ -981,7 +1002,7 @@ CMplot <- function(
                                 #lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
                                 circle.plot(myr=(significantline1+r+H*(i-1)+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
                             }else{
-                                warning(paste("No significant points for ",taxa[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
+                                warning(paste("No significant points for ",trait[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
                             }
                         }
                     }
@@ -1166,14 +1187,23 @@ CMplot <- function(
 
                 }
 
-                X=(-Cpvalue+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN-round(band/2))/TotalN)
-                Y=(-Cpvalue+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN-round(band/2))/TotalN)
+                X=(-Cpvalue[ylimIndx]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[ylimIndx]-round(band/2))/TotalN)
+                Y=(-Cpvalue[ylimIndx]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[ylimIndx]-round(band/2))/TotalN)
                 if(file.output){
                     is_visable <- filter.points(X, Y, wh, ht, dpi = dpi)
                 }else{
                     is_visable <- rep(TRUE, length(X))
                 }
-                points(X[is_visable],Y[is_visable],pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]])[is_visable])
+
+                if(cir.legend==TRUE){
+                    circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                    circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                    circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                    circle.plot(myr=r+H*(i-0.25)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                    circle.plot(myr=r+H*(i-0)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
+                }
+
+                points(X[is_visable],Y[is_visable],pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]])[ylimIndx][is_visable])
                 
                 if(cir.legend==TRUE){
                     
@@ -1185,15 +1215,10 @@ CMplot <- function(
                     }
                     segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     segments(0,r+H*(i-0.75)+cir.band*(i-1),H/20,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-0.25)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    circle.plot(myr=r+H*(i-0)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     text(-r/15,r+H*(i-0.06)+cir.band*(i-1),round(Min+(Max-Min)*0,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                     text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Min+(Max-Min)*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                     text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Min+(Max-Min)*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
@@ -1212,7 +1237,7 @@ CMplot <- function(
                                 #lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
                                 circle.plot(myr=(-significantline1+r+H*i+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
                             }else{
-                                warning(paste("No significant points for ",taxa[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
+                                warning(paste("No significant points for ",trait[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
                             }
                         }
                         if(amplify==TRUE){
@@ -1341,7 +1366,7 @@ CMplot <- function(
             for(i in 1:R){
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
-                if(verbose) cat(paste(" Rectangular-Manhattan Plotting ",taxa[i],".\n",sep=""))
+                if(verbose) cat(paste(" Rectangular-Manhattan Plotting ",trait[i],".\n",sep=""))
                     if(file.output){
                         ht=ifelse(is.null(height), 6, height)
                         wh=ifelse(is.null(width), 14, width)
@@ -1364,7 +1389,7 @@ CMplot <- function(
                             if(sum(threshold!=0)==length(threshold)){
                                 if(LOG10 == TRUE){
                                     Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),(-log10(min_no_na(threshold))))))
-                                    Min <- 0
+                                    Min <- min_ylim(min_no_na(c(-log10((max_no_na(pvalue))),-log10(max_no_na(threshold)))))
                                 }else{
                                     Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
                                     #if(abs(Max)<=1)    Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
@@ -1374,7 +1399,7 @@ CMplot <- function(
                             }else{
                                 if(LOG10){
                                     Max=max_ylim(-log10(min_no_na(pvalue)))
-                                    Min<-0
+                                    Min<-min_ylim(-log10(max_no_na(pvalue)))
                                 }else{
                                     Max=max_ylim(max_no_na(pvalue))
                                     #if(abs(Max)<=1)    Max=max_no_na(c(max_no_na(pvalue)))
@@ -1388,7 +1413,7 @@ CMplot <- function(
                         }else{
                             if(LOG10){
                                     Max=max_ylim(-log10(min_no_na(pvalue)))
-                                    Min<-0
+                                    Min<-min_ylim(-log10(max_no_na(pvalue)))
                             }else{
                                     Max=max_ylim(max_no_na(pvalue))
                                     #if(abs(Max)<=1)    Max=max_no_na(c(max_no_na(pvalue)))
@@ -1418,13 +1443,13 @@ CMplot <- function(
                         }
                         mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
                     }else{
-                        Max <- max_no_na(ylim)
-                        Min <- min_no_na(ylim)
+                        Max <- max_no_na(ylim[[i]])
+                        Min <- min_no_na(ylim[[i]])
                         if(cir.density){
-                            plot(pvalue.posN[logpvalue>=min_no_na(ylim) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim)-(Max-Min)/den.fold, max_no_na(ylim)),ann=FALSE,
+                            plot(pvalue.posN[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim[[i]])-(Max-Min)/den.fold, max_no_na(ylim[[i]])),ann=FALSE,
                             cex.axis=cex.axis,font=2,axes=FALSE)
                         }else{
-                            plot(pvalue.posN[logpvalue>=min_no_na(ylim) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=ylim,ann=FALSE,
+                            plot(pvalue.posN[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=ylim[[i]],ann=FALSE,
                             cex.axis=cex.axis,font=2,axes=FALSE)
                         }
                         mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
@@ -1473,8 +1498,9 @@ CMplot <- function(
                             legend.y <- Max
                         }
                     }else{
-                        axis(2, at = seq(ylim[1], ylim[2], length=5), labels = seq(ylim[1], ylim[2], length=5), las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                        legend.y <- tail(ylim[2], 1)
+                        axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
+                        axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
+                        legend.y <- tail(ylim[[i]][2], 1)
                     }
                     if(!is.null(threshold)){
                         for(thr in 1:length(threshold)){
@@ -1548,7 +1574,7 @@ CMplot <- function(
 
                     #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
             
-                    if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(ylim)}
+                    if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(ylim[[i]])}
                     if(cir.density){
                         for(yll in 1:length(pvalue.posN.list)){
                             polygon(c(min_no_na(pvalue.posN.list[[yll]]), min_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]])), 
@@ -1602,7 +1628,7 @@ CMplot <- function(
                 if(i == 1)  par(mar=c(0, mar[2]+1, mar[3], mar[4]))
                 if(i == R)  par(mar=c(mar[1]+1, mar[2]+1, 0, mar[4]))
                 if(i != 1 & i != R) par(mar=c(0, mar[2]+1, 0, mar[4]))
-                if(verbose) cat(paste(" Multracks-Manhattan Plotting ",taxa[i],".\n",sep=""))
+                if(verbose) cat(paste(" Multracks-Manhattan Plotting ",trait[i],".\n",sep=""))
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
                 pvalue=pvalueT[,i]
@@ -1612,7 +1638,7 @@ CMplot <- function(
                         # if(sum(threshold!=0)==length(threshold)){
                             if(LOG10){
                                 Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold)))))
-                                Min <- 0
+                                Min <- min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(threshold)))))
                             }else{
                                 Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
                                 #if(abs(Max)<=1)    Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
@@ -1636,7 +1662,7 @@ CMplot <- function(
                     }else{
                         if(LOG10){
                                 Max=max_ylim((-log10(min_no_na(pvalue))))
-                                Min<-0
+                                Min<-min_ylim((-log10(max_no_na(pvalue))))
                         }else{
                                 Max=max_ylim((max_no_na(pvalue)))
                                 #if(abs(Max)<=1)    Max=max_no_na(max_no_na(pvalue))
@@ -1656,9 +1682,9 @@ CMplot <- function(
                     }
                     mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab*(R/2), font=1, xpd=TRUE)
                 }else{
-                    Max <- max_no_na(ylim)
-                    Min <- min_no_na(ylim)
-                    plot(pvalue.posN[logpvalue>=min_no_na(ylim) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]*(R/2)+1,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim,ann=FALSE,
+                    Max <- max_no_na(ylim[[i]])
+                    Min <- min_no_na(ylim[[i]])
+                    plot(pvalue.posN[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]*(R/2)+1,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim[[i]],ann=FALSE,
                         cex.axis=cex.axis*(R/2),font=1,axes=FALSE,yaxs="r")
                     mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab*(R/2), font=1, xpd=TRUE)
                 }
@@ -1676,14 +1702,14 @@ CMplot <- function(
                         threshold.max <- max(threshold)
                     }
                     if(threshold.max == Max){
-                        text(max_no_na(pvalue.posN),Max*0.98,labels=taxa[i],adj=c(1, 1),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
-                    }else if((threshold.max + 0.5 * strheight(taxa[i], cex=cex.lab*(R/2))) >= Max){
-                        text(max_no_na(pvalue.posN),threshold.max*1.02,labels=taxa[i],adj=c(1, 0),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                        text(max_no_na(pvalue.posN),Max*0.98,labels=trait[i],adj=c(1, 1),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                    }else if((threshold.max + 0.5 * strheight(trait[i], cex=cex.lab*(R/2))) >= Max){
+                        text(max_no_na(pvalue.posN),threshold.max*1.02,labels=trait[i],adj=c(1, 0),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
                     }else{
-                        text(max_no_na(pvalue.posN),Max,labels=taxa[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
                     }
                 }else{
-                   text(max_no_na(pvalue.posN),Max,labels=taxa[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                   text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
                 }
                 
                 if(i == R){
@@ -1724,7 +1750,8 @@ CMplot <- function(
                         axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
                     }
                 }else{
-                    axis(2, at = seq(ylim[1], ylim[2], length=5), labels = seq(ylim[1], ylim[2], length=5), las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+                    axis(2, las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
+                    axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
 
                     # if(ylim[2]>1){
                     #     axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
@@ -1830,7 +1857,7 @@ CMplot <- function(
                     # if(sum(threshold!=0)==length(threshold)){
                         if(LOG10){
                             Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold)))))
-                            Min<-0
+                            Min<-min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(threshold)))))
                         }else{
                             Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
                             # if(abs(Max)<=1)   Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
@@ -1854,7 +1881,7 @@ CMplot <- function(
                 }else{
                     if(LOG10){
                             Max=max_ylim((-log10(min_no_na(pvalue))))
-                            Min=0
+                            Min=min_ylim((-log10(max_no_na(pvalue))))
                     }else{
                             Max=max_ylim((max_no_na(pvalue)))
                             # if(abs(Max)<=1)   Max=max_no_na(max_no_na(pvalue))
@@ -1883,13 +1910,13 @@ CMplot <- function(
                 }
                 mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
             }else{
-                Max <- max_no_na(ylim)
-                Min <- min_no_na(ylim)
+                Max <- max_no_na(unlist(ylim))
+                Min <- min_no_na(unlist(ylim))
                 if(cir.density){
-                    plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim)-Max/den.fold,Max),ann=FALSE,
+                    plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-Max/den.fold,Max),ann=FALSE,
                         cex.axis=cex.axis,font=2,axes=FALSE)
                 }else{
-                    plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=ylim,ann=FALSE,
+                    plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min, Max),ann=FALSE,
                         cex.axis=cex.axis,font=2,axes=FALSE)
                 }
                 mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
@@ -1900,15 +1927,15 @@ CMplot <- function(
             # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
             if(!is.null(ylim)){
                 if(is.null(trait.legend.ncol)){
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,ylim[2],taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
                 }else{
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,ylim[2],taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
                 }
             }else{
                 if(is.null(trait.legend.ncol)){
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
                 }else{
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,taxa,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
                 }
             }
             if(chr.labels.angle == 0){
@@ -1949,8 +1976,9 @@ CMplot <- function(
                     legend.y <- Max
                 }
             }else{
-                axis(2, at = seq(ylim[1], ylim[2], length=5), labels = seq(ylim[1], ylim[2], length=5), las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                legend.y <- tail(ylim[2], 1)
+                axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
+                axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
+                legend.y <- Max
                 # if(ylim[2]>1){
                 #     axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
                 #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
@@ -1989,7 +2017,7 @@ CMplot <- function(
                         }
                         sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
                         logpvalue=logpvalueT[plot.index,i]
-                        if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim)}else{indexx <- 1:length(logpvalue)}
+                        if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
                         points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
                         #if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))   abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
                     }
@@ -2030,7 +2058,7 @@ CMplot <- function(
                 # }
             }
 
-            if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(ylim)}
+            if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(unlist(ylim))}
             if(cir.density){
                 for(yll in 1:length(pvalue.posN.list)){
                     polygon(c(min_no_na(pvalue.posN.list[[yll]]), min_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]])), 
@@ -2087,7 +2115,7 @@ CMplot <- function(
                 if(i == 1)  par(mar=c(mar[2], mar[2], mar[3], 0))
                 if(i == R)  par(mar=c(mar[2], 1.5, mar[3], mar[4]))
                 if(i != 1 & i != R) par(mar=c(mar[2], 1.5, mar[3], 0))
-                if(verbose) cat(paste(" Multracks-QQ Plotting ",taxa[i],".\n",sep=""))        
+                if(verbose) cat(paste(" Multracks-QQ Plotting ",trait[i],".\n",sep=""))        
                 P.values=as.numeric(Pmap[,i+2])
                 P.values=P.values[!is.na(P.values)]
                 if(LOG10){
@@ -2129,10 +2157,11 @@ CMplot <- function(
                 if(is.null(ylim)){
                     plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab ="", ylab="")
                 }else{
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim)),xlab ="", ylab="")
+                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim[[i]])),xlab ="", ylab="")
                 }
                 axis(1, mgp=c(3,cex.axis*0.8,0), at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
                 axis(2, las=1, lwd=lwd.axis,cex.axis=cex.axis)
+                axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(ylim[[i]]))), labels=c("",""), tcl=0, lwd=lwd.axis)
                 
                 #plot the confidence interval of QQ-plot
                 if(conf.int){
@@ -2172,7 +2201,7 @@ CMplot <- function(
                 if(all(main != "")) {
                     title(main = main[i], cex.main = main.cex, font.main= main.font)
                 }else{
-                    title(main = taxa[i], cex.main = main.cex, font.main= main.font) 
+                    title(main = trait[i], cex.main = main.cex, font.main= main.font) 
                 }
                 mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+2, cex=cex.lab, font=1, xpd=TRUE)
                 if(i == 1)  mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
@@ -2218,17 +2247,18 @@ CMplot <- function(
                     YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), -log10(min_no_na(Pmap.min_no_na[Pmap.min_no_na > 0]))))
                     plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, floor(YlimMax+1)), main = "QQplot", cex.main=main.cex, font.main=main.font)
                 }else{
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, max(ylim)),main = "QQplot", cex.main=main.cex, font.main=main.font)
+                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, max(unlist(ylim))),main = "QQplot", cex.main=main.cex, font.main=main.font)
                 }
-                legend("topleft",taxa,col=t(col)[1:R],pch=19,text.font=6,box.col=NA, xpd=TRUE)
+                legend("topleft",trait,col=t(col)[1:R],pch=19,text.font=6,box.col=NA, xpd=TRUE)
                 axis(1, mgp=c(3,cex.axis*0.8,0), at=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), cex.axis=cex.axis)
                 axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
+                axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(unlist(ylim)))), labels=c("",""), tcl=0, lwd=lwd.axis)
 
                 mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+1, cex=cex.lab, font=1, xpd=TRUE)
                 mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
                 
                 for(i in 1:R){
-                    if(verbose) cat(paste(" Multraits-QQ Plotting ",taxa[i],".\n",sep=""))
+                    if(verbose) cat(paste(" Multraits-QQ Plotting ",trait[i],".\n",sep=""))
                     P.values=as.numeric(Pmap[,i+2])
                     P.values=P.values[!is.na(P.values)]
                     if(LOG10){
@@ -2308,7 +2338,7 @@ CMplot <- function(
             }
         }else{
             for(i in 1:R){
-                if(verbose) cat(paste(" QQ Plotting ",taxa[i],".\n",sep=""))
+                if(verbose) cat(paste(" QQ Plotting ",trait[i],".\n",sep=""))
                 if(file.output){
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
@@ -2361,10 +2391,12 @@ CMplot <- function(
                     YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), floor(max_no_na(log.P.values)+1)))
                     plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab="",ylab="")
                 }else{
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim)),xlab="",ylab="")      
+                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim[[i]])),xlab="",ylab="")      
                 }
                 axis(1, mgp=c(3,cex.axis*0.8,0),at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
                 axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
+                axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(ylim[[i]]))), labels=c("",""), tcl=0, lwd=lwd.axis)
+
                 mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+1, cex=cex.lab, font=1, xpd=TRUE)
                 mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
                 
@@ -2411,7 +2443,7 @@ CMplot <- function(
                 if(all(main != "")) {
                     title(main = main[i], cex.main = main.cex, font.main= main.font)
                 }else{
-                    title(main = taxa[i], cex.main = main.cex, font.main= main.font) 
+                    title(main = trait[i], cex.main = main.cex, font.main= main.font) 
                 }
                 if(box) box(lwd=lwd.axis)
                 if(file.output) dev.off()

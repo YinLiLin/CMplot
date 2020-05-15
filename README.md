@@ -156,7 +156,9 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
         chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1.5,1.5),signal.pch=c(19,19),
         file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 
-#Note: if the ylim is setted, then CMplot will only plot the points which among this interval.
+#Note: if the ylim is setted, then CMplot will only plot the points among this interval,
+#       ylim can be vector or list, if it is a list, different traits can be assigned with
+#       different range at y-axis.
 ```
 
 <p align="center">
