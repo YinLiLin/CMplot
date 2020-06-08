@@ -758,7 +758,7 @@ CMplot <- function(
             }
         }
 
-        if(!is.null(chr.labels)){
+        if(!is.null(chr.labels) & Nchr != 1){
             chr.labels <- as.character(chr.labels)
             if(length(chr.labels) != Nchr)  stop("length of 'chr.labels' should equal to the number of chromosomes.")
             ticks.logi <- rep(TRUE, length(ticks))
