@@ -454,7 +454,13 @@ CMplot <- function(
         }
         if(plot){
             xticks = seq(0, chorm.maxlen / bp, length=10)
-            xticks = seq(0, chorm.maxlen / bp, round(xticks[2]))
+            
+            if(round(xticks[2]) <= 10){
+                xticks = seq(0, chorm.maxlen / bp, round(xticks[2], 1))
+            }else{
+                xticks = seq(0, chorm.maxlen / bp, round(xticks[2]))    
+            }
+            
             if((chorm.maxlen/bp - max(xticks)) > 0.5*xticks[2]){
                 xticks = c(xticks, round(chorm.maxlen / bp))
             }
