@@ -45,6 +45,7 @@ CMplot <- function(
     highlight.text.yadj=NULL,
     highlight.text.font=3,
     chr.labels=NULL,
+    chr.border=FALSE,
     chr.labels.angle=0,
     chr.den.col="black",
     cir.band=1,
@@ -735,6 +736,7 @@ CMplot <- function(
         
         #insert the space into chromosomes and return the midpoint of each chromosome
         ticks <- NULL
+        chr.border.pos <- NULL
         pvalue.posN <- NULL
         #pvalue <- pvalueT[,j]
         if(Nchr == 1){
@@ -750,18 +752,22 @@ CMplot <- function(
             ticks <- ticks[-1]
             chr.labels <- ticks
             ticks <- ticks * bp + band
+            chr.border <- FALSE
         }else{
             for(i in 0:(Nchr-1)){
                 if (i==0){
                     #pvalue <- append(pvalue,rep(Inf,band),after=0)
                     pvalue.posN <- pvalue.pos.list[[i+1]] + band
                     ticks[i+1] <- max_no_na(pvalue.posN)-floor(max_no_na(pvalue.pos.list[[i+1]])/2)
+                    chr.border.pos[i+1] <- max_no_na(pvalue.posN) + 0.5 * band
                 }else{
                     #pvalue <- append(pvalue,rep(Inf,band),after=sum(Num[1:i])+i*band)
                     pvalue.posN <- c(pvalue.posN, max_no_na(pvalue.posN) + band + pvalue.pos.list[[i+1]])
                     ticks[i+1] <- max_no_na(pvalue.posN)-floor(max_no_na(pvalue.pos.list[[i+1]])/2)
+                    chr.border.pos[i+1] <- max_no_na(pvalue.posN) + 0.5 * band
                 }
             }
+
         }
 
         if(!is.null(chr.labels) & Nchr != 1){
@@ -1465,6 +1471,12 @@ CMplot <- function(
                     # Min1 <- Min
                     # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
                     # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
+                    if(chr.border){
+                        for(b in 1:length(chr.border.pos)){
+                            segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=lwd.axis, lty=2)
+                        }
+                    }
+
                     if(chr.labels.angle == 0){
                         if(!is.null(chr.labels)){
                             if(Nchr == 1){
@@ -1696,6 +1708,11 @@ CMplot <- function(
                     mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab*(R/2), font=1, xpd=TRUE)
                 }
 
+                if(chr.border){
+                    for(b in 1:length(chr.border.pos)){
+                        segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=lwd.axis, lty=2)
+                    }
+                }
                 # Max1 <- Max
                 # Min1 <- Min
                 # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
@@ -1928,6 +1945,7 @@ CMplot <- function(
                 }
                 mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
             }
+
             # Max1 <- Max
             # Min1 <- Min
             # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
@@ -1995,6 +2013,11 @@ CMplot <- function(
                 #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
                 #     legend.y <- tail(ylim[2], 1)
                 # }
+            }
+            if(chr.border){
+                for(b in 1:length(chr.border.pos)){
+                    segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=lwd.axis, lty=2)
+                }
             }
             do <- TRUE
             sam.index <- list()
