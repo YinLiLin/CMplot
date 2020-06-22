@@ -12,7 +12,7 @@ CMplot [![](https://img.shields.io/badge/Issues-%2B-brightgreen.svg)](https://gi
 > library("CMplot")
 
 # if you want to use the latest version on GitHub:
-> source("https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/R/CMplot.r")
+> source("https://raw.githubusercontent.com/YinLiLin/CMplot/master/R/CMplot.r")
 ```
 
 ---
