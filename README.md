@@ -194,7 +194,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
         pig60K$Position<(signal+1000000)&pig60K$Position>(signal-1000000)]
 > CMplot(pig60K, plot.type="m",LOG10=TRUE,col=c("grey30","grey60"),highlight=SNPs,
         highlight.col="green",highlight.cex=1,highlight.pch=19,file="jpg",memo="",
-        dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+        chr.border=TRUE,dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 #Note:
 'highlight' could be vector or list, if it is a vector, all traits will use the same highlighted SNPs index, 
 if it is a list, the length of the list should equal to the number of traits.
