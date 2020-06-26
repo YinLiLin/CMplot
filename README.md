@@ -82,7 +82,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,type="p",plot.type="c",chr.labels=paste("Chr",c(1:18,"X"),sep=""),r=0.4,cir.legend=TRUE,
+> CMplot(pig60K,type="p",plot.type="c",chr.labels=paste("Chr",c(1:18,"X","Y"),sep=""),r=0.4,cir.legend=TRUE,
         outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
         memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
 ```
@@ -94,7 +94,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 </p>
 
 ```r
-> CMplot(pig60K,type="p",plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X"),sep=""),
+> CMplot(pig60K,type="p",plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X","Y"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
       bin.size=1e6,outward=FALSE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
