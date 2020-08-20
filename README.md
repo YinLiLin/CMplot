@@ -54,7 +54,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 ---
 ### Citation
-**Please cite the website https://github.com/YinLiLin/R-CMplot**<br>
+Yin, L. et al. rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study. bioRxiv, 2020.08.20.258491 (2020)<br>
 
 ---
 ### SNP-density plot
