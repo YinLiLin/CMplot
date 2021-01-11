@@ -54,6 +54,7 @@ Total 50~ parameters are available in **CMplot**, typing ```?CMplot``` can get t
 
 ---
 ### Citation
+CMplot has been integrated into our developed GWAS package ```rMVP```, please cite the following paper:</br>
 Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-accelerated tool for Genome-Wide Association Study](https://www.biorxiv.org/content/10.1101/2020.08.20.258491v1). bioRxiv, 2020.08.20.258491 (2020)<br>
 
 ---
