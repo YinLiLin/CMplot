@@ -163,7 +163,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 #       ylim can be vector or list, if it is a list, different traits can be assigned with
 #       different range at y-axis.
 #      'threshold' can be set for different traits, for example: threshold=list(c(1e-6,1e-4), NULL, 1e-5),
-#       each list contains a vector of thresholds for each trait, NULL means no threshould for correspoding trait. 
+#       each list contains a vector of thresholds for each trait, NULL means no threshold for corresponding trait. 
 ```
 
 <p align="center">
