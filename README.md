@@ -62,12 +62,14 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 
 ```r
 > CMplot(pig60K,type="p",plot.type="d",bin.size=1e6,chr.den.col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300,
-    file.output=TRUE,verbose=TRUE,width=9,height=6)
+    main="illumilla_60K",file.output=TRUE,verbose=TRUE,width=9,height=6)
 # users can personally set the windowsize and the min/max of legend by:
 # bin.size=1e6
 # bin.range=c(min, max)
 # memo: add a character to the output file name
 # chr.labels: change the chromosome names
+# main: change the title of the plots, for manhattan plot, if there are more than one trait, main can be
+#       assigned as a character vector containing the desired title for each trait
 ```
 
 <p align="center">
@@ -160,6 +162,8 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 #Note: if the ylim is setted, then CMplot will only plot the points among this interval,
 #       ylim can be vector or list, if it is a list, different traits can be assigned with
 #       different range at y-axis.
+#      'threshold' can be set for different traits, for example: threshold=list(c(1e-6,1e-4), NULL, 1e-5),
+#       each list contains a vector of thresholds for each trait, NULL means no threshould for correspoding trait. 
 ```
 
 <p align="center">
@@ -196,11 +200,11 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(pig60K, plot.type="m",LOG10=TRUE,col=c("grey30","grey60"),highlight=SNPs,
         highlight.col="green",highlight.cex=1,highlight.pch=19,file="jpg",memo="",
         chr.border=TRUE,dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
-#Note:
-'highlight' could be vector or list, if it is a vector, all traits will use the same highlighted SNPs index, 
-if it is a list, the length of the list should equal to the number of traits.
-highlight.col, highlight.cex, highlight.pch can be value or vector, if its length equals to the length of highlighted SNPs,
-each SNPs have its special colour, size and shape.
+# Note:
+# 'highlight' could be vector or list, if it is a vector, all traits will use the same highlighted SNPs index, 
+# if it is a list, the length of the list should equal to the number of traits.
+# highlight.col, highlight.cex, highlight.pch can be value or vector, if its length equals to the length of highlighted SNPs,
+# each SNPs have its special colour, size and shape.
 ```
 
 </p>
@@ -260,15 +264,14 @@ each SNPs have its special colour, size and shape.
         highlight.col=c("red","blue","green"),highlight.cex=1,highlight.pch=c(15:17), highlight.text=genes,      
         highlight.text.col=c("red","blue","green"),threshold=0.05/nrow(pig60K),threshold.lty=2,   
         amplify=FALSE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
-#Note:
-'highlight', 'highlight.text', 'highlight.text.xadj', 'highlight.text.yadj' could be vector or list, if it is a vector, 
-all traits will use the same highlighted SNPs index and text, if it is a list, the length of the list should equal to the number of traits.
-the order of 'highlight.text' must be consistent with 'highlight'
-highlight.text.cex: value or vecter, control the size of added text
-highlight.text.font: value or vecter, control the font of added text
-highlight.text.xadj: value or vecter or list for multiple traits, -1, 0, 1 limited, control the position of text around the highlighted SNPs,
-                     -1(left), 0(center), 1(right)
-highlight.text.yadj: value or vector or list for multiple traits, same as above, -1(down), 0(center), 1(up)
+# Note:
+# 'highlight', 'highlight.text', 'highlight.text.xadj', 'highlight.text.yadj' could be vector or list, if it is a vector, 
+# all traits will use the same highlighted SNPs index and text, if it is a list, the length of the list should equal to the number of traits.
+# the order of 'highlight.text' must be consistent with 'highlight'
+# highlight.text.cex: value or vecter, control the size of added text
+# highlight.text.font: value or vecter, control the font of added text
+# highlight.text.xadj: value or vecter or list for multiple traits, -1, 0, 1 limited, control the position of text around the highlighted SNPs: -1(left), 0(center), 1(right)
+# highlight.text.yadj: value or vector or list for multiple traits, same as above, -1(down), 0(center), 1(up)
 ```
 
 </p>
@@ -323,7 +326,7 @@ CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty
         signal.cex=1, file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,
         highlight=SNPs, highlight.text=SNPs, highlight.text.cex=1.4)
 #Note: if you are not supposed to change the color of signal, 
-          please set signal.col=NULL and highlight.col=NULL.
+#          please set signal.col=NULL and highlight.col=NULL.
 ```
 
 #### a. all traits in one axes:

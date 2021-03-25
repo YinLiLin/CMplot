@@ -64,7 +64,7 @@ CMplot <- function(
     height=NULL,
     width=NULL,
     memo="",
-    main="",
+    main=NULL,
     main.cex=1.5,
     main.font=2,
     trait.legend.ncol=NULL,
@@ -350,7 +350,9 @@ CMplot <- function(
     DensityPlot <- function(
         map,
         col=c("darkgreen", "yellow", "red"),
-        main="SNP Density",
+        main=NULL,
+        main.cex=1.2,
+        main.font=2,
         chr.labels=NULL, 
         bin=1e6,
         band=3,
@@ -392,8 +394,8 @@ CMplot <- function(
         chorm.maxlen <- max(pos)
         bp <- ifelse(chorm.maxlen < 1e6, 1e3, 1e6)
         bp_label <- ifelse(bp == 1e3, "Kb", "Mb")
-        main <- paste("The number of SNPs within ", bin / bp, bp_label, " window size", sep="")
-        if(plot)    plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/10), ylim=c(0, length(chr.num) * band + band), main=main,axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
+        if(is.null(main))   main <- paste("The number of SNPs within ", bin / bp, bp_label, " window size", sep="")
+        if(plot)    plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/10), ylim=c(0, length(chr.num) * band + band), main=main, cex.main=main.cex, font.main=main.font, axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
         pos.x <- list()
         col.index <- list()
         maxbin.num <- NULL
@@ -542,7 +544,7 @@ CMplot <- function(
             if(length(bin.range) != 2)  stop("Two values (min and max) should be provided for bin.range!")
             if(bin.range[1] == 0)   stop("Min value of bin.range should be more than 1!")
         }
-        DensityPlot(map=Pmap[,c(1:3)], file.output = file.output, dpi = dpi, wh = wh, ht = ht, chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2])
+        DensityPlot(map=Pmap[,c(1:3)], file.output = file.output, dpi = dpi, wh = wh, ht = ht, chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2], main = main[1], main.cex=main.cex, main.font=main.font)
         if(file.output) dev.off()
     }
 
@@ -555,24 +557,33 @@ CMplot <- function(
         Pmap <- Pmap[!is.na(Pmap[, 2]), ]
         suppressWarnings(Pmap <- Pmap[!is.na(as.numeric(Pmap[, 3])), ])
 
+        #get the number of traits
+        R=ncol(Pmap)-3
+
         #scale and adjust the parameters
         cir.chr.h <- cir.chr.h/5
         cir.band <- cir.band/5
         if(!is.null(threshold)){
-            if(LOG10){
-                if(sum(threshold <= 0) != 0) stop("threshold must be greater than 0.")
+            if(!is.list(threshold)){
+                thresholdlist <- list()
+                for(i in 1:R){
+                    thresholdlist[[i]]  <- threshold
+                }
+                threshold <- thresholdlist
             }
-            threshold.col <- rep(threshold.col,length(threshold))
-            threshold.lwd <- rep(threshold.lwd,length(threshold))
-            threshold.lty <- rep(threshold.lty,length(threshold))
-            signal.col <- rep(signal.col,length(threshold))
-            signal.pch <- rep(signal.pch,length(threshold))
-            signal.cex <- rep(signal.cex,length(threshold))
+
+            if(LOG10){
+                if(sum(unlist(threshold) <= 0) != 0) stop("threshold must be greater than 0.")
+            }
+
+            threshold.col <- rep(threshold.col, max(sapply(threshold, length)))
+            threshold.lwd <- rep(threshold.lwd, max(sapply(threshold, length)))
+            threshold.lty <- rep(threshold.lty, max(sapply(threshold, length)))
+            signal.col <- rep(signal.col, max(sapply(threshold, length)))
+            signal.pch <- rep(signal.pch, max(sapply(threshold, length)))
+            signal.cex <- rep(signal.cex, max(sapply(threshold, length)))
         }
         if(length(cex)!=3) cex <- rep(cex,3)
-
-        #get the number of traits
-        R=ncol(Pmap)-3
 
         if(!is.null(ylim)){
             if(!is.list(ylim)){
@@ -594,7 +605,7 @@ CMplot <- function(
         }
         
         if(!is.null(conf.int.col)) conf.int.col <- rep(conf.int.col, R)
-        if(all(main != "")) main <- rep(main, R)
+        if(!is.null(main)) main <- rep(main, R)
         if(length(mar) != 4)    stop("length of 'mar' shoud equal to 4.")
         if(chr.labels.angle > 90 | chr.labels.angle < -90)  stop("'chr.labels.angle' should be > -90 and < 90.")
         # if(is.na(conf.int.col)){
@@ -811,25 +822,28 @@ CMplot <- function(
         }else{
             cir.density=FALSE
         }
-        
-        signal.line.index <- NULL
-        if(!is.null(threshold)){
-            if(!is.null(signal.line)){
-                for(l in 1:R){
-                    if(LOG10){
-                        signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min_no_na(threshold)))
-                    }else{
-                        signal.line.index <- c(signal.line.index,which(pvalueT[,l] > max_no_na(threshold)))
-                    }
-                }
-                signal.line.index <- unique(signal.line.index)
-            }
-        }
-        signal.line.index <- pvalue.posN[signal.line.index]
     }
     
     #plot circle Manhattan
     if("c" %in% plot.type){
+
+        signal.line.index <- NULL
+        if(!is.null(threshold)){
+            if(!is.null(signal.line)){
+                for(l in 1:R){
+                    if(!is.null(threshold[[l]])){
+                        if(LOG10){
+                            signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min_no_na(threshold[[l]])))
+                        }else{
+                            signal.line.index <- c(signal.line.index,which(pvalueT[,l] > max_no_na(threshold[[l]])))
+                        }
+                    }
+                }
+                signal.line.index <- unique(signal.line.index)
+            }
+            signal.line.index <- pvalue.posN[signal.line.index]
+        }
+
         #print("Starting Circular-Manhattan plot!",quote=F)
         if(file.output){
             ht=ifelse(is.null(height), 10, height)
@@ -1006,31 +1020,31 @@ CMplot <- function(
                     text(-r/15,r+H*(i-0.06)+cir.band*(i-1),round(Min+(Max-Min)*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                 }
                 
-                if(!is.null(threshold)){
-                    if(sum(threshold!=0)==length(threshold)){
-                        for(thr in 1:length(threshold)){
-                            significantline1=ifelse(LOG10, H*(-log10(threshold[thr])-Min)/(Max-Min), H*(threshold[thr]-Min)/(Max-Min))
+                if(!is.null(threshold[[i]])){
+                    if(sum(threshold[[i]]!=0)==length(threshold[[i]])){
+                        for(thr in 1:length(threshold[[i]])){
+                            significantline1=ifelse(LOG10, H*(-log10(threshold[[i]][thr])-Min)/(Max-Min), H*(threshold[[i]][thr]-Min)/(Max-Min))
                             #s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
                             #s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
                             if(significantline1<H){
                                 #lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
                                 circle.plot(myr=(significantline1+r+H*(i-1)+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
                             }else{
-                                warning(paste("No significant points for ",trait[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
+                                warning(paste("No significant points for ",trait[i]," pass the threshold level using threshold=",threshold[[i]][thr],"!",sep=""))
                             }
                         }
                     }
                 }
                 
-                if(!is.null(threshold)){
-                    if(sum(threshold!=0)==length(threshold)){
+                if(!is.null(threshold[[i]])){
+                    if(sum(threshold[[i]]!=0)==length(threshold[[i]])){
                         if(amplify==TRUE){
                             if(LOG10){
-                                threshold <- sort(threshold)
-                                significantline1=H*(-log10(max_no_na(threshold))-Min)/(Max-Min)
+                                threshold[[i]] <- sort(threshold[[i]])
+                                significantline1=H*(-log10(max_no_na(threshold[[i]]))-Min)/(Max-Min)
                             }else{
-                                threshold <- sort(threshold, decreasing=TRUE)
-                                significantline1=H*(min_no_na(threshold)-Min)/(Max-Min)
+                                threshold[[i]] <- sort(threshold[[i]], decreasing=TRUE)
+                                significantline1=H*(min_no_na(threshold[[i]])-Min)/(Max-Min)
                             }
                             
                             p_amp.index <- which(Cpvalue>=significantline1)
@@ -1040,23 +1054,23 @@ CMplot <- function(
                             #cover the points that exceed the threshold with the color "white"
                             points(HX1,HY1,pch=19,cex=cex[1],col="white")
                             
-                                for(ll in 1:length(threshold)){
+                                for(ll in 1:length(threshold[[i]])){
                                     if(ll == 1){
                                         if(LOG10){
-                                            significantline1=H*(-log10(threshold[ll])-Min)/(Max-Min)
+                                            significantline1=H*(-log10(threshold[[i]][ll])-Min)/(Max-Min)
                                         }else{
-                                            significantline1=H*(threshold[ll]-Min)/(Max-Min)
+                                            significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                         }
                                         p_amp.index <- which(Cpvalue>=significantline1)
                                         HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                         HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                     }else{
                                         if(LOG10){
-                                            significantline0=H*(-log10(threshold[ll-1])-Min)/(Max-Min)
-                                            significantline1=H*(-log10(threshold[ll])-Min)/(Max-Min)
+                                            significantline0=H*(-log10(threshold[[i]][ll-1])-Min)/(Max-Min)
+                                            significantline1=H*(-log10(threshold[[i]][ll])-Min)/(Max-Min)
                                         }else{
-                                            significantline0=H*(threshold[ll-1]-Min)/(Max-Min)
-                                            significantline1=H*(threshold[ll]-Min)/(Max-Min)
+                                            significantline0=H*(threshold[[i]][ll-1]-Min)/(Max-Min)
+                                            significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                         }
                                         p_amp.index <- which(Cpvalue>=significantline1 & Cpvalue < significantline0)
                                         HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
@@ -1240,27 +1254,27 @@ CMplot <- function(
                     text(-r/15,r+H*(i-0.94)+cir.band*(i-1),round(Min+(Max-Min)*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                 }
                 
-                if(!is.null(threshold)){
-                    if(sum(threshold!=0)==length(threshold)){
+                if(!is.null(threshold[[i]])){
+                    if(sum(threshold[[i]]!=0)==length(threshold[[i]])){
                     
-                        for(thr in 1:length(threshold)){
-                            significantline1=ifelse(LOG10, H*(-log10(threshold[thr])-Min)/(Max-Min), H*(threshold[thr]-Min)/(Max-Min))
+                        for(thr in 1:length(threshold[[i]])){
+                            significantline1=ifelse(LOG10, H*(-log10(threshold[[i]][thr])-Min)/(Max-Min), H*(threshold[[i]][thr]-Min)/(Max-Min))
                             #s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
                             #s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
                             if(significantline1<H){
                                 #lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
                                 circle.plot(myr=(-significantline1+r+H*i+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
                             }else{
-                                warning(paste("No significant points for ",trait[i]," pass the threshold level using threshold=",threshold[thr],"!",sep=""))
+                                warning(paste("No significant points for ",trait[i]," pass the threshold level using threshold=",threshold[[i]][thr],"!",sep=""))
                             }
                         }
                         if(amplify==TRUE){
                             if(LOG10){
-                                threshold <- sort(threshold)
-                                significantline1=H*(-log10(max_no_na(threshold))-Min)/(Max-Min)
+                                threshold[[i]] <- sort(threshold[[i]])
+                                significantline1=H*(-log10(max_no_na(threshold[[i]]))-Min)/(Max-Min)
                             }else{
-                                threshold <- sort(threshold, decreasing=TRUE)
-                                significantline1=H*(min_no_na(threshold)-Min)/(Max-Min)
+                                threshold[[i]] <- sort(threshold[[i]], decreasing=TRUE)
+                                significantline1=H*(min_no_na(threshold[[i]])-Min)/(Max-Min)
                             }
                             p_amp.index <- which(Cpvalue>=significantline1)
                             HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
@@ -1269,23 +1283,23 @@ CMplot <- function(
                             #cover the points that exceed the threshold with the color "white"
                             points(HX1,HY1,pch=19,cex=cex[1],col="white")
                             
-                                for(ll in 1:length(threshold)){
+                                for(ll in 1:length(threshold[[i]])){
                                     if(ll == 1){
                                         if(LOG10){
-                                            significantline1=H*(-log10(threshold[ll])-Min)/(Max-Min)
+                                            significantline1=H*(-log10(threshold[[i]][ll])-Min)/(Max-Min)
                                         }else{
-                                            significantline1=H*(threshold[ll]-Min)/(Max-Min)
+                                            significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                         }
                                         p_amp.index <- which(Cpvalue>=significantline1)
                                         HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                         HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                     }else{
                                         if(LOG10){
-                                            significantline0=H*(-log10(threshold[ll-1])-Min)/(Max-Min)
-                                            significantline1=H*(-log10(threshold[ll])-Min)/(Max-Min)
+                                            significantline0=H*(-log10(threshold[[i]][ll-1])-Min)/(Max-Min)
+                                            significantline1=H*(-log10(threshold[[i]][ll])-Min)/(Max-Min)
                                         }else{
-                                            significantline0=H*(threshold[ll-1]-Min)/(Max-Min)
-                                            significantline1=H*(threshold[ll]-Min)/(Max-Min)
+                                            significantline0=H*(threshold[[i]][ll-1]-Min)/(Max-Min)
+                                            significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                         }
                                         p_amp.index <- which(Cpvalue>=significantline1 & Cpvalue < significantline0)
                                         HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
@@ -1399,15 +1413,15 @@ CMplot <- function(
                     pvalue=pvalueT[,i]
                     logpvalue=logpvalueT[,i]
                     if(is.null(ylim)){
-                        if(!is.null(threshold)){
-                            if(sum(threshold!=0)==length(threshold)){
+                        if(!is.null(threshold[[i]])){
+                            if(sum(threshold[[i]]!=0)==length(threshold[[i]])){
                                 if(LOG10 == TRUE){
-                                    Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),(-log10(min_no_na(threshold))))))
-                                    Min <- min_ylim(min_no_na(c(-log10((max_no_na(pvalue))),-log10(max_no_na(threshold)))))
+                                    Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),(-log10(min_no_na(threshold[[i]]))))))
+                                    Min <- min_ylim(min_no_na(c(-log10((max_no_na(pvalue))),-log10(max_no_na(threshold[[i]])))))
                                 }else{
-                                    Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
+                                    Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold[[i]]))))
                                     #if(abs(Max)<=1)    Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-                                    Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold))))
+                                    Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold[[i]]))))
                                     #if(abs(Min)<=1)    Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
                                 }
                             }else{
@@ -1522,9 +1536,9 @@ CMplot <- function(
                         axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
                         legend.y <- tail(ylim[[i]][2], 1)
                     }
-                    if(!is.null(threshold)){
-                        for(thr in 1:length(threshold)){
-                            h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
+                    if(!is.null(threshold[[i]])){
+                        for(thr in 1:length(threshold[[i]])){
+                            h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
                             # print(h)
                             # print(threshold.col[thr])
                             # print(threshold.lty[thr])
@@ -1533,11 +1547,11 @@ CMplot <- function(
                         }
                         if(amplify == TRUE){
                             if(LOG10){
-                                threshold <- sort(threshold)
-                                sgline1=-log10(max_no_na(threshold))
+                                threshold[[i]] <- sort(threshold[[i]])
+                                sgline1=-log10(max_no_na(threshold[[i]]))
                             }else{
-                                threshold <- sort(threshold, decreasing=TRUE)
-                                sgline1=min_no_na(threshold)
+                                threshold[[i]] <- sort(threshold[[i]], decreasing=TRUE)
+                                sgline1=min_no_na(threshold[[i]])
                             }
 
                             sgindex=which(logpvalue>=sgline1)
@@ -1547,23 +1561,23 @@ CMplot <- function(
                             #cover the points that exceed the threshold with the color "white"
                             points(HX1,HY1,pch=pch,cex=cex[2],col="white")
                             
-                            for(ll in 1:length(threshold)){
+                            for(ll in 1:length(threshold[[i]])){
                                 if(ll == 1){
                                     if(LOG10){
-                                        sgline1=-log10(threshold[ll])
+                                        sgline1=-log10(threshold[[i]][ll])
                                     }else{
-                                        sgline1=threshold[ll]
+                                        sgline1=threshold[[i]][ll]
                                     }
                                     sgindex=which(logpvalue>=sgline1)
                                     HY1=logpvalue[sgindex]
                                     HX1=pvalue.posN[sgindex]
                                 }else{
                                     if(LOG10){
-                                        sgline0=-log10(threshold[ll-1])
-                                        sgline1=-log10(threshold[ll])
+                                        sgline0=-log10(threshold[[i]][ll-1])
+                                        sgline1=-log10(threshold[[i]][ll])
                                     }else{
-                                        sgline0=threshold[ll-1]
-                                        sgline1=threshold[ll]
+                                        sgline0=threshold[[i]][ll-1]
+                                        sgline1=threshold[[i]][ll]
                                     }
                                     sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
                                     HY1=logpvalue[sgindex]
@@ -1621,7 +1635,7 @@ CMplot <- function(
                         )
                         
                     }
-                if(all(main != ""))  title(main = main[i], cex.main = main.cex, font.main= main.font)
+                if(!is.null(main))  title(main = main[i], cex.main = main.cex, font.main= main.font)
                 if(box) box(lwd=lwd.axis)
                 #if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))   abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
                 if(file.output)  dev.off()
@@ -1654,15 +1668,15 @@ CMplot <- function(
                 pvalue=pvalueT[,i]
                 logpvalue=logpvalueT[,i]
                 if(is.null(ylim)){
-                    if(!is.null(threshold)){
+                    if(!is.null(threshold[[i]])){
                         # if(sum(threshold!=0)==length(threshold)){
                             if(LOG10){
-                                Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold)))))
-                                Min <- min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(threshold)))))
+                                Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold[[i]])))))
+                                Min <- min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(threshold[[i]])))))
                             }else{
-                                Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
+                                Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold[[i]]))))
                                 #if(abs(Max)<=1)    Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-                                Min<-min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold))))
+                                Min<-min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold[[i]]))))
                                 #if(abs(Min)<=1)    Min=min_no_na(min_no_na(pvalue),min_no_na(threshold))
                             }
                         # }else{
@@ -1720,11 +1734,11 @@ CMplot <- function(
                 # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
                 
                 #add the names of traits on plot 
-                if(!is.null(threshold)){
+                if(!is.null(threshold[[i]])){
                     if(LOG10){
-                        threshold.max <- -log10(min(threshold))
+                        threshold.max <- -log10(min(threshold[[i]]))
                     }else{
-                        threshold.max <- max(threshold)
+                        threshold.max <- max(threshold[[i]])
                     }
                     if(threshold.max == Max){
                         text(max_no_na(pvalue.posN),Max*0.98,labels=trait[i],adj=c(1, 1),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
@@ -1786,18 +1800,18 @@ CMplot <- function(
                     #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
                     # }
                 }
-                if(!is.null(threshold)){
-                    for(thr in 1:length(threshold)){
-                        h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
+                if(!is.null(threshold[[i]])){
+                    for(thr in 1:length(threshold[[i]])){
+                        h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
                         segments(0, h, max_no_na(pvalue.posN), h, col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
                     }
                     if(amplify==TRUE){
                         if(LOG10){
-                            threshold <- sort(threshold)
-                            sgline1=-log10(max_no_na(threshold))
+                            threshold[[i]] <- sort(threshold[[i]])
+                            sgline1=-log10(max_no_na(threshold[[i]]))
                         }else{
-                            threshold <- sort(threshold, decreasing=TRUE)
-                            sgline1=min_no_na(threshold)
+                            threshold[[i]] <- sort(threshold[[i]], decreasing=TRUE)
+                            sgline1=min_no_na(threshold[[i]])
                         }
                         sgindex=which(logpvalue>=sgline1)
                         HY1=logpvalue[sgindex]
@@ -1806,23 +1820,23 @@ CMplot <- function(
                         #cover the points that exceed the threshold with the color "white"
                         points(HX1,HY1,pch=pch,cex=cex[2]*R,col="white")
                         
-                        for(ll in 1:length(threshold)){
+                        for(ll in 1:length(threshold[[i]])){
                             if(ll == 1){
                                 if(LOG10){
-                                    sgline1=-log10(threshold[ll])
+                                    sgline1=-log10(threshold[[i]][ll])
                                 }else{
-                                    sgline1=threshold[ll]
+                                    sgline1=threshold[[i]][ll]
                                 }
                                 sgindex=which(logpvalue>=sgline1)
                                 HY1=logpvalue[sgindex]
                                 HX1=pvalue.posN[sgindex]
                             }else{
                                 if(LOG10){
-                                    sgline0=-log10(threshold[ll-1])
-                                    sgline1=-log10(threshold[ll])
+                                    sgline0=-log10(threshold[[i]][ll-1])
+                                    sgline1=-log10(threshold[[i]][ll])
                                 }else{
-                                    sgline0=threshold[ll-1]
-                                    sgline1=threshold[ll]
+                                    sgline0=threshold[[i]][ll-1]
+                                    sgline1=threshold[[i]][ll]
                                 }
                                 sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
                                 HY1=logpvalue[sgindex]
@@ -1881,12 +1895,12 @@ CMplot <- function(
                 if(!is.null(threshold)){
                     # if(sum(threshold!=0)==length(threshold)){
                         if(LOG10){
-                            Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold)))))
-                            Min<-min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(threshold)))))
+                            Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(unlist(threshold))))))
+                            Min<-min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(unlist(threshold))))))
                         }else{
-                            Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold))))
+                            Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(unlist(threshold)))))
                             # if(abs(Max)<=1)   Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-                            Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold))))
+                            Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(unlist(threshold)))))
                             # if(abs(Min)<=1)   Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
                         }
                     # }else{
@@ -2069,9 +2083,9 @@ CMplot <- function(
                     for(i in 1:R){
                         logpvalue=logpvalueT[, i]
                         if(LOG10){
-                            sgindex = which(logpvalue > -log10(min(threshold)))
+                            sgindex = which(logpvalue > -log10(min(unlist(threshold))))
                         }else{
-                            sgindex = which(logpvalue > max(threshold))
+                            sgindex = which(logpvalue > max(unlist(threshold)))
                         }
                         HY1=logpvalue[sgindex]
                         HX1=pvalue.posN[sgindex]
@@ -2081,10 +2095,12 @@ CMplot <- function(
                         }else{
                             points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
                         }
-                    }
-                    for(thr in 1:length(threshold)){
-                        h <- ifelse(LOG10, -log10(threshold[thr]), threshold[thr])
-                        segments(0, h, max_no_na(pvalue.posN), h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+                        if(!is.null(threshold[[i]])){
+                            for(thr in 1:length(threshold[[i]])){
+                                h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
+                                segments(0, h, max_no_na(pvalue.posN), h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+                            }
+                        }
                     }
                 # }
             }
@@ -2204,9 +2220,9 @@ CMplot <- function(
                 }
                 if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1,lwd=threshold.lty[1], lty=threshold.lty[1], col = threshold.col[1]); par(xpd=TRUE)}
                 is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi = dpi)
-                if(!is.null(threshold)){
+                if(!is.null(threshold[[i]])){
                     # if(sum(threshold!=0)==length(threshold)){
-                        thre.line=-log10(min_no_na(threshold))
+                        thre.line=-log10(min_no_na(threshold[[i]]))
                         if(amplify==TRUE){
                             thre.index <- log.P.values<thre.line
                             if(sum(!thre.index)!=0){
@@ -2229,7 +2245,7 @@ CMplot <- function(
                 }else{
                     points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
                 }
-                if(all(main != "")) {
+                if(!is.null(main)) {
                     title(main = main[i], cex.main = main.cex, font.main= main.font)
                 }else{
                     title(main = trait[i], cex.main = main.cex, font.main= main.font) 
@@ -2338,9 +2354,9 @@ CMplot <- function(
                     if((i == R) & !is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1,lwd=threshold.lty[1], lty=threshold.lty[1], col = threshold.col[1]); par(xpd=TRUE)}
                     # points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
                     is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi = dpi)
-                    if(!is.null(threshold)){
+                    if(!is.null(threshold[[i]])){
                         # if(sum(threshold!=0)==length(threshold)){
-                            thre.line=-log10(min_no_na(threshold))
+                            thre.line=-log10(min_no_na(threshold[[i]]))
                             if(amplify==TRUE){
                                 thre.index <- log.P.values<thre.line
                                 if(sum(!thre.index)!=0){
@@ -2443,9 +2459,9 @@ CMplot <- function(
                 if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1,lwd=threshold.lty[1], lty=threshold.lty[1], col = threshold.col[1]); par(xpd=TRUE)}
                 # points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
                 is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi = dpi)
-                if(!is.null(threshold)){
+                if(!is.null(threshold[[i]])){
                     # if(sum(threshold!=0)==length(threshold)){
-                        thre.line=-log10(min_no_na(threshold))
+                        thre.line=-log10(min_no_na(threshold[[i]]))
                         if(amplify==TRUE){
                             thre.index <- log.P.values<thre.line
                             if(sum(!thre.index)!=0){
@@ -2471,7 +2487,7 @@ CMplot <- function(
                 }else{
                     points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
                 }
-                if(all(main != "")) {
+                if(!is.null(main)) {
                     title(main = main[i], cex.main = main.cex, font.main= main.font)
                 }else{
                     title(main = trait[i], cex.main = main.cex, font.main= main.font) 
