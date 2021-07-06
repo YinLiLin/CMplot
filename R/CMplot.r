@@ -642,6 +642,11 @@ CMplot <- function(
 
         if(!is.null(highlight)){
             highlight_index <- list()
+            highlight_col <- list()
+            if(is.list(highlight.col)){
+                if(length(highlight.col) != R){stop("length of 'highlight.col' not equals to the number of traits.")}
+                highlight_col = highlight.col
+            }
             if(!is.list(highlight)){
                 highlight <- list(highlight)
                 for(i in 1:R){highlight[[i]] = highlight[[1]]}
@@ -652,11 +657,13 @@ CMplot <- function(
             for(i in 1:length(highlight)){
                 if(sum(!is.na(highlight[[i]])) == 0 | length(highlight[[i]]) == 0){
                     highlight_index[[i]] <- NA
+                    highlight_col[[i]] <- NA
                 }else{
                     highlight[[i]] <- highlight[[i]][!is.na(highlight[[i]])]
                     highlight_index[[i]] <- match(as.character(as.matrix(highlight[[i]])), SNP_id)
                     if(all(is.na(highlight_index[[i]]))) stop("No shared SNPs between Pmap and highlight!")
                     highlight_index[[i]] <- na.omit(highlight_index[[i]])
+                    if(!is.null(highlight.col) && !is.list(highlight.col))  highlight_col[[i]] <- rep(highlight.col, length(highlight_index[[i]]))
                 }
             }
         }
@@ -1089,8 +1096,11 @@ CMplot <- function(
 
                 if(!is.null(highlight)){
                     points(X[highlight_index[[i]]],X[highlight_index[[i]]],pch=19,cex=cex[1],col="white")
-                    if(is.null(highlight.col))  highlight.col = rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]]
-                    points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
+                    if(is.null(highlight.col)){
+                        points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]])
+                    }else{
+                        points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=highlight_col[[i]])
+                    }
                 }
 
                 if(cir.chr==TRUE){
@@ -1319,8 +1329,11 @@ CMplot <- function(
                 
                 if(!is.null(highlight)){
                     points(X[highlight_index[[i]]],X[highlight_index[[i]]],pch=19,cex=cex[1],col="white")
-                    if(is.null(highlight.col))  highlight.col = rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]]
-                    points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=highlight.col)
+                    if(is.null(highlight.col)){
+                        points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]])
+                    }else{
+                        points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=highlight_col[[i]])
+                    }
                 }
 
                 if(cir.chr==TRUE){
@@ -1601,7 +1614,7 @@ CMplot <- function(
                             if(is.null(highlight.col)){
                                 highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,type=highlight.type,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
                             }else{
-                                highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,type=highlight.type,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
+                                highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,type=highlight.type,point.col=highlight_col[[i]],text.col=highlight.text.col,text.font=highlight.text.font)
                             }
                         }
                     }
@@ -1860,7 +1873,7 @@ CMplot <- function(
                         if(is.null(highlight.col)){
                             highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,type=highlight.type,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
                         }else{
-                            highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,type=highlight.type,point.col=highlight.col,text.col=highlight.text.col,text.font=highlight.text.font)
+                            highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,type=highlight.type,point.col=highlight_col[[i]],text.col=highlight.text.col,text.font=highlight.text.font)
                         }
                     }
                 }
