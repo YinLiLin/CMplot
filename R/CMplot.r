@@ -1095,11 +1095,13 @@ CMplot <- function(
                 }
 
                 if(!is.null(highlight)){
-                    points(X[highlight_index[[i]]],X[highlight_index[[i]]],pch=19,cex=cex[1],col="white")
+                    HX1=(Cpvalue[highlight_index[[i]]]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
+                    HY1=(Cpvalue[highlight_index[[i]]]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
+                    points(HX1,X[highlight_index[[i]]],pch=19,cex=cex[1],col="white")
                     if(is.null(highlight.col)){
-                        points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]])
+                        points(HX1,HY1,pch=highlight.pch,cex=highlight.cex,col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]])
                     }else{
-                        points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=highlight_col[[i]])
+                        points(HX1,HY1,pch=highlight.pch,cex=highlight.cex,col=highlight_col[[i]])
                     }
                 }
 
@@ -1328,11 +1330,13 @@ CMplot <- function(
                 }
                 
                 if(!is.null(highlight)){
-                    points(X[highlight_index[[i]]],X[highlight_index[[i]]],pch=19,cex=cex[1],col="white")
+                    HX1=(-Cpvalue[highlight_index[[i]]]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
+                    HY1=(-Cpvalue[highlight_index[[i]]]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
+                    points(HX1,HY1,pch=19,cex=cex[1],col="white")
                     if(is.null(highlight.col)){
-                        points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]])
+                        points(HX1,HY1,pch=highlight.pch,cex=highlight.cex,col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]])
                     }else{
-                        points(X[highlight_index[[i]]],Y[highlight_index[[i]]],pch=highlight.pch,cex=highlight.cex,col=highlight_col[[i]])
+                        points(HX1,HY1,pch=highlight.pch,cex=highlight.cex,col=highlight_col[[i]])
                     }
                 }
 
