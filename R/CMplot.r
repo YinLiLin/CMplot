@@ -1,5 +1,5 @@
-#Version: 3.7.0
-#Data: 2021/10/19
+#Version: 3.7.2
+#Data: 2021/10/25
 #Author: Lilin Yin
 
 CMplot <- function(
@@ -1012,7 +1012,11 @@ CMplot <- function(
                     if((Max-Min) > 1) {
                         round.n=2
                     }else{
-                        round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
+                        if(Max == 1){
+                            round.n=1
+                        }else{
+                            round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
+                        }
                     }
                     segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
@@ -1020,11 +1024,13 @@ CMplot <- function(
                     segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    text(-r/15,r+H*(i-0.94)+cir.band*(i-1),round(Min+(Max-Min)*0,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Min+(Max-Min)*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Min+(Max-Min)*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Min+(Max-Min)*0.75,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.06)+cir.band*(i-1),round(Min+(Max-Min)*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+
+                    lab = seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length = 5)
+                    text(-r/15,r+H*(i-0.94)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-r/15,r+H*(i-0.75)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-r/15,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-r/15,r+H*(i-0.25)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-r/15,r+H*(i-0.06)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                 }
                 
                 if(!is.null(threshold[[i]])){
@@ -1249,7 +1255,11 @@ CMplot <- function(
                     
                     #try to get the number after radix point
                     if((Max-Min)<=1) {
-                        round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
+                        if(Max == 1){
+                            round.n=1
+                        }else{
+                            round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
+                        }
                     }else{
                         round.n=2
                     }
@@ -1259,11 +1269,13 @@ CMplot <- function(
                     segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    text(-r/15,r+H*(i-0.06)+cir.band*(i-1),round(Min+(Max-Min)*0,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.25)+cir.band*(i-1),round(Min+(Max-Min)*0.25,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.5)+cir.band*(i-1),round(Min+(Max-Min)*0.5,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.75)+cir.band*(i-1),round(Min+(Max-Min)*0.75,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.94)+cir.band*(i-1),round(Min+(Max-Min)*1,round.n),adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    
+                    lab = seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length = 5)
+                    text(-r/15,r+H*(i-0.06)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-r/15,r+H*(i-0.25)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-r/15,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-r/15,r+H*(i-0.75)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-r/15,r+H*(i-0.94)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                 }
                 
                 if(!is.null(threshold[[i]])){
