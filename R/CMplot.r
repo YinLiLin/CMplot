@@ -1,5 +1,5 @@
-#Version: 3.7.2
-#Data: 2021/10/25
+#Version: 4.0.0
+#Data: 2021/12/12
 #Author: Lilin Yin
 
 CMplot <- function(
@@ -48,6 +48,7 @@ CMplot <- function(
     chr.border=FALSE,
     chr.labels.angle=0,
     chr.den.col="black",
+    chr.pos.max=FALSE,
     cir.band=1,
     cir.chr=TRUE,
     cir.chr.h=1.5,
@@ -354,6 +355,7 @@ CMplot <- function(
         main.cex=1.2,
         main.font=2,
         chr.labels=NULL, 
+        chr.pos.max=FALSE,
         bin=1e6,
         band=3,
         width=5,
@@ -397,16 +399,24 @@ CMplot <- function(
         if(is.null(main))   main <- paste("The number of SNPs within ", bin / bp, bp_label, " window size", sep="")
         if(plot)    plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/10), ylim=c(0, length(chr.num) * band + band), main=main, cex.main=main.cex, font.main=main.font, axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
         pos.x <- list()
+        chr.pos.max.v <- NULL
         col.index <- list()
         maxbin.num <- NULL
         for(i in 1 : length(chr.num)){
             pos.x[[i]] <- pos[which(chr == chr.num[i])]
-            cut.len <- ceiling((max(pos.x[[i]]) - min(pos.x[[i]])) / bin)
+            maxposindx <- which.max(pos.x[[i]])
+            max.pos <- pos.x[[i]][maxposindx]
+            chr.pos.max.v <- c(chr.pos.max.v, max.pos)
+            cut.len <- ceiling(max.pos / bin)
+            if(chr.pos.max){
+                pos.x[[i]] <- pos.x[[i]][-maxposindx]
+            }
             if(cut.len <= 1){
                 maxbin.num <- c(maxbin.num,length(pos.x[[i]]))
                 col.index[[i]] <- rep(length(pos.x[[i]]), length(pos.x[[i]]))
             }else{
-                cut.r <- cut(pos.x[[i]], cut.len, labels=FALSE)
+                cut.r <- cut(c(0, pos.x[[i]], max.pos), cut.len, labels=FALSE)
+                cut.r <- cut.r[-c(1, length(cut.r))]
                 eachbin.num <- table(cut.r)
                 maxbin.num <- c(maxbin.num, max(eachbin.num))
                 col.index[[i]] <- rep(eachbin.num, eachbin.num)
@@ -421,10 +431,10 @@ CMplot <- function(
         col.seg=NULL
         for(i in 1 : length(chr.num)){
             if(plot){
-                polygon(c(0, 0, max(pos.x[[i]]), max(pos.x[[i]])), 
+                polygon(c(0, 0, chr.pos.max.v[i], chr.pos.max.v[i]), 
                 c(-width/5 - band * (i - length(chr.num) - 1), width/5 - band * (i - length(chr.num) - 1), 
                 width/5 - band * (i - length(chr.num) - 1), -width/5 - band * (i - length(chr.num) - 1)), col="grey95", border="grey95")
-                rect(xleft = 0, ybottom = -width/5 - band * (i - length(chr.num) - 1), xright = max(pos.x[[i]]), ytop = width/5 - band * (i - length(chr.num) - 1), border="grey80")
+                rect(xleft = 0, ybottom = -width/5 - band * (i - length(chr.num) - 1), xright = chr.pos.max.v[i], ytop = width/5 - band * (i - length(chr.num) - 1), border="grey80")
             }
             if(!is.null(legend.max)){
                 if(legend.max < Maxbin.num){
@@ -544,7 +554,7 @@ CMplot <- function(
             if(length(bin.range) != 2)  stop("Two values (min and max) should be provided for bin.range!")
             if(bin.range[1] == 0)   stop("Min value of bin.range should be more than 1!")
         }
-        DensityPlot(map=Pmap[,c(1:3)], file.output = file.output, dpi = dpi, wh = wh, ht = ht, chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2], main = main[1], main.cex=main.cex, main.font=main.font)
+        DensityPlot(map=Pmap[,c(1:3)], file.output = file.output, chr.pos.max=chr.pos.max, dpi = dpi, wh = wh, ht = ht, chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2], main = main[1], main.cex=main.cex, main.font=main.font)
         if(file.output) dev.off()
     }
 
@@ -824,7 +834,7 @@ CMplot <- function(
         if(length(chr.den.col) > 1){
             cir.density=TRUE
             den.fold <- 20
-            density.list <- DensityPlot(map=Pmap[,c(1,1,2)], file.output = FALSE, col=chr.den.col, plot=FALSE, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2])
+            density.list <- DensityPlot(map=Pmap[,c(1,1,2)], file.output = FALSE, chr.pos.max=FALSE, col=chr.den.col, plot=FALSE, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2])
             #list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y)
         }else{
             cir.density=FALSE
@@ -1026,11 +1036,11 @@ CMplot <- function(
                     segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 
                     lab = seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length = 5)
-                    text(-r/15,r+H*(i-0.94)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.75)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.25)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.06)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                 }
                 
                 if(!is.null(threshold[[i]])){
@@ -1271,11 +1281,11 @@ CMplot <- function(
                     segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     
                     lab = seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length = 5)
-                    text(-r/15,r+H*(i-0.06)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.25)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.75)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-r/15,r+H*(i-0.94)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
                 }
                 
                 if(!is.null(threshold[[i]])){
