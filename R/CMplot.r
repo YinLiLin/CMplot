@@ -643,7 +643,8 @@ CMplot <- function(
         #delete the column of SNPs names
         Pmap <- Pmap[,-1]
 
-        Pmap <- matrix(as.numeric(Pmap), nrow(Pmap))
+        Pmap <- apply(Pmap, 2, as.numeric)
+        # Pmap <- matrix(as.numeric(Pmap), nrow(Pmap))
         order_index <- order(Pmap[, 1], Pmap[,2])
 
         #order the GWAS results by chromosome and position
@@ -734,6 +735,7 @@ CMplot <- function(
         if(band==0) band=1
         
         if(LOG10){
+            if(sum(pvalueT <= 0) != 0 || sum(pvalueT > 1) != 0) stop("p values should be at range of (0, 1).")
             pvalueT[pvalueT <= 0] <- NA
             pvalueT[pvalueT > 1] <- NA
         }
