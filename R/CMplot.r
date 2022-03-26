@@ -2085,12 +2085,11 @@ CMplot <- function(
                     segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=lwd.axis, lty=2)
                 }
             }
-            do <- TRUE
             sam.index <- list()
             trait_max_n <- 0
             trait_max <- 0
             for(l in 1:R){
-                sam.index[[l]] <- c(1:nrow(Pmap))[is_visable[[l]]]
+                sam.index[[l]] <- c(1:nrow(Pmap))[is_visable[[l]] & !is.na(logpvalueT[,l])]
                 if(length(sam.index[[l]]) >= trait_max_n){
                     trait_max_n = length(sam.index[[l]])
                     trait_max = l
@@ -2101,13 +2100,19 @@ CMplot <- function(
             #sam.num <- ceiling(nrow(Pmap)/100)
             sam.num <- 1000
             cat_bar <- seq(1, 100, 1)
-            while(do){
+            trait_n <- sapply(sam.index, length)
+            trait_sams <- ceiling(trait_n / sam.num)
+            trait_max_sams <- max(trait_sams)
+            trait_1st_sam <- trait_max_sams - trait_sams + 1
+            trait_full_sams <- floor(trait_n / sam.num)
+            trait_1st_full_sam <- trait_max_sams - trait_full_sams + 1
+            for(sam in 1:trait_max_sams) {
                 for(i in 1:R){
-                    if(length(sam.index[[i]]) == 0){
+                    if(sam < trait_1st_sam[i]){
                         # nothing
                     }else{
-                        if(length(sam.index[[i]]) < sam.num){
-                            plot.index <- sam.index[[i]]
+                        if(sam < trait_1st_full_sam[i]){
+                            plot.index <- sample(sam.index[[i]], trait_n[i] %% sam.num, replace=FALSE)
                         }else{
                             plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
                         }
@@ -2126,7 +2131,6 @@ CMplot <- function(
                         if(progress == 100) cat("\n")
                     }
                 }
-                if(length(sam.index[[trait_max]]) == 0) do <- FALSE
             }
 
             if(!is.null(threshold)){
