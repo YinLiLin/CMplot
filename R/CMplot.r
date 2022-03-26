@@ -1,7 +1,7 @@
 #Version: 4.0.0
 #Data: 2021/12/12
 #Author: Lilin Yin
-#Contributor: Marcel Schilling
+#Contributors: Marcel Schilling, Laura Deeke
 
 CMplot <- function(
     Pmap,
@@ -18,6 +18,7 @@ CMplot <- function(
     cex.lab=1.5,
     plot.type="b",
     multracks=FALSE,
+    points.alpha=100L,
     cex=c(0.5,1,1),
     r=0.3,
     outward=FALSE,
@@ -533,6 +534,14 @@ CMplot <- function(
     if(!is.null(memo) && memo != "")    memo <- paste("_", memo, sep="")
     if(length(trait) == 0)   trait <- paste("Col", 1:(ncol(Pmap)-3), sep="")
     taxa <- paste(trait, memo, sep="")
+    if(length(points.alpha) != 1L)   stop("invalid 'points.alpha': must be 'TRUE', 'FALSE' or an integer between 0 and 255")
+    if(is.logical(points.alpha))   points.alpha <- ifelse(points.alpha, formals()$points.alpha, 255L)
+    if(!is.integer(points.alpha)){
+      if(is.numeric(points.alpha) && points.alpha == as.integer(points.alpha))   points.alpha <- as.integer(points.alpha)
+      else   stop("invalid 'points.alpha': must an integer between")
+    }
+    if(!is.integer(points.alpha))    stop("invalid 'points.alpha': must an integer between")
+    if(points.alpha < 0L || points.alpha > 255L)   stop("out-of range 'points.alpha': must be between 0 and 255")
 
     #SNP-Density plot
     if("d" %in% plot.type){
@@ -2110,7 +2119,7 @@ CMplot <- function(
                         sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
                         logpvalue=logpvalueT[plot.index,i]
                         if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
-                        points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
+                        points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], points.alpha, maxColorValue=255))
                         #if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))   abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
                     }
                 }
@@ -2139,7 +2148,7 @@ CMplot <- function(
                         if(!is.null(signal.col)){
                             points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rep(signal.col, R)[i])
                         }else{
-                            points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255))
+                            points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], points.alpha, maxColorValue=255))
                         }
                         if(!is.null(threshold[[i]])){
                             for(thr in 1:length(threshold[[i]])){
