@@ -179,7 +179,7 @@ CMplot <- function(
               isOverlaped <- FALSE
             } else{
               theta <- theta + tstep
-              r <- r + rstep * tstep / (2 * pi)
+              r <- r + rstep * tstep / (2 * base::pi)
               x1 <- xo + sdx * r * cos(theta)
               y1 <- yo + sdy * r * sin(theta)
               # if(iter == itermax){
@@ -896,10 +896,10 @@ CMplot <- function(
         }
         if(!is.null(signal.line)){
             if(!is.null(signal.line.index)){
-                X1chr <- (RR)*sin(2*pi*(signal.line.index-round(band/2)-circleMin)/TotalN)
-                Y1chr <- (RR)*cos(2*pi*(signal.line.index-round(band/2)-circleMin)/TotalN)
-                X2chr <- (r)*sin(2*pi*(signal.line.index-round(band/2)-circleMin)/TotalN)
-                Y2chr <- (r)*cos(2*pi*(signal.line.index-round(band/2)-circleMin)/TotalN)
+                X1chr <- (RR)*sin(2*base::pi*(signal.line.index-round(band/2)-circleMin)/TotalN)
+                Y1chr <- (RR)*cos(2*base::pi*(signal.line.index-round(band/2)-circleMin)/TotalN)
+                X2chr <- (r)*sin(2*base::pi*(signal.line.index-round(band/2)-circleMin)/TotalN)
+                Y2chr <- (r)*cos(2*base::pi*(signal.line.index-round(band/2)-circleMin)/TotalN)
                 segments(X1chr,Y1chr,X2chr,Y2chr,lty=2,lwd=signal.line,col="grey")
             }
         }
@@ -940,10 +940,10 @@ CMplot <- function(
                         if(k==1){
                             polygon.index <- seq(round(band/2)+1,-round(band/2)-circleMin+max_no_na(pvalue.posN.list[[1]]), length=polygon.num)
                             #change the axis from right angle into circle format
-                            X1chr=(RR)*sin(2*pi*(polygon.index)/TotalN)
-                            Y1chr=(RR)*cos(2*pi*(polygon.index)/TotalN)
-                            X2chr=(RR+cir.chr.h)*sin(2*pi*(polygon.index)/TotalN)
-                            Y2chr=(RR+cir.chr.h)*cos(2*pi*(polygon.index)/TotalN)
+                            X1chr=(RR)*sin(2*base::pi*(polygon.index)/TotalN)
+                            Y1chr=(RR)*cos(2*base::pi*(polygon.index)/TotalN)
+                            X2chr=(RR+cir.chr.h)*sin(2*base::pi*(polygon.index)/TotalN)
+                            Y2chr=(RR+cir.chr.h)*cos(2*base::pi*(polygon.index)/TotalN)
                             if(is.null(chr.den.col)){
                                 polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])   
                             }else{
@@ -955,10 +955,10 @@ CMplot <- function(
                             }
                         }else{
                             polygon.index <- seq(1+round(band/2)+max_no_na(pvalue.posN.list[[k-1]])-circleMin,-round(band/2)-circleMin+max_no_na(pvalue.posN.list[[k]]), length=polygon.num)
-                            X1chr=(RR)*sin(2*pi*(polygon.index)/TotalN)
-                            Y1chr=(RR)*cos(2*pi*(polygon.index)/TotalN)
-                            X2chr=(RR+cir.chr.h)*sin(2*pi*(polygon.index)/TotalN)
-                            Y2chr=(RR+cir.chr.h)*cos(2*pi*(polygon.index)/TotalN)
+                            X1chr=(RR)*sin(2*base::pi*(polygon.index)/TotalN)
+                            Y1chr=(RR)*cos(2*base::pi*(polygon.index)/TotalN)
+                            X2chr=(RR+cir.chr.h)*sin(2*base::pi*(polygon.index)/TotalN)
+                            Y2chr=(RR+cir.chr.h)*cos(2*base::pi*(polygon.index)/TotalN)
                             if(is.null(chr.den.col)){
                                 polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])
                             }else{
@@ -974,15 +974,15 @@ CMplot <- function(
                     if(cir.density){
 
                         if(file.output){
-                            is_visable <- filter.points((RR+cir.chr.h)*sin(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), (RR+cir.chr.h)*cos(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), wh, ht, dpi = dpi)
+                            is_visable <- filter.points((RR+cir.chr.h)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), (RR+cir.chr.h)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), wh, ht, dpi = dpi)
                         }else{
                             is_visable <- rep(TRUE, length(pvalue.posN))
                         }
                         segments(
-                            (RR)*sin(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
-                            (RR)*cos(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
-                            (RR+cir.chr.h)*sin(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
-                            (RR+cir.chr.h)*cos(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
+                            (RR)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
+                            (RR)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
+                            (RR+cir.chr.h)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
+                            (RR+cir.chr.h)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
                             col=density.list$den.col[is_visable], lwd=0.5
                         )
                         legend(
@@ -997,8 +997,8 @@ CMplot <- function(
                         
                     }
                     
-                    # XLine=(RR+cir.chr.h)*sin(2*pi*(1:TotalN)/TotalN)
-                    # YLine=(RR+cir.chr.h)*cos(2*pi*(1:TotalN)/TotalN)
+                    # XLine=(RR+cir.chr.h)*sin(2*base::pi*(1:TotalN)/TotalN)
+                    # YLine=(RR+cir.chr.h)*cos(2*base::pi*(1:TotalN)/TotalN)
                     # lines(XLine,YLine,lwd=1.5)
                     if(cir.density){
                         circle.plot(myr=RR+cir.chr.h,lwd=1.5,add=TRUE,col='grey')
@@ -1010,8 +1010,8 @@ CMplot <- function(
 
                 }
                 
-                X=(Cpvalue[ylimIndx]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
-                Y=(Cpvalue[ylimIndx]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
+                X=(Cpvalue[ylimIndx]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
+                Y=(Cpvalue[ylimIndx]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
                 if(file.output){
                     is_visable <- filter.points(X, Y, wh, ht, dpi = dpi)
                 }else{
@@ -1059,8 +1059,8 @@ CMplot <- function(
                     if(sum(threshold[[i]]!=0)==length(threshold[[i]])){
                         for(thr in 1:length(threshold[[i]])){
                             significantline1=ifelse(LOG10, H*(-log10(threshold[[i]][thr])-Min)/(Max-Min), H*(threshold[[i]][thr]-Min)/(Max-Min))
-                            #s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(0:TotalN)/TotalN)
-                            #s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(0:TotalN)/TotalN)
+                            #s1X=(significantline1+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(0:TotalN)/TotalN)
+                            #s1Y=(significantline1+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(0:TotalN)/TotalN)
                             if(significantline1<H){
                                 #lines(s1X,s1Y,type="l",col=threshold.col,lwd=threshold.col,lty=threshold.lty)
                                 circle.plot(myr=(significantline1+r+H*(i-1)+cir.band*(i-1)),col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
@@ -1083,8 +1083,8 @@ CMplot <- function(
                             }
                             
                             p_amp.index <- which(Cpvalue>=significantline1)
-                            HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
-                            HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                            HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                            HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                             
                             #cover the points that exceed the threshold with the color "white"
                             points(HX1,HY1,pch=19,cex=cex[1],col="white")
@@ -1097,8 +1097,8 @@ CMplot <- function(
                                             significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                         }
                                         p_amp.index <- which(Cpvalue>=significantline1)
-                                        HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
-                                        HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                     }else{
                                         if(LOG10){
                                             significantline0=H*(-log10(threshold[[i]][ll-1])-Min)/(Max-Min)
@@ -1108,8 +1108,8 @@ CMplot <- function(
                                             significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                         }
                                         p_amp.index <- which(Cpvalue>=significantline1 & Cpvalue < significantline0)
-                                        HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
-                                        HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                     }
                                 
                                     if(is.null(signal.col)){
@@ -1123,8 +1123,8 @@ CMplot <- function(
                 }
 
                 if(!is.null(highlight)){
-                    HX1=(Cpvalue[highlight_index[[i]]]+r+H*(i-1)+cir.band*(i-1))*sin(2*pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
-                    HY1=(Cpvalue[highlight_index[[i]]]+r+H*(i-1)+cir.band*(i-1))*cos(2*pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
+                    HX1=(Cpvalue[highlight_index[[i]]]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
+                    HY1=(Cpvalue[highlight_index[[i]]]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
                     points(HX1,X[highlight_index[[i]]],pch=19,cex=cex[1],col="white")
                     if(is.null(highlight.col)){
                         points(HX1,HY1,pch=highlight.pch,cex=highlight.cex,col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]])
@@ -1134,8 +1134,8 @@ CMplot <- function(
                 }
 
                 if(cir.chr==TRUE){
-                    ticks1=(RR+1.5*cir.chr.h)*sin(2*pi*(ticks-round(band/2)-circleMin)/TotalN)
-                    ticks2=(RR+1.5*cir.chr.h)*cos(2*pi*(ticks-round(band/2)-circleMin)/TotalN)
+                    ticks1=(RR+1.5*cir.chr.h)*sin(2*base::pi*(ticks-round(band/2)-circleMin)/TotalN)
+                    ticks2=(RR+1.5*cir.chr.h)*cos(2*base::pi*(ticks-round(band/2)-circleMin)/TotalN)
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                             angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
@@ -1155,10 +1155,10 @@ CMplot <- function(
                         }
                     }
                 }else{
-                    ticks1=1.01*RR*sin(2*pi*(ticks-round(band/2)-circleMin)/TotalN)
-                    ticks2=1.01*RR*cos(2*pi*(ticks-round(band/2)-circleMin)/TotalN)
-                    # ticks1=(0.9*r)*sin(2*pi*(ticks-round(band/2))/TotalN)
-                    # ticks2=(0.9*r)*cos(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks1=1.01*RR*sin(2*base::pi*(ticks-round(band/2)-circleMin)/TotalN)
+                    ticks2=1.01*RR*cos(2*base::pi*(ticks-round(band/2)-circleMin)/TotalN)
+                    # ticks1=(0.9*r)*sin(2*base::pi*(ticks-round(band/2))/TotalN)
+                    # ticks2=(0.9*r)*cos(2*base::pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                         angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
@@ -1181,18 +1181,18 @@ CMplot <- function(
             }
             if(outward==FALSE){
                 if(cir.chr==TRUE & i == 1){
-                    # XLine=(2*cir.band+RR+cir.chr.h)*sin(2*pi*(1:TotalN)/TotalN)
-                    # YLine=(2*cir.band+RR+cir.chr.h)*cos(2*pi*(1:TotalN)/TotalN)
+                    # XLine=(2*cir.band+RR+cir.chr.h)*sin(2*base::pi*(1:TotalN)/TotalN)
+                    # YLine=(2*cir.band+RR+cir.chr.h)*cos(2*base::pi*(1:TotalN)/TotalN)
                     # lines(XLine,YLine,lwd=1.5)
 
                     polygon.num <- 1000
                     for(k in 1:length(chr)){
                         if(k==1){
                             polygon.index <- seq(round(band/2)+1,-round(band/2)-circleMin+max_no_na(pvalue.posN.list[[1]]), length=polygon.num)
-                            X1chr=(RR)*sin(2*pi*(polygon.index)/TotalN)
-                            Y1chr=(RR)*cos(2*pi*(polygon.index)/TotalN)
-                            X2chr=(RR+cir.chr.h)*sin(2*pi*(polygon.index)/TotalN)
-                            Y2chr=(RR+cir.chr.h)*cos(2*pi*(polygon.index)/TotalN)
+                            X1chr=(RR)*sin(2*base::pi*(polygon.index)/TotalN)
+                            Y1chr=(RR)*cos(2*base::pi*(polygon.index)/TotalN)
+                            X2chr=(RR+cir.chr.h)*sin(2*base::pi*(polygon.index)/TotalN)
+                            Y2chr=(RR+cir.chr.h)*cos(2*base::pi*(polygon.index)/TotalN)
                                 if(is.null(chr.den.col)){
                                     polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])   
                                 }else{
@@ -1204,10 +1204,10 @@ CMplot <- function(
                                 }
                         }else{
                             polygon.index <- seq(1+round(band/2)+max_no_na(pvalue.posN.list[[k-1]]),-round(band/2)-circleMin+max_no_na(pvalue.posN.list[[k]]), length=polygon.num)
-                            X1chr=(RR)*sin(2*pi*(polygon.index)/TotalN)
-                            Y1chr=(RR)*cos(2*pi*(polygon.index)/TotalN)
-                            X2chr=(RR+cir.chr.h)*sin(2*pi*(polygon.index)/TotalN)
-                            Y2chr=(RR+cir.chr.h)*cos(2*pi*(polygon.index)/TotalN)
+                            X1chr=(RR)*sin(2*base::pi*(polygon.index)/TotalN)
+                            Y1chr=(RR)*cos(2*base::pi*(polygon.index)/TotalN)
+                            X2chr=(RR+cir.chr.h)*sin(2*base::pi*(polygon.index)/TotalN)
+                            Y2chr=(RR+cir.chr.h)*cos(2*base::pi*(polygon.index)/TotalN)
                             if(is.null(chr.den.col)){
                                 polygon(c(rev(X1chr),X2chr),c(rev(Y1chr),Y2chr),col=rep(colx,ceiling(length(chr)/length(colx)))[k],border=rep(colx,ceiling(length(chr)/length(colx)))[k])   
                             }else{
@@ -1222,15 +1222,15 @@ CMplot <- function(
                     if(cir.density){
 
                         if(file.output){
-                            is_visable <- filter.points((RR+cir.chr.h)*sin(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), (RR+cir.chr.h)*cos(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), wh, ht, dpi = dpi)
+                            is_visable <- filter.points((RR+cir.chr.h)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), (RR+cir.chr.h)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), wh, ht, dpi = dpi)
                         }else{
                             is_visable <- rep(TRUE, length(pvalue.posN))
                         }
                         segments(
-                            (RR)*sin(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
-                            (RR)*cos(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
-                            (RR+cir.chr.h)*sin(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
-                            (RR+cir.chr.h)*cos(2*pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
+                            (RR)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
+                            (RR)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
+                            (RR+cir.chr.h)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
+                            (RR+cir.chr.h)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN)[is_visable],
                             col=density.list$den.col[is_visable], lwd=0.5
                         )
                         legend(
@@ -1255,8 +1255,8 @@ CMplot <- function(
 
                 }
 
-                X=(-Cpvalue[ylimIndx]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
-                Y=(-Cpvalue[ylimIndx]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
+                X=(-Cpvalue[ylimIndx]+r+H*i+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
+                Y=(-Cpvalue[ylimIndx]+r+H*i+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
                 if(file.output){
                     is_visable <- filter.points(X, Y, wh, ht, dpi = dpi)
                 }else{
@@ -1323,8 +1323,8 @@ CMplot <- function(
                                 significantline1=H*(min_no_na(threshold[[i]])-Min)/(Max-Min)
                             }
                             p_amp.index <- which(Cpvalue>=significantline1)
-                            HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
-                            HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                            HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                            HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                             
                             #cover the points that exceed the threshold with the color "white"
                             points(HX1,HY1,pch=19,cex=cex[1],col="white")
@@ -1337,8 +1337,8 @@ CMplot <- function(
                                             significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                         }
                                         p_amp.index <- which(Cpvalue>=significantline1)
-                                        HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
-                                        HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                     }else{
                                         if(LOG10){
                                             significantline0=H*(-log10(threshold[[i]][ll-1])-Min)/(Max-Min)
@@ -1348,8 +1348,8 @@ CMplot <- function(
                                             significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                         }
                                         p_amp.index <- which(Cpvalue>=significantline1 & Cpvalue < significantline0)
-                                        HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
-                                        HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        HX1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        HY1=(-Cpvalue[p_amp.index]+r+H*i+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                     
                                     }
                                 
@@ -1364,8 +1364,8 @@ CMplot <- function(
                 }
                 
                 if(!is.null(highlight)){
-                    HX1=(-Cpvalue[highlight_index[[i]]]+r+H*i+cir.band*(i-1))*sin(2*pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
-                    HY1=(-Cpvalue[highlight_index[[i]]]+r+H*i+cir.band*(i-1))*cos(2*pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
+                    HX1=(-Cpvalue[highlight_index[[i]]]+r+H*i+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
+                    HY1=(-Cpvalue[highlight_index[[i]]]+r+H*i+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[highlight_index[[i]]]-round(band/2)-circleMin)/TotalN)
                     points(HX1,HY1,pch=19,cex=cex[1],col="white")
                     if(is.null(highlight.col)){
                         points(HX1,HY1,pch=highlight.pch,cex=highlight.cex,col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]])
@@ -1375,8 +1375,8 @@ CMplot <- function(
                 }
 
                 if(cir.chr==TRUE){
-                    ticks1=(RR+1.5*cir.chr.h)*sin(2*pi*(ticks-round(band/2)-circleMin)/TotalN)
-                    ticks2=(RR+1.5*cir.chr.h)*cos(2*pi*(ticks-round(band/2)-circleMin)/TotalN)
+                    ticks1=(RR+1.5*cir.chr.h)*sin(2*base::pi*(ticks-round(band/2)-circleMin)/TotalN)
+                    ticks2=(RR+1.5*cir.chr.h)*cos(2*base::pi*(ticks-round(band/2)-circleMin)/TotalN)
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                           angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
@@ -1396,10 +1396,10 @@ CMplot <- function(
                         }
                     }
                 }else{
-                    ticks1=1.01*RR*sin(2*pi*(ticks-round(band/2)-circleMin)/TotalN)
-                    ticks2=1.01*RR*cos(2*pi*(ticks-round(band/2)-circleMin)/TotalN)
-                    # ticks1=RR*sin(2*pi*(ticks-round(band/2))/TotalN)
-                    # ticks2=RR*cos(2*pi*(ticks-round(band/2))/TotalN)
+                    ticks1=1.01*RR*sin(2*base::pi*(ticks-round(band/2)-circleMin)/TotalN)
+                    ticks2=1.01*RR*cos(2*base::pi*(ticks-round(band/2)-circleMin)/TotalN)
+                    # ticks1=RR*sin(2*base::pi*(ticks-round(band/2))/TotalN)
+                    # ticks2=RR*cos(2*base::pi*(ticks-round(band/2))/TotalN)
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                         
