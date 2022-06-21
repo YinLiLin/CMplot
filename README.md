@@ -3,7 +3,7 @@
 
 ## A high-quality drawing tool designed for Manhattan plot of genomic analysis
 
-### :toolbox: Software tools for genetic analyses and genomic breeding
+### :toolbox: Relevant software tools for genetic analyses and genomic breeding
 <table>
     <tr>
 	<td><g-emoji class="g-emoji" alias="mailbox" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4eb.png">📫</g-emoji> <strong><a href="https://www.hiblup.com/" rel="nofollow">HIBLUP</a></strong>: Versatile and easy-to-use GS toolbox.</td>
