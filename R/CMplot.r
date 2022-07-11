@@ -1,5 +1,3 @@
-#Version: 4.0.1
-#Date: 2022/07/11
 #Author: Lilin Yin
 #Contributors: Marcel Schilling, Laura Deeke
 
