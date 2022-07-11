@@ -1,5 +1,5 @@
-#Version: 4.0.0
-#Data: 2021/12/12
+#Version: 4.0.1
+#Date: 2022/07/11
 #Author: Lilin Yin
 #Contributors: Marcel Schilling, Laura Deeke
 
@@ -396,8 +396,8 @@ CMplot <- function(
         pos <- as.numeric(map[, 3])
         chr.num <- unique(chr)
         chorm.maxlen <- max(pos)
-        bp <- ifelse(chorm.maxlen < 1e6, 1e3, 1e6)
-        bp_label <- ifelse(bp == 1e3, "Kb", "Mb")
+        bp <- ifelse(chorm.maxlen < 1e3, 1, ifelse(chorm.maxlen < 1e6, 1e3, 1e6))
+        bp_label <- ifelse(bp == 1, "bp", ifelse(bp == 1e3, "Kb", "Mb"))
         if(is.null(main))   main <- paste("The number of SNPs within ", bin / bp, bp_label, " window size", sep="")
         if(plot)    plot(NULL, xlim=c(0, chorm.maxlen + chorm.maxlen/10), ylim=c(0, length(chr.num) * band + band), main=main, cex.main=main.cex, font.main=main.font, axes=FALSE, xlab="", ylab="", xaxs="i", yaxs="i")
         pos.x <- list()
