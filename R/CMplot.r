@@ -24,7 +24,8 @@ CMplot <- function(
     ylab.pos=3,
     xticks.pos=1,
     mar = c(3,6,3,3),
-    threshold = NULL, 
+    threshold = NULL,
+    threshold_qqplot = NULL,
     threshold.col="red",
     threshold.lwd=1,
     threshold.lty=2,
@@ -2499,6 +2500,7 @@ CMplot <- function(
 
                 mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+1, cex=cex.lab, font=1, xpd=TRUE)
                 mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
+                albine(h=threshold_qqplot, col='grey', lyt=2)
                 
                 #plot the confidence interval of QQ-plot
                 if(conf.int){
