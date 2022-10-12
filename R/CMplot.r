@@ -69,6 +69,8 @@ CMplot <- function(
     main.cex=1.5,
     main.font=2,
     trait.legend.ncol=NULL,
+    trait.legend.pos=c("left","middle","right"),
+    trait.legend.cex=NULL,
     verbose=TRUE
 )
 {   
@@ -526,9 +528,10 @@ CMplot <- function(
     }
 
     if(!all(plot.type %in% c("b","c","m","q","d"))) stop("unknown 'plot.type'.")
-    if(sum(plot.type %in% "b")==1) plot.type=c("c","m","q","d")
-    file=match.arg(file)
-    trait=colnames(Pmap)[-c(1:3)]
+    if(sum(plot.type %in% "b")==1) plot.type <- c("c","m","q","d")
+    trait.legend.pos <- match.arg(trait.legend.pos)
+    file <- match.arg(file)
+    trait <- colnames(Pmap)[-c(1:3)]
     if(!is.null(memo) && memo != "")    memo <- paste("_", memo, sep="")
     if(length(trait) == 0)   trait <- paste("Col", 1:(ncol(Pmap)-3), sep="")
     taxa <- paste(trait, memo, sep="")
@@ -990,7 +993,7 @@ CMplot <- function(
                             cex=1, bty="n",
                             y.intersp=1,
                             x.intersp=1,
-                            yjust=0.5, xjust=0, xpd=TRUE
+                            yjust=0.3, xjust=0, xpd=TRUE
                         )
                         
                     }
@@ -1238,7 +1241,7 @@ CMplot <- function(
                             cex=1, bty="n",
                             y.intersp=1,
                             x.intersp=1,
-                            yjust=0.5, xjust=0, xpd=TRUE
+                            yjust=0.3, xjust=0, xpd=TRUE
                         )
                         
                     }
@@ -1680,7 +1683,7 @@ CMplot <- function(
                             cex=0.8, bty="n",
                             y.intersp=1,
                             x.intersp=1,
-                            yjust=1, xjust=0, xpd=TRUE
+                            yjust=0.9, xjust=0, xpd=TRUE
                         )
                         
                     }
@@ -1708,9 +1711,9 @@ CMplot <- function(
                 # par(xpd=TRUE)
             }
             for(i in 1:R){
-                if(i == 1)  par(mar=c(0, mar[2]+1, mar[3], mar[4]))
-                if(i == R)  par(mar=c(mar[1]+1, mar[2]+1, 0, mar[4]))
-                if(i != 1 & i != R) par(mar=c(0, mar[2]+1, 0, mar[4]))
+                if(i == 1)  par(mar=c(0, mar[2]+1, mar[3], 0))
+                if(i == R)  par(mar=c(mar[1]+1, mar[2]+1, 0, 0))
+                if(i != 1 & i != R) par(mar=c(0, mar[2]+1, 0, 0))
                 if(verbose) cat(paste(" Multracks-Manhattan Plotting ",trait[i],".\n",sep=""))
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
@@ -1783,22 +1786,29 @@ CMplot <- function(
                 # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
                 
                 #add the names of traits on plot 
-                if(!is.null(threshold[[i]])){
-                    if(LOG10){
-                        threshold.max <- -log10(min(threshold[[i]]))
+                # if(!is.null(threshold[[i]])){
+                #     if(LOG10){
+                #         threshold.max <- -log10(min(threshold[[i]]))
+                #     }else{
+                #         threshold.max <- max(threshold[[i]])
+                #     }
+
+                #     if(threshold.max == Max){
+                #         text(max_no_na(pvalue.posN),Max*0.98,labels=trait[i],adj=c(1, 1),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                #     }else if((threshold.max + 0.5 * strheight(trait[i], cex=cex.lab*(R/2))) >= Max){
+                #         text(max_no_na(pvalue.posN),threshold.max*1.02,labels=trait[i],adj=c(1, 0),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                #     }else{
+                #         text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
+                #     }
+                # }else{
+                    if(trait.legend.pos=="left"){
+                        text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
+                    }else if(trait.legend.pos=="middle"){
+                        text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
                     }else{
-                        threshold.max <- max(threshold[[i]])
+                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
                     }
-                    if(threshold.max == Max){
-                        text(max_no_na(pvalue.posN),Max*0.98,labels=trait[i],adj=c(1, 1),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
-                    }else if((threshold.max + 0.5 * strheight(trait[i], cex=cex.lab*(R/2))) >= Max){
-                        text(max_no_na(pvalue.posN),threshold.max*1.02,labels=trait[i],adj=c(1, 0),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
-                    }else{
-                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
-                    }
-                }else{
-                   text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
-                }
+                # }
                 
                 if(i == R){
                     if(chr.labels.angle == 0){
@@ -1927,7 +1937,7 @@ CMplot <- function(
                 if(file=="jpg") jpeg(paste("Multraits-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
                 if(file=="pdf") pdf(paste("Multraits-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
                 if(file=="tiff")    tiff(paste("Multraits-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-                if(!is.null(trait.legend.ncol)){
+                if(!is.null(trait.legend.ncol) && trait.legend.pos=="middle"){
                     mar[3] = mar[3] + ceiling(length(taxa) / trait.legend.ncol)
                 }
                 par(mar = mar,xaxs="i",yaxs="r")
@@ -2014,19 +2024,20 @@ CMplot <- function(
             # Min1 <- Min
             # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
             # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
-            if(!is.null(ylim)){
+            if(trait.legend.pos=="middle"){
                 if(is.null(trait.legend.ncol)){
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),cex.lab,trait.legend.cex),box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
                 }else{
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
+                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),cex.lab,trait.legend.cex),box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
                 }
             }else{
                 if(is.null(trait.legend.ncol)){
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
+                    legend(ifelse(trait.legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),cex.lab,trait.legend.cex),box.col=NA,horiz=FALSE,xpd=TRUE)
                 }else{
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=cex.lab,box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
+                    legend(ifelse(trait.legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),cex.lab,trait.legend.cex),box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xpd=TRUE)
                 }
             }
+
             if(chr.labels.angle == 0){
                 if(is.null(chr.labels)){
                     axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks),lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
@@ -2181,7 +2192,7 @@ CMplot <- function(
                     cex=0.8, bty="n",
                     y.intersp=1,
                     x.intersp=1,
-                    yjust=1, xjust=0, xpd=TRUE
+                    yjust=0.9, xjust=0, xpd=TRUE
                 )          
             }
             if(file.output) dev.off()
