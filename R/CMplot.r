@@ -6,6 +6,7 @@ CMplot <- function(
     col=c("#4197d8", "#f8c120", "#413496", "#495226", "#d60b6f", "#e66519", "#d581b7", "#83d3ad", "#7c162c", "#26755d"),
     bin.size=1e6,
     bin.range=NULL,
+    bin.legend.num=10,
     pch=19,
     type="p",
     band=1,
@@ -69,8 +70,8 @@ CMplot <- function(
     main.cex=1.5,
     main.font=2,
     trait.legend.ncol=NULL,
-    trait.legend.pos=c("left","middle","right"),
     trait.legend.cex=NULL,
+    trait.legend.pos=c("left","middle","right"),
     verbose=TRUE
 )
 {   
@@ -565,7 +566,7 @@ CMplot <- function(
             if(length(bin.range) != 2)  stop("Two values (min and max) should be provided for bin.range!")
             if(bin.range[1] == 0)   stop("Min value of bin.range should be more than 1!")
         }
-        DensityPlot(map=Pmap[,c(1:3)], file.output = file.output, chr.pos.max=chr.pos.max, dpi = dpi, wh = wh, ht = ht, chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2], main = main[1], main.cex=main.cex, main.font=main.font)
+        DensityPlot(map=Pmap[,c(1:3)], file.output = file.output, chr.pos.max=chr.pos.max, dpi = dpi, wh = wh, ht = ht, chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.len=bin.legend.num, legend.min=bin.range[1], legend.max=bin.range[2], main = main[1], main.cex=main.cex, main.font=main.font)
         if(file.output) dev.off()
     }
 
@@ -847,7 +848,7 @@ CMplot <- function(
         if(length(chr.den.col) > 1){
             cir.density=TRUE
             den.fold <- 20
-            density.list <- DensityPlot(map=Pmap[,c(1,1,2)], file.output = FALSE, chr.pos.max=FALSE, col=chr.den.col, plot=FALSE, bin=bin.size, legend.min=bin.range[1], legend.max=bin.range[2])
+            density.list <- DensityPlot(map=Pmap[,c(1,1,2)], file.output = FALSE, chr.pos.max=FALSE, col=chr.den.col, plot=FALSE, bin=bin.size, legend.len=bin.legend.num, legend.min=bin.range[1], legend.max=bin.range[2])
             #list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y)
         }else{
             cir.density=FALSE
@@ -2563,3 +2564,4 @@ CMplot <- function(
     }
     if(file.output & verbose)   cat(paste(" Plots are stored in: ", getwd(), sep=""), "\n")
 }
+
