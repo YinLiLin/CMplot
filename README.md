@@ -1,5 +1,5 @@
 # CMplot 
-[![GitHub issues](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=green)](https://github.com/YinLiLin/CMplot/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-4.2.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FYinLiLin%2FCMplot"/></a>
+[![GitHub issues](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=green)](https://github.com/YinLiLin/CMplot/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-4.3.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FYinLiLin%2FCMplot"/></a>
 
 ## A high-quality drawing tool designed for Manhattan plot of genomic analysis
 
@@ -256,6 +256,24 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_6_1.jpg">
 <img src="Figure/2_6_1.jpg" height="385px" width="900px">
 </a>
+
+```r
+> SNPs <-  pig60K[
+	pig60K$trait1 < 1e-4 |
+	pig60K$trait2 < 1e-4 |
+	pig60K$trait3 < 1e-4, 1]
+> CMplot(pig60K,type="p",plot.type="m",LOG10=TRUE,highlight=SNPs,highlight.type="l",
+        threshold=1e-4,threshold.col="black",threshold.lty=1,col=c("grey60","#4197d8"),
+        signal.cex=1.2, signal.col="red", highlight.col="grey",highlight.cex=0.7,
+        file="jpg",dpi=300,file.output=TRUE,verbose=TRUE,multracks=TRUE)
+
+```
+
+</p>
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2_6_2.jpg">
+<img src="Figure/2_6_2.jpg" height="900px" width="640px">
+</a>
 	
 #### Visualize only one chromosome
 
@@ -333,14 +351,14 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ### Multi_tracks Rectangular-Manhattan plot
 
 ```r
-SNPs <- list(
+> SNPs <- list(
 	pig60K$SNP[pig60K$trait1<1e-6],
 	pig60K$SNP[pig60K$trait2<1e-6],
 	pig60K$SNP[pig60K$trait3<1e-6]
 )
-CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
+> CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
-        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green","blue"),
+        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),
         signal.cex=1, file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,
         highlight=SNPs, highlight.text=SNPs, highlight.text.cex=1.4)
 #Note: if you are not supposed to change the color of signal, 

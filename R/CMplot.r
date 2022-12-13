@@ -292,6 +292,9 @@ CMplot <- function(
             if(type=="h"){
                 points(x1,y1,pch = pch,type="h",col = point.col, lwd = point.cex+1)
                 points(x1,y1,pch = pch,type="p",col = point.col, cex = point.cex)
+            }else if(type=="l"){
+                segments(x1, ylim[1], x1, ylim[2], col=point.col, lwd=point.cex, lty=2)
+                # points(x1,y1,pch = pch,type="p",col = point.col, cex = point.cex)
             }else{
                 points(x1,y1,pch = pch,type=type,col = point.col,cex = point.cex)
             }
@@ -300,6 +303,9 @@ CMplot <- function(
             if(type=="h"){
                 points(x,y,pch = pch,type="h",col = point.col, lwd = point.cex+1)
                 points(x,y,pch = pch,type="p",col = point.col, cex = point.cex)
+            }else if(type=="l"){
+                segments(x, ylim[1], x, ylim[2], col=point.col, lwd=point.cex, lty=2)
+                # points(x,y,pch = pch,type="p",col = point.col, cex = point.cex)
             }else{
                 points(x,y,pch = pch,type=type,col = point.col,cex = point.cex)
             }
@@ -1090,36 +1096,36 @@ CMplot <- function(
                             
                             #cover the points that exceed the threshold with the color "white"
                             points(HX1,HY1,pch=19,cex=cex[1],col="white")
-                            
-                                for(ll in 1:length(threshold[[i]])){
-                                    if(ll == 1){
-                                        if(LOG10){
-                                            significantline1=H*(-log10(threshold[[i]][ll])-Min)/(Max-Min)
-                                        }else{
-                                            significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
-                                        }
-                                        p_amp.index <- which(Cpvalue>=significantline1)
-                                        HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
-                                        HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                        
+                            for(ll in 1:length(threshold[[i]])){
+                                if(ll == 1){
+                                    if(LOG10){
+                                        significantline1=H*(-log10(threshold[[i]][ll])-Min)/(Max-Min)
                                     }else{
-                                        if(LOG10){
-                                            significantline0=H*(-log10(threshold[[i]][ll-1])-Min)/(Max-Min)
-                                            significantline1=H*(-log10(threshold[[i]][ll])-Min)/(Max-Min)
-                                        }else{
-                                            significantline0=H*(threshold[[i]][ll-1]-Min)/(Max-Min)
-                                            significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
-                                        }
-                                        p_amp.index <- which(Cpvalue>=significantline1 & Cpvalue < significantline0)
-                                        HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
-                                        HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                        significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                     }
-                                
-                                    if(is.null(signal.col)){
-                                        points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rep(rep(colx,N[i]),add[[i]])[p_amp.index])
+                                    p_amp.index <- which(Cpvalue>=significantline1)
+                                    HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                    HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                }else{
+                                    if(LOG10){
+                                        significantline0=H*(-log10(threshold[[i]][ll-1])-Min)/(Max-Min)
+                                        significantline1=H*(-log10(threshold[[i]][ll])-Min)/(Max-Min)
                                     }else{
-                                        points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=signal.col[ll])
+                                        significantline0=H*(threshold[[i]][ll-1]-Min)/(Max-Min)
+                                        significantline1=H*(threshold[[i]][ll]-Min)/(Max-Min)
                                     }
+                                    p_amp.index <- which(Cpvalue>=significantline1 & Cpvalue < significantline0)
+                                    HX1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
+                                    HY1=(Cpvalue[p_amp.index]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[p_amp.index]-round(band/2)-circleMin)/TotalN)
                                 }
+                            
+                                if(is.null(signal.col)){
+                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rep(rep(colx,N[i]),add[[i]])[p_amp.index])
+                                }else{
+                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=signal.col[ll])
+                                }
+                            }
                         }
                     }
                 }
@@ -1649,7 +1655,7 @@ CMplot <- function(
                     }
 
                     if(!is.null(highlight)){
-                        points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2],col="white")
+                        # points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2],col="white")
                         if(!is.na(highlight_index[[i]][1])){
                             if(is.null(highlight.col)){
                                 highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,type=highlight.type,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
@@ -1915,7 +1921,7 @@ CMplot <- function(
                 }
 
                 if(!is.null(highlight)){
-                    points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2]*R,col="white")
+                    # points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2]*R,col="white")
                     if(!is.na(highlight_index[[i]][1])){
                         if(is.null(highlight.col)){
                             highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,type=highlight.type,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
@@ -2129,7 +2135,7 @@ CMplot <- function(
                         sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
                         logpvalue=logpvalueT[plot.index,i]
                         if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
-                        points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], points.alpha, maxColorValue=255))
+                        points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
                         #if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))   abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
                     }
                 }
@@ -2144,29 +2150,66 @@ CMplot <- function(
             }
 
             if(!is.null(threshold)){
+                for(thr in 1:length(threshold[[i]])){
+                    h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
+                    segments(0, h, max_no_na(pvalue.posN), h, col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+                }
+                if(amplify==TRUE){
                 # if(sum(threshold!=0)==length(threshold)){
                     for(i in 1:R){
+                        # logpvalue=logpvalueT[, i]
+                        # if(LOG10){
+                        #     sgindex = which(logpvalue > -log10(min(unlist(threshold))))
+                        # }else{
+                        #     sgindex = which(logpvalue > max(unlist(threshold)))
+                        # }
+                        # HY1=logpvalue[sgindex]
+                        # HX1=pvalue.posN[sgindex]
+                        # points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
+                        # if(!is.null(signal.col)){
+                        #     points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rep(signal.col, R)[i])
+                        # }else{
+                        #     points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
+                        # }
+                        # if(!is.null(threshold[[i]])){
+                        #     for(thr in 1:length(threshold[[i]])){
+                        #         h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
+                        #         segments(0, h, max_no_na(pvalue.posN), h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+                        #     }
+                        # }
                         logpvalue=logpvalueT[, i]
-                        if(LOG10){
-                            sgindex = which(logpvalue > -log10(min(unlist(threshold))))
-                        }else{
-                            sgindex = which(logpvalue > max(unlist(threshold)))
-                        }
-                        HY1=logpvalue[sgindex]
-                        HX1=pvalue.posN[sgindex]
-                        points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
-                        if(!is.null(signal.col)){
-                            points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rep(signal.col, R)[i])
-                        }else{
-                            points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], points.alpha, maxColorValue=255))
-                        }
-                        if(!is.null(threshold[[i]])){
-                            for(thr in 1:length(threshold[[i]])){
-                                h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
-                                segments(0, h, max_no_na(pvalue.posN), h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+                        for(ll in 1:length(threshold[[i]])){
+                            if(ll == 1){
+                                if(LOG10){
+                                    sgline1=-log10(threshold[[i]][ll])
+                                }else{
+                                    sgline1=threshold[[i]][ll]
+                                }
+                                sgindex=which(logpvalue>=sgline1)
+                                HY1=logpvalue[sgindex]
+                                HX1=pvalue.posN[sgindex]
+                            }else{
+                                if(LOG10){
+                                    sgline0=-log10(threshold[[i]][ll-1])
+                                    sgline1=-log10(threshold[[i]][ll])
+                                }else{
+                                    sgline0=threshold[[i]][ll-1]
+                                    sgline1=threshold[[i]][ll]
+                                }
+                                sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
+                                HY1=logpvalue[sgindex]
+                                HX1=pvalue.posN[sgindex]
                             }
+                            points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
+                            if(is.null(signal.col)){
+                                points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rep(rep(colx,N[i]),add[[i]])[sgindex])
+                            }else{
+                                points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=signal.col[ll])
+                            }
+                            
                         }
                     }
+                }
                 # }
             }
 
@@ -2196,8 +2239,8 @@ CMplot <- function(
                     yjust=0.9, xjust=0, xpd=TRUE
                 )          
             }
+
             if(file.output) dev.off()
-            
         }
     }
         
@@ -2278,9 +2321,9 @@ CMplot <- function(
                 #plot the confidence interval of QQ-plot
                 if(conf.int){
                     if(is.null(conf.int.col)){
-                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255),border=t(col)[i])
+                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
                     }else{
-                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col[i],border=conf.int.col[i])
+                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255))
                     }
                 }
                 if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1,lwd=threshold.lty[1], lty=threshold.lty[1], col = threshold.col[1]); par(xpd=TRUE)}
@@ -2361,7 +2404,7 @@ CMplot <- function(
                 }else{
                     plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, max(unlist(ylim))),main = "QQplot", cex.main=main.cex, font.main=main.font)
                 }
-                legend("topleft",trait,col=t(col)[1:R],pch=19,text.font=6,box.col=NA, xpd=TRUE)
+                legend("topleft",trait,col=rgb(t(col2rgb(t(col)[1:R])), alpha=points.alpha, maxColorValue=255),pch=19,text.font=6,box.col=NA, xpd=TRUE)
                 axis(1, mgp=c(3,xticks.pos,0), at=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), cex.axis=cex.axis)
                 axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
                 axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(unlist(ylim)))), labels=c("",""), tcl=0, lwd=lwd.axis)
@@ -2410,9 +2453,9 @@ CMplot <- function(
                     # plot the confidence interval of QQ-plot
                     if(conf.int){
                         if(is.null(conf.int.col)){
-                            polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255),border=t(col)[i])
+                            polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
                         }else{
-                            polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col[i],border=conf.int.col[i])
+                            polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255))
                         }
                     }
                        
@@ -2425,24 +2468,24 @@ CMplot <- function(
                             if(amplify==TRUE){
                                 thre.index <- log.P.values<thre.line
                                 if(sum(!thre.index)!=0){
-                                    points(log.Quantiles[thre.index & is_visable], log.P.values[thre.index & is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                                    points(log.Quantiles[thre.index & is_visable], log.P.values[thre.index & is_visable], col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),pch=19,cex=cex[3])
                             
                                     # cover the points that exceed the threshold with the color "white"
                                     # points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
                                     if(is.null(signal.col)){
-                                        points(log.Quantiles[!thre.index],log.P.values[!thre.index],col = t(col)[i],pch=signal.pch[i],cex=signal.cex[i])
+                                        points(log.Quantiles[!thre.index],log.P.values[!thre.index],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),pch=signal.pch[i],cex=signal.cex[i])
                                     }else{
-                                        points(log.Quantiles[!thre.index],log.P.values[!thre.index],col = signal.col[i],pch=signal.pch[i],cex=signal.cex[i])
+                                        points(log.Quantiles[!thre.index],log.P.values[!thre.index],col=rgb(t(col2rgb(signal.col[i])), alpha=points.alpha, maxColorValue=255),pch=signal.pch[i],cex=signal.cex[i])
                                     }
                                 }else{
-                                    points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                                    points(log.Quantiles[is_visable], log.P.values[is_visable], col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),pch=19,cex=cex[3])
                                 }
                             }else{
-                                points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                                points(log.Quantiles[is_visable], log.P.values[is_visable], col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),pch=19,cex=cex[3])
                             }
                         # }
                     }else{
-                        points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                        points(log.Quantiles[is_visable], log.P.values[is_visable], col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),pch=19,cex=cex[3])
                     }
                 }
                 if(box) box(lwd=lwd.axis)
@@ -2515,9 +2558,9 @@ CMplot <- function(
                 #plot the confidence interval of QQ-plot
                 if(conf.int){
                     if(is.null(conf.int.col)){
-                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(col2rgb(t(col)[i])[1], col2rgb(t(col)[i])[2], col2rgb(t(col)[i])[3], 100, maxColorValue=255),border=t(col)[i])
+                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
                     }else{
-                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=conf.int.col[i],border=conf.int.col[i])
+                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255))
                     }
                 }
 
@@ -2564,4 +2607,3 @@ CMplot <- function(
     }
     if(file.output & verbose)   cat(paste(" Plots are stored in: ", getwd(), sep=""), "\n")
 }
-
