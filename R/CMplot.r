@@ -615,7 +615,7 @@ CMplot <- function(
 
         if(!is.null(ylim)){
             if(!is.list(ylim)){
-                cat(" (warning: all phenotypes will use the same ylim.)\n")
+                if(R > 1)    cat(" (warning: all phenotypes will use the same ylim.)\n")
                 if(length(ylim)!=2) stop("ylim for each phenotype should be assigned two values.")
                 if(ylim[2] <= ylim[1])  stop("second value should be larger than the first in ylim.")
                 ylimlist <- list()
@@ -692,7 +692,7 @@ CMplot <- function(
                     highlight_index[[i]] <- match(as.character(as.matrix(highlight[[i]])), SNP_id)
                     if(all(is.na(highlight_index[[i]]))) stop("No shared SNPs between Pmap and highlight!")
                     highlight_index[[i]] <- na.omit(highlight_index[[i]])
-                    if(!is.null(highlight.col) && !is.list(highlight.col))  highlight_col[[i]] <- rep(highlight.col, length(highlight_index[[i]]))
+                    if(!is.null(highlight.col) && !is.list(highlight.col))  highlight_col[[i]] <- highlight.col
                 }
             }
         }
