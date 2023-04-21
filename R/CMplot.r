@@ -61,11 +61,11 @@ CMplot <- function(
     conf.int=TRUE,
     conf.int.col=NULL,
     file.output=TRUE,
+    file.name="",
     file=c("jpg","pdf","tiff"),
     dpi=300,
     height=NULL,
     width=NULL,
-    memo="",
     main=NULL,
     main.cex=1.5,
     main.font=2,
@@ -539,9 +539,9 @@ CMplot <- function(
     trait.legend.pos <- match.arg(trait.legend.pos)
     file <- match.arg(file)
     trait <- colnames(Pmap)[-c(1:3)]
-    if(!is.null(memo) && memo != "")    memo <- paste("_", memo, sep="")
-    if(length(trait) == 0)   trait <- paste("Col", 1:(ncol(Pmap)-3), sep="")
-    taxa <- paste(trait, memo, sep="")
+    if(length(trait) == 0)   trait <- paste("Trait", 1:(ncol(Pmap)-3), sep="")
+    taxa <- paste(trait, collapse="_")
+    
     if(length(points.alpha) != 1L)   stop("invalid 'points.alpha': must be 'TRUE', 'FALSE' or an integer between 0 and 255")
     if(is.logical(points.alpha))   points.alpha <- ifelse(points.alpha, formals()$points.alpha, 255L)
     if(!is.integer(points.alpha)){
@@ -553,13 +553,13 @@ CMplot <- function(
 
     #SNP-Density plot
     if("d" %in% plot.type){
-        if(verbose) cat(" SNP-Density Plotting.\n")
+        if(verbose) cat(" Marker density plotting.\n")
         if(file.output){
             ht=ifelse(is.null(height), 6, height)
             wh=ifelse(is.null(width), 9, width)
-            if(file=="jpg") jpeg(paste("SNP-Density.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-            if(file=="pdf") pdf(paste("SNP-Density.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
-            if(file=="tiff")    tiff(paste("SNP-Density.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+            if(file=="jpg") jpeg(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+            if(file=="pdf") pdf(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht)
+            if(file=="tiff")    tiff(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
             # par(xpd=TRUE)
             par(mar=c(mar[1], mar[2], mar[3]+1, mar[4]))
         }else{
@@ -738,10 +738,6 @@ CMplot <- function(
 
         pvalueT <- as.matrix(Pmap[,-c(1:2)])
         pvalue.pos <- Pmap[, 2]
-        # p0.index <- Pmap[, 1] == 0
-        # if(sum(p0.index) != 0){
-            # pvalue.pos[p0.index] <- 1:sum(p0.index)
-        # }
         pvalue.pos.list <- tapply(pvalue.pos, Pmap[, 1], list)
         
         #scale the space parameter between chromosomes
@@ -760,9 +756,6 @@ CMplot <- function(
         Pmap[,-c(1:2)] <- pvalueT
 
         #set the colors for the plot
-        #palette(heat.colors(1024)) #(heatmap)
-        #T=floor(1024/max(pvalue))
-        #plot(pvalue,pch=19,cex=0.6,col=(1024-floor(pvalue*T)))
         if(is.vector(col)){
             col <- matrix(col,R,length(col),byrow=TRUE)
         }
@@ -832,7 +825,6 @@ CMplot <- function(
         }
 
         pvalue.posN.list <- tapply(pvalue.posN, Pmap[, 1], list)
-        #NewP[[j]] <- pvalue
         
         #merge the pvalues of traits by column
         if(LOG10){
@@ -881,13 +873,12 @@ CMplot <- function(
             signal.line.index <- pvalue.posN[signal.line.index]
         }
 
-        #print("Starting Circular-Manhattan plot!",quote=F)
         if(file.output){
             ht=ifelse(is.null(height), 10, height)
             wh=ifelse(is.null(width), 10, width)
-            if(file=="jpg") jpeg(paste("Circular-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-            if(file=="pdf") pdf(paste("Circular-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
-            if(file=="tiff")    tiff(paste("Circular-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+            if(file=="jpg") jpeg(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+            if(file=="pdf") pdf(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht)
+            if(file=="tiff")    tiff(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
             par(pty="s", xpd=TRUE, mar=c(1,1,1,1))
         }
         if(!file.output){
@@ -920,7 +911,7 @@ CMplot <- function(
             #debug
             #print(colx)
             
-            if(verbose) cat(paste(" Circular-Manhattan Plotting ",trait[i],".\n",sep=""))
+            if(verbose) cat(paste(" Circular Manhattan plotting ",trait[i],".\n",sep=""))
             pvalue <- pvalueT[,i]
             logpvalue <- logpvalueT[,i]
             if(is.null(ylim)){
@@ -1450,16 +1441,17 @@ CMplot <- function(
 
         if(multracks==FALSE){
             #print("Starting Rectangular-Manhattan plot!",quote=F)
+            if(file.name != "" && length(file.name) != R)   stop(paste("please provide a vector containing file names of all", R, "traits."))
             for(i in 1:R){
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
-                if(verbose) cat(paste(" Rectangular-Manhattan Plotting ",trait[i],".\n",sep=""))
+                if(verbose) cat(paste(" Rectangular Manhattan plotting ",trait[i],".\n",sep=""))
                     if(file.output){
                         ht=ifelse(is.null(height), 6, height)
                         wh=ifelse(is.null(width), 14, width)
-                        if(file=="jpg") jpeg(paste("Rectangular-Manhattan.",taxa[i],".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                        if(file=="pdf") pdf(paste("Rectangular-Manhattan.",taxa[i],".pdf",sep=""), width = wh,height=ht)
-                        if(file=="tiff")    tiff(paste("Rectangular-Manhattan.",taxa[i],".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+                        if(file=="jpg") jpeg(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+                        if(file=="pdf") pdf(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".pdf",sep=""), width = wh,height=ht)
+                        if(file=="tiff")    tiff(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
                         par(mar = mar,xaxs="i",yaxs="r")
                     }
                     if(!file.output){
@@ -1696,19 +1688,15 @@ CMplot <- function(
                     }
                 if(!is.null(main))  title(main = main[i], cex.main = main.cex, font.main= main.font)
                 if(box) box(lwd=lwd.axis)
-                #if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))   abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
                 if(file.output)  dev.off()
             }
-            #print("Rectangular-Manhattan has been finished!",quote=F)
         }else{
-            #print("Starting Rectangular-Manhattan plot!",quote=F)
-            #print("Plotting in multiple tracks!",quote=F)
             if(file.output){
                 ht=ifelse(is.null(height), 6, height)
                 wh=ifelse(is.null(width), 14, width)
-                if(file=="jpg") jpeg(paste("Multracks-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi,quality = 100)
-                if(file=="pdf") pdf(paste("Multracks-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht*R)
-                if(file=="tiff")    tiff(paste("Multracks-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi)
+                if(file=="jpg") jpeg(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi,quality = 100)
+                if(file=="pdf") pdf(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht*R)
+                if(file=="tiff")    tiff(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi)
                 par(mfcol=c(R,1), xaxs="i")
             }
             if(!file.output){
@@ -1721,7 +1709,7 @@ CMplot <- function(
                 if(i == 1)  par(mar=c(0, mar[2]+1, mar[3], 0))
                 if(i == R)  par(mar=c(mar[1]+1, mar[2]+1, 0, 0))
                 if(i != 1 & i != R) par(mar=c(0, mar[2]+1, 0, 0))
-                if(verbose) cat(paste(" Multracks-Manhattan Plotting ",trait[i],".\n",sep=""))
+                if(verbose) cat(paste(" Multi-tracks Manhattan plotting ",trait[i],".\n",sep=""))
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
                 pvalue=pvalueT[,i]
@@ -1738,20 +1726,6 @@ CMplot <- function(
                                 Min<-min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold[[i]]))))
                                 #if(abs(Min)<=1)    Min=min_no_na(min_no_na(pvalue),min_no_na(threshold))
                             }
-                        # }else{
-                        #     if(LOG10){
-                        #         Max=max_ylim((-log10(min_no_na(pvalue))))
-                        #         Min<-0
-                        #     }else{
-                        #         Max=max_ylim((max_no_na(pvalue)))
-                        #         #if(abs(Max)<=1)    Max=max_no_na(max_no_na(pvalue))
-                        #         Min=min_ylim((min_no_na(pvalue)))
-                        #         #if(abs(Min)<=1)    Min=min_no_na(min_no_na(pvalue))
-                        #         # }else{
-                        #             # Max=max_no_na(ceiling(max_no_na(pvalue)))
-                        #         # }
-                        #     }   
-                        # }
                     }else{
                         if(LOG10){
                                 Max=max_ylim((-log10(min_no_na(pvalue))))
@@ -1787,36 +1761,16 @@ CMplot <- function(
                         segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=lwd.axis, lty=2)
                     }
                 }
-                # Max1 <- Max
-                # Min1 <- Min
-                # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
-                # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
-                
-                #add the names of traits on plot 
-                # if(!is.null(threshold[[i]])){
-                #     if(LOG10){
-                #         threshold.max <- -log10(min(threshold[[i]]))
-                #     }else{
-                #         threshold.max <- max(threshold[[i]])
-                #     }
 
-                #     if(threshold.max == Max){
-                #         text(max_no_na(pvalue.posN),Max*0.98,labels=trait[i],adj=c(1, 1),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
-                #     }else if((threshold.max + 0.5 * strheight(trait[i], cex=cex.lab*(R/2))) >= Max){
-                #         text(max_no_na(pvalue.posN),threshold.max*1.02,labels=trait[i],adj=c(1, 0),font=4,cex=cex.lab*(R/2),xpd=TRUE) 
-                #     }else{
-                #         text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=1,font=4,cex=cex.lab*(R/2),xpd=TRUE) 
-                #     }
-                # }else{
-                    if(trait.legend.pos=="left"){
-                        text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
-                    }else if(trait.legend.pos=="middle"){
-                        text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
-                    }else{
-                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
-                    }
-                # }
-                
+                #add the names of traits on plot 
+                if(trait.legend.pos=="left"){
+                    text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
+                }else if(trait.legend.pos=="middle"){
+                    text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
+                }else{
+                    text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
+                }
+            
                 if(i == R){
                     if(chr.labels.angle == 0){
                         if(is.null(chr.labels)){
@@ -1857,14 +1811,6 @@ CMplot <- function(
                 }else{
                     axis(2, las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
                     axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-
-                    # if(ylim[2]>1){
-                    #     axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
-                    #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-                    # }else{
-                    #     axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
-                    #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-                    # }
                 }
                 if(!is.null(threshold[[i]])){
                     for(thr in 1:length(threshold[[i]])){
@@ -1914,10 +1860,8 @@ CMplot <- function(
                             }else{
                                 points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*R,col=signal.col[ll])
                             }
-                            
                         }
                     }
-
                 }
 
                 if(!is.null(highlight)){
@@ -1941,11 +1885,11 @@ CMplot <- function(
             if(file.output){
                 ht=ifelse(is.null(height), 6, height)
                 wh=ifelse(is.null(width), 14, width)
-                if(file=="jpg") jpeg(paste("Multraits-Manhattan.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                if(file=="pdf") pdf(paste("Multraits-Manhattan.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
-                if(file=="tiff")    tiff(paste("Multraits-Manhattan.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+                if(file=="jpg") jpeg(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+                if(file=="pdf") pdf(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht)
+                if(file=="tiff")    tiff(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
                 if(!is.null(trait.legend.ncol) && trait.legend.pos=="middle"){
-                    mar[3] = mar[3] + ceiling(length(taxa) / trait.legend.ncol)
+                    mar[3] = mar[3] + ceiling(length(trait) / trait.legend.ncol)
                 }
                 par(mar = mar,xaxs="i",yaxs="r")
             }
@@ -1959,30 +1903,15 @@ CMplot <- function(
             pvalue <- as.vector(Pmap[,3:(R+2)])
             if(is.null(ylim)){
                 if(!is.null(threshold)){
-                    # if(sum(threshold!=0)==length(threshold)){
-                        if(LOG10){
-                            Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(unlist(threshold))))))
-                            Min<-min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(unlist(threshold))))))
-                        }else{
-                            Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(unlist(threshold)))))
-                            # if(abs(Max)<=1)   Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-                            Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(unlist(threshold)))))
-                            # if(abs(Min)<=1)   Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
-                        }
-                    # }else{
-                    #     if(LOG10){
-                    #         Max=max_ylim((-log10(min_no_na(pvalue))))
-                    #         Min=0
-                    #     }else{
-                    #         Max=max_ylim((max_no_na(pvalue)))
-                    #         # if(abs(Max)<=1)   Max=max_no_na(max_no_na(pvalue))
-                    #         Min<- min_ylim((min_no_na(pvalue)))
-                    #         # if(abs(Min)<=1)   Min=min_no_na(min_no_na(pvalue))
-                    #         # }else{
-                    #             # Max=max_no_na(ceiling(max_no_na(pvalue)))
-                    #         # }
-                    #     }   
-                    # }
+                    if(LOG10){
+                        Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(unlist(threshold))))))
+                        Min<-min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(unlist(threshold))))))
+                    }else{
+                        Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(unlist(threshold)))))
+                        # if(abs(Max)<=1)   Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
+                        Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(unlist(threshold)))))
+                        # if(abs(Min)<=1)   Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
+                    }
                 }else{
                     if(LOG10){
                             Max=max_ylim((-log10(min_no_na(pvalue))))
@@ -2086,15 +2015,6 @@ CMplot <- function(
                 axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
                 axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
                 legend.y <- Max
-                # if(ylim[2]>1){
-                #     axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
-                #     legend.y <- tail(ylim[2], 1)
-                # }else{
-                #     axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                #     axis(2, at=c(min_no_na(ylim), ylim[2]), labels=c("",""), tcl=0, lwd=lwd.axis)
-                #     legend.y <- tail(ylim[2], 1)
-                # }
             }
             if(chr.border){
                 for(b in 1:length(chr.border.pos)){
@@ -2136,13 +2056,12 @@ CMplot <- function(
                         logpvalue=logpvalueT[plot.index,i]
                         if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
                         points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
-                        #if(!is.null(threshold) & (length(grep("FarmCPU",taxa[i])) != 0))   abline(v=which(pvalueT[,i] < min_no_na(threshold)/max_no_na(dim(Pmap))),col="grey",lty=2,lwd=signal.line)
                     }
                 }
                 if(verbose){
                     progress <- round((nrow(Pmap) - length(sam.index[[trait_max]])) * 100 / nrow(Pmap))
                     if(progress %in% cat_bar){
-                        cat(" Multraits-Rectangular Plotting...(finished ", progress, "%)\r", sep="")
+                        cat(" Multi-traits Rectangular plotting ... (finished ", progress, "%)\r", sep="")
                         cat_bar <- cat_bar[cat_bar != progress]
                         if(progress == 100) cat("\n")
                     }
@@ -2157,26 +2076,6 @@ CMplot <- function(
                 if(amplify==TRUE){
                 # if(sum(threshold!=0)==length(threshold)){
                     for(i in 1:R){
-                        # logpvalue=logpvalueT[, i]
-                        # if(LOG10){
-                        #     sgindex = which(logpvalue > -log10(min(unlist(threshold))))
-                        # }else{
-                        #     sgindex = which(logpvalue > max(unlist(threshold)))
-                        # }
-                        # HY1=logpvalue[sgindex]
-                        # HX1=pvalue.posN[sgindex]
-                        # points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
-                        # if(!is.null(signal.col)){
-                        #     points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rep(signal.col, R)[i])
-                        # }else{
-                        #     points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
-                        # }
-                        # if(!is.null(threshold[[i]])){
-                        #     for(thr in 1:length(threshold[[i]])){
-                        #         h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
-                        #         segments(0, h, max_no_na(pvalue.posN), h,col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
-                        #     }
-                        # }
                         logpvalue=logpvalueT[, i]
                         for(ll in 1:length(threshold[[i]])){
                             if(ll == 1){
@@ -2250,14 +2149,13 @@ CMplot <- function(
         signal.pch <- rep(signal.pch,R)
         signal.cex <- rep(signal.cex*1.1,R)
 
-        #print("Starting QQ-plot!",quote=F)
         if(multracks){
             if(file.output){
                 ht=ifelse(is.null(height), 5.5, height)
                 wh=ifelse(is.null(width), 3.5, width)
-                if(file=="jpg") jpeg(paste("Multracks-QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                if(file=="pdf") pdf(paste("Multracks-QQplot.",paste(taxa,collapse="."),".pdf",sep=""), width = R*wh,height=ht)
-                if(file=="tiff")    tiff(paste("Multracks-QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi)
+                if(file=="jpg") jpeg(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+                if(file=="pdf") pdf(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = R*wh,height=ht)
+                if(file=="tiff")    tiff(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi)
                 par(mfcol=c(1,R),xpd=TRUE)
             }else{
                 ht=ifelse(is.null(height), 5.5, height)
@@ -2270,7 +2168,7 @@ CMplot <- function(
                 if(i == 1)  par(mar=c(mar[2], mar[2], mar[3], 0))
                 if(i == R)  par(mar=c(mar[2], 1.5, mar[3], mar[4]))
                 if(i != 1 & i != R) par(mar=c(mar[2], 1.5, mar[3], 0))
-                if(verbose) cat(paste(" Multracks-QQ Plotting ",trait[i],".\n",sep=""))        
+                if(verbose) cat(paste(" Multi-tracks Q-Q plotting ",trait[i],".\n",sep=""))        
                 P.values=as.numeric(Pmap[,i+2])
                 P.values=P.values[!is.na(P.values)]
                 if(LOG10){
@@ -2368,9 +2266,9 @@ CMplot <- function(
                 if(file.output){
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
-                    if(file=="jpg") jpeg(paste("Multraits-QQplot.",paste(taxa,collapse="."),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                    if(file=="pdf") pdf(paste("Multraits-QQplot.",paste(taxa,collapse="."),".pdf",sep=""), width = wh,height=ht)
-                    if(file=="tiff")    tiff(paste("Multraits-QQplot.",paste(taxa,collapse="."),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+                    if(file=="jpg") jpeg(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+                    if(file=="pdf") pdf(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht)
+                    if(file=="tiff")    tiff(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
                     par(mar = c(mar[2],mar[2],mar[3],mar[4]),xpd=TRUE)
                 }else{  
                     ht=ifelse(is.null(height), 5.5, height)
@@ -2413,7 +2311,7 @@ CMplot <- function(
                 mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
                 
                 for(i in 1:R){
-                    if(verbose) cat(paste(" Multraits-QQ Plotting ",trait[i],".\n",sep=""))
+                    if(verbose) cat(paste(" Multi-traits Q-Q plotting ",trait[i],".\n",sep=""))
                     P.values=as.numeric(Pmap[,i+2])
                     P.values=P.values[!is.na(P.values)]
                     if(LOG10){
@@ -2492,14 +2390,15 @@ CMplot <- function(
                 if(file.output) dev.off()
             }
         }else{
+            if(file.name != "" && length(file.name) != R)   stop(paste("please provide a vector containing file names of all", R, "traits."))
             for(i in 1:R){
-                if(verbose) cat(paste(" QQ Plotting ",trait[i],".\n",sep=""))
+                if(verbose) cat(paste(" Q-Q plotting ",trait[i],".\n",sep=""))
                 if(file.output){
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
-                    if(file=="jpg") jpeg(paste("QQplot.",taxa[i],".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                    if(file=="pdf") pdf(paste("QQplot.",taxa[i],".pdf",sep=""), width = wh,height=ht)
-                    if(file=="tiff")    tiff(paste("QQplot.",taxa[i],".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+                    if(file=="jpg") jpeg(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
+                    if(file=="pdf") pdf(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".pdf",sep=""), width = wh,height=ht)
+                    if(file=="tiff") tiff(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
                      par(mar = c(mar[2],mar[2],mar[3],mar[4]),xpd=TRUE)
                 }else{
                     ht=ifelse(is.null(height), 5.5, height)
