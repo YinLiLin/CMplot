@@ -77,12 +77,12 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ### SNP-density plot
 
 ```r
-> CMplot(pig60K,type="p",plot.type="d",bin.size=1e6,chr.den.col=c("darkgreen", "yellow", "red"),file="jpg",memo="",dpi=300,
+> CMplot(pig60K,type="p",plot.type="d",bin.size=1e6,chr.den.col=c("darkgreen", "yellow", "red"),file="jpg",file.name="",dpi=300,
     main="illumilla_60K",file.output=TRUE,verbose=TRUE,width=9,height=6)
 # users can personally set the windowsize and the min/max of legend by:
 # bin.size=1e6
 # bin.range=c(min, max)
-# memo: add a character to the output file name
+# file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '
 # chr.labels: change the chromosome names
 # main: change the title of the plots, for manhattan plot, if there are more than one trait, main can be
 #       assigned as a character vector containing the desired title for each trait
@@ -105,7 +105,8 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ```r
 > CMplot(pig60K,type="p",plot.type="c",chr.labels=paste("Chr",c(1:18,"X","Y"),sep=""),r=0.4,cir.legend=TRUE,
         outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
-        memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
+        file.name="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
+# file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '
 ```
 
 <p align="center">
@@ -118,7 +119,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(pig60K,type="p",plot.type="c",r=0.4,col=c("grey30","grey60"),chr.labels=paste("Chr",c(1:18,"X","Y"),sep=""),
       threshold=c(1e-6,1e-4),cir.chr.h=1.5,amplify=TRUE,threshold.lty=c(1,2),threshold.col=c("red",
       "blue"),signal.line=1,signal.col=c("red","green"),chr.den.col=c("darkgreen","yellow","red"),
-      bin.size=1e6,outward=FALSE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
+      bin.size=1e6,outward=FALSE,file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
 
 #Note:
 1. if signal.line=NULL, the lines that crosse circles won't be added.
@@ -139,10 +140,11 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(cattle50K,type="p",plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("#4DAF4A",NA,NA,"dodgerblue4",
          "deepskyblue",NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),
          chr.labels=paste("Chr",c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,
-         cir.band=1,file="jpg", memo="",dpi=300,chr.den.col="black",file.output=TRUE,verbose=TRUE,
+         cir.band=1,file="jpg", file.name="",dpi=300,chr.den.col="black",file.output=TRUE,verbose=TRUE,
          width=10,height=10)
         
-#Note: parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
+# parameter 'col' can be either vector or matrix, if a matrix, each trait can be plotted in different colors.
+# file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '
 ```
 
 <p align="center">
@@ -158,9 +160,10 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 #### Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,type="p",plot.type="m",LOG10=TRUE,threshold=NULL,file="jpg",memo="",dpi=300,
+> CMplot(pig60K,type="p",plot.type="m",LOG10=TRUE,threshold=NULL,file="jpg",file.name="",dpi=300,
     file.output=TRUE,verbose=TRUE,width=14,height=6,chr.labels.angle=45)
 # 'chr.labels.angle': adjust the angle of labels of x-axis (-90 < chr.labels.angle < 90).
+# file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '.
 ```
 
 <p align="center">
@@ -175,7 +178,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(pig60K, plot.type="m", col=c("grey30","grey60"), LOG10=TRUE, ylim=c(2,12), threshold=c(1e-6,1e-4),
         threshold.lty=c(1,2), threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,
         chr.den.col=NULL, signal.col=c("red","green"), signal.cex=c(1.5,1.5),signal.pch=c(19,19),
-        file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+        file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 
 #Note: if the ylim is setted, then CMplot will only plot the points among this interval,
 #       ylim can be vector or list, if it is a list, different traits can be assigned with
@@ -196,10 +199,11 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(pig60K, plot.type="m", LOG10=TRUE, ylim=NULL, threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"),signal.col=c("red","green"),signal.cex=c(1.5,1.5),
-        signal.pch=c(19,19),file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,
+        signal.pch=c(19,19),file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,
         width=14,height=6)
-        
-#Note: if the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts 
+
+# Note: if the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts 
+# file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '
    the number of SNP within given size('bin.size') will be plotted.
 ```
 
@@ -216,7 +220,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > SNPs <- pig60K$SNP[pig60K$Chromosome==13 & 
         pig60K$Position<(signal+1000000)&pig60K$Position>(signal-1000000)]
 > CMplot(pig60K, plot.type="m",LOG10=TRUE,col=c("grey30","grey60"),highlight=SNPs,
-        highlight.col="green",highlight.cex=1,highlight.pch=19,file="jpg",memo="",
+        highlight.col="green",highlight.cex=1,highlight.pch=19,file="jpg",file.name="",
         chr.border=TRUE,dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 # Note:
 # 'highlight' could be vector or list, if it is a vector, all traits will use the same highlighted SNPs index, 
@@ -234,7 +238,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ```r
 > SNPs <-  pig60K[pig60K$trait2 < 1e-4, 1]
 > CMplot(pig60K,type="h",plot.type="m",LOG10=TRUE,highlight=SNPs,highlight.type="p",
-        highlight.col=NULL,highlight.cex=1.2,highlight.pch=19,file="jpg",memo="",
+        highlight.col=NULL,highlight.cex=1.2,highlight.pch=19,file="jpg",file.name="",
         dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6,band=0.6)
 ```
 
@@ -279,7 +283,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 
 ```r
 > CMplot(pig60K[pig60K$Chromosome==13, ], plot.type="m",LOG10=TRUE,col=c("grey60"),highlight=SNPs,
-        highlight.col="green",highlight.cex=1,highlight.pch=19,file="jpg",memo="", 
+        highlight.col="green",highlight.cex=1,highlight.pch=19,file="jpg",file.name="", 
         threshold=c(1e-6,1e-4),threshold.lty=c(1,2),threshold.lwd=c(1,2), width=9,height=6,
         threshold.col=c("red","blue"),amplify=FALSE,dpi=300,file.output=TRUE,verbose=TRUE)
 ```
@@ -299,7 +303,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(pig60K[,c(1:3,5)], plot.type="m",LOG10=TRUE,col=c("grey30","grey60"),highlight=SNPs,
         highlight.col=c("red","blue","green"),highlight.cex=1,highlight.pch=c(15:17), highlight.text=genes,      
         highlight.text.col=c("red","blue","green"),threshold=0.05/nrow(pig60K),threshold.lty=2,   
-        amplify=FALSE,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
+        amplify=FALSE,file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 # Note:
 # 'highlight', 'highlight.text', 'highlight.text.xadj', 'highlight.text.yadj' could be vector or list, if it is a vector, 
 # all traits will use the same highlighted SNPs index and text, if it is a list, the length of the list should equal to the number of traits.
@@ -321,7 +325,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ```r
 > CMplot(cattle50K, plot.type="m", band=0.5, LOG10=FALSE, ylab="SNP effect",threshold=0.015,
         threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=TRUE, width=14,height=6,
-        signal.col=NULL, chr.den.col=NULL, file="jpg",memo="",dpi=300,file.output=TRUE,
+        signal.col=NULL, chr.den.col=NULL, file="jpg",file.name="",dpi=300,file.output=TRUE,
         verbose=TRUE,cex=0.8)
 #Note: if signal.col=NULL, the significant SNPs will be plotted with original colors.
 ```
@@ -337,7 +341,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
          function(x) x*sample(c(1,-1), length(x), rep=TRUE))
 > CMplot(cattle50K, type="h",plot.type="m", band=0.5, LOG10=FALSE, ylab="SNP effect",ylim=c(-0.02,0.02),
         threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=FALSE,cex=0.6,
-        chr.den.col=NULL, file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE)
+        chr.den.col=NULL, file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE)
 
 #Note: Positive and negative values are acceptable.
 ```
@@ -359,7 +363,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),
-        signal.cex=1, file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,
+        signal.cex=1, file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,
         highlight=SNPs, highlight.text=SNPs, highlight.text.cex=1.4)
 #Note: if you are not supposed to change the color of signal, 
 #          please set signal.col=NULL and highlight.col=NULL.
@@ -386,7 +390,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ### Single_track Q-Q plot
 
 ```r
-> CMplot(pig60K,plot.type="q",box=FALSE,file="jpg",memo="",dpi=300,
+> CMplot(pig60K,plot.type="q",box=FALSE,file="jpg",file.name="",dpi=300,
     conf.int=TRUE,conf.int.col=NULL,threshold.col="red",threshold.lty=2,
     file.output=TRUE,verbose=TRUE,width=5,height=5)
 ```
@@ -404,7 +408,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > pig60K$trait2[sample(1:nrow(pig60K), round(nrow(pig60K)*0.25))] <- NA
 > CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e-6,
         ylab.pos=2,signal.pch=c(19,6,4),signal.cex=1.2,signal.col="red",conf.int=TRUE,box=FALSE,multracks=
-        TRUE,cex.axis=2,file="jpg",memo="",dpi=300,file.output=TRUE,verbose=TRUE,ylim=c(0,8),width=5,height=5)
+        TRUE,cex.axis=2,file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,ylim=c(0,8),width=5,height=5)
 ```
 
 #### a. all traits in a axes:
