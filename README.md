@@ -360,7 +360,8 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 	pig60K$SNP[pig60K$trait2<1e-6],
 	pig60K$SNP[pig60K$trait3<1e-6]
 )
-> CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
+> CMplot(pig60K, plot.type="m",multracks=TRUE, mul.xaxis=TRUE, mar.between=2,
+        threshold=c(1e-6,1e-4),threshold.lty=c(1,2),
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),
         signal.cex=1, file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,
@@ -380,8 +381,8 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 #### b. all traits in separated axes:
 
 <p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5_new.jpg">
-<img src="Figure/5_new.jpg" height="900px" width="640px">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5_new_multi_xaxis.jpg">
+<img src="Figure/5_new_multi_xaxis.jpg" height="900px" width="640px">
 </a>
 </p>
 
