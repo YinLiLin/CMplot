@@ -17,6 +17,7 @@ CMplot <- function(
     cex.lab=1.5,
     plot.type="b",
     multracks=FALSE,
+    mul.xaxis=FALSE,
     points.alpha=100L,
     cex=c(0.5,1,1),
     r=0.3,
@@ -25,6 +26,7 @@ CMplot <- function(
     ylab.pos=3,
     xticks.pos=1,
     mar = c(3,6,3,3),
+    mar.between = 0,
     threshold = NULL, 
     threshold.col="red",
     threshold.lwd=1,
@@ -1706,9 +1708,11 @@ CMplot <- function(
                 # par(xpd=TRUE)
             }
             for(i in 1:R){
-                if(i == 1)  par(mar=c(0, mar[2]+1, mar[3], 0))
+                # Add room for x axis, if there are multiple
+                btwn_adj = if(mul.xaxis) 2 else 0
+                if(i == 1)  par(mar=c(mar.between + btwn_adj, mar[2]+1, mar[3], 0))
                 if(i == R)  par(mar=c(mar[1]+1, mar[2]+1, 0, 0))
-                if(i != 1 & i != R) par(mar=c(0, mar[2]+1, 0, 0))
+                if(i != 1 & i != R) par(mar=c(mar.between + btwn_adj, mar[2]+1, 0, 0))
                 if(verbose) cat(paste(" Multi-tracks Manhattan plotting ",trait[i],".\n",sep=""))
                 colx=col[i,]
                 colx=colx[!is.na(colx)]
@@ -1771,7 +1775,7 @@ CMplot <- function(
                     text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
                 }
             
-                if(i == R){
+                if(i == R || mul.xaxis){
                     if(chr.labels.angle == 0){
                         if(is.null(chr.labels)){
                             axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.ori),padj=1)
