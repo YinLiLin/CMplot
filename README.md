@@ -315,7 +315,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 </p>
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2-5.jpg">
-<img src="Figure/2-5.jpg" height="385px" width="900px">
+<img src="Figure/2-5.jpg" height="365px" width="900px">
 </a>
  
 #### Genomic Selection/Prediction(GS/GP) or other none p-values
@@ -363,7 +363,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
         c("red","green"), signal.cex=1, file="jpg",file.name="",dpi=300,file.output=TRUE,
         verbose=TRUE, highlight=SNPs, highlight.text=SNPs, highlight.text.cex=1.4)
 #Note: if you are not supposed to change the color of signal, 
-#          please set signal.col=NULL and highlight.col=NULL.
+#      please set signal.col=NULL and highlight.col=NULL.
 ```
 
 <p align="center">
