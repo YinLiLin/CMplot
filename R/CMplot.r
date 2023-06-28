@@ -1,6 +1,3 @@
-#Author: Lilin Yin
-#Contributors: Marcel Schilling, Laura Deeke
-
 CMplot <- function(
     Pmap,
     col=c("#4197d8", "#f8c120", "#413496", "#495226", "#d60b6f", "#e66519", "#d581b7", "#83d3ad", "#7c162c", "#26755d"),
@@ -12,11 +9,14 @@ CMplot <- function(
     band=1,
     H=1.5,
     ylim=NULL,
-    cex.axis=1,
-    lwd.axis=1.5,
-    cex.lab=1.5,
-    plot.type="b",
+    axis.cex=1,
+    axis.lwd=1.5,
+    lab.cex=1.5,
+    lab.font=2,
+    plot.type=c("m","c","q","d"),
     multracks=FALSE,
+    multracks.xaxis=FALSE,
+    multraits=FALSE,
     points.alpha=100L,
     cex=c(0.5,1,1),
     r=0.3,
@@ -24,14 +24,15 @@ CMplot <- function(
     ylab=expression(-log[10](italic(p))),
     ylab.pos=3,
     xticks.pos=1,
-    mar = c(3,6,3,3),
-    threshold = NULL, 
+    mar=c(3,6,3,3),
+    mar.between=0,
+    threshold=NULL, 
     threshold.col="red",
     threshold.lwd=1,
     threshold.lty=2,
     amplify= TRUE,
-    signal.cex = 1.5,
-    signal.pch = 19,
+    signal.cex=1.5,
+    signal.pch=19,
     signal.col=NULL,
     signal.line=2,
     highlight=NULL,
@@ -42,8 +43,6 @@ CMplot <- function(
     highlight.text=NULL,
     highlight.text.col="black",
     highlight.text.cex=1,
-    highlight.text.xadj=NULL,
-    highlight.text.yadj=NULL,
     highlight.text.font=3,
     chr.labels=NULL,
     chr.border=FALSE,
@@ -62,7 +61,7 @@ CMplot <- function(
     conf.int.col=NULL,
     file.output=TRUE,
     file.name="",
-    file=c("jpg","pdf","tiff"),
+    file=c("jpg","pdf","tiff","png"),
     dpi=300,
     height=NULL,
     width=NULL,
@@ -86,149 +85,125 @@ CMplot <- function(
     highlight_text <- function(
         x,
         y,
-        xadj=NULL,
-        yadj=NULL,
         words=NULL,
-        point.cex = 1,
-        text.cex = 1,
-        pch = 19,
+        point.cex=1,
+        text.cex=1,
+        pch=19,
         type = "p",
         point.col = "red",
         text.col = "black",
-        text.font = 3,
-        xlim = c(-Inf, Inf),
-        ylim = c(-Inf, Inf)
+        text.font=3,
+        xlim=c(-Inf, Inf),
+        ylim=c(-Inf, Inf)
     )
     {
         overlap <- function(x1, y1, sw1, sh1, boxes) {
-          s <- 0
-          last <- 1
-          if (length(boxes) == 0)
-            return(FALSE)
-          for (i in c(1:length(boxes))) {
-            bnds <- boxes[[i]]
-            x2 <- bnds[1]
-            y2 <- bnds[2]
-            sw2 <- bnds[3]
-            sh2 <- bnds[4]
-            if (x1 < x2)
-              overlap <- x1 + sw1 > x2 - s
-            else
-              overlap <- x2 + sw2 > x1 - s
-            
-            if (y1 < y2)
-              overlap <- overlap && (y1 + sh1 > y2 - s)
-            else
-              overlap <- overlap && (y2 + sh2 > y1 - s)
-            if (overlap) {
-              return(TRUE)
+            if (length(boxes) == 0) return(FALSE)
+            for (i in c(1:length(boxes))) {
+                bnds <- boxes[[i]]
+                x2 <- bnds[1]
+                y2 <- bnds[2]
+                sw2 <- bnds[3]
+                sh2 <- bnds[4]
+
+                if (x1 < x2)
+                    overlap <- x1 + sw1 > x2
+                else
+                    overlap <- x2 + sw2 > x1
+
+                if (y1 < y2)
+                    overlap <- overlap && (y1 + sh1 > y2)
+                else
+                    overlap <- overlap && (y2 + sh2 > y1)
+
+                if (overlap) {
+                    return(TRUE)
+                }
             }
-          }
-          FALSE
+            return(FALSE)
         }
     
-        layout <- function(x,
-                           y,
-                           words,
-                           cex = 1,
-                           rotate90 = FALSE,
-                           xlim = c(-Inf, Inf),
-                           ylim = c(-Inf, Inf),
-                           tstep = .1,
-                           rstep = .1)
-        {
-          tails <- "g|j|p|q|y"
-          n <- length(words)
-          sdx <- sd(x, na.rm = TRUE)
-          sdy <- sd(y, na.rm = TRUE)
-          if (sdx == 0)
-          sdx <- 1
-          if (sdy == 0)
-          sdy <- 1
-          if (length(cex) == 1)
-          cex <- rep(cex, n)
-          if (length(rotate90) == 1)
-          rotate90 <- rep(rotate90, n)
-
-
-          boxes <- list()
-          for (i in 1:length(words)) {
-          rotWord <- rotate90[i]
-          r <- 0
-          theta <- runif(1, 0, 2 * pi)
-          x1 <- xo <- x[i]
-          y1 <- yo <- y[i]
-          wid <- strwidth(words[i], cex = cex[i])
-          ht <- 1.5 * strheight(words[i], cex = cex[i])
-          #mind your ps and qs
-          if (grepl(tails, words[i]))
-            ht <- ht + ht * .2
-          if (rotWord) {
-            tmp <- ht
-            ht <- wid
-            wid <- tmp
-          }
-          isOverlaped <- TRUE
-          # iter = 0
-          # itermax = 20
-          while (isOverlaped) {
-            # iter = iter + 1
-            if (!overlap(x1 - .5 * wid, y1 - .5 * ht, wid, ht, boxes) &&
-                x1 - .5 * wid > xlim[1] && y1 - .5 * ht > ylim[1] &&
-                x1 + .5 * wid < xlim[2] && y1 + .5 * ht < ylim[2]) {
-              boxes[[length(boxes) + 1]] <- c(x1 - .5 * wid, y1 - .5 * ht, wid, ht)
-              isOverlaped <- FALSE
-            } else{
-              theta <- theta + tstep
-              r <- r + rstep * tstep / (2 * base::pi)
-              x1 <- xo + sdx * r * cos(theta)
-              y1 <- yo + sdy * r * sin(theta)
-              # if(iter == itermax){
-              #   boxes[[length(boxes) + 1]] <- c(x1 - .5 * wid, y1 - .5 * ht, wid, ht)
-              #   isOverlaped <- FALSE
-              # }
+        layout <- function(x, y, words, cex=1, xlim=c(-Inf, Inf), ylim=c(-Inf, Inf), tstep = .1, rstep = .1) {
+            sdx <- sd(x, na.rm=TRUE)
+            sdy <- sd(y, na.rm=TRUE)
+            if (sdx == 0) sdx <- 1
+            if (sdy == 0) sdy <- 1
+            boxes <- list()
+            for(i in 1:length(words)){
+                wid <- strwidth(words[i], cex=cex[i])
+                ht <- strheight(words[i], cex=cex[i])
+                if(i <= (length(words) / 2)){
+                    boxes[[length(boxes) + 1]] <- c(x[i]-0.5*wid, y[i]-0.5*ht, wid, ht)
+                }else{
+                    xupdt <- xrot <- x[i]
+                    yupdt <- yrot <- y[i]
+                    r <- 0
+                    theta <- runif(1, 0, 2 * pi)
+                    ht <- 1.5 * ht
+                    isOverlaped <- TRUE
+                    while(isOverlaped){
+                        if(
+                            !overlap(xupdt-0.5*wid, yupdt-0.5*ht, wid, ht, boxes) &&
+                            (xupdt-0.5*wid) > xlim[1] &&
+                            (yupdt-0.5*ht) > ylim[1] &&
+                            (xupdt+0.5*wid) < xlim[2] &&
+                            (yupdt+0.5*ht) < ylim[2]
+                        ){
+                            boxes[[length(boxes) + 1]] <- c(xupdt-0.5*wid, yupdt-0.5*ht, wid, ht)
+                            isOverlaped <- FALSE
+                        }else{
+                            theta <- theta + tstep
+                            r <- r + rstep * tstep / (2 * base::pi)
+                            xupdt <- xrot + sdx * r * cos(theta)
+                            yupdt <- yrot + sdy * r * sin(theta)
+                        }
+                    }
+                }
             }
-          }
-          }
-          result <- do.call(rbind, boxes)
-          colnames(result) <- c("x", "y", "width", "ht")
-          rownames(result) <- words
-          result
+            result <- do.call(rbind, boxes)
+            colnames(result) <- c("x", "y", "width", "ht")
+            rownames(result) <- words
+            result
         }
+
         if(!is.null(words)){
-            n <- length(x)
-            indx <- order(y, decreasing = TRUE)
+            if(length(x) != length(words))  stop("length of highlighted labels is not equal to the highlighted SNPs.")
+            indx <- order(y, decreasing=TRUE)
             x <- x[indx]
             y <- y[indx]
-            if(length(point.cex)!=1){point.cex = rep(point.cex, n); point.cex = point.cex[indx]}
-            if(length(pch)!=1){pch = rep(pch, n); pch = pch[indx]}
-            if(length(point.col)!=1){point.col = rep(point.col, n); point.col = point.col[indx]}
-            if(length(text.col)!=1){text.col = rep(text.col, n); text.col = text.col[indx]}
-            if(length(text.cex)!=1){text.cex = rep(text.cex, n); text.cex = text.cex[indx]}   
-            x1=x; y1=y
-            if(length(x) != length(words))  stop("highlighted genes not equal to the highlighted SNPs.")
             words <- words[indx]
-            if(is.null(xadj)){
-                xadj = sample(c(1.5, 0, -0.5), n, replace=TRUE)
-            }else{
-                if(length(xadj) != n)   stop("length of xadj not equals to length of x")
-                if(sum(!xadj %in% c(-1,0,1)) > 0)   stop("-1, 0, 1 limited for xadj")
-                xadj[xadj==-1] = 1.5
-                xadj[xadj==1] = -0.5
-                xadj = xadj[indx]
+            if(length(point.cex)!=1){if(length(point.cex)==length(x)){point.cex=point.cex[indx]}else{stop("unequal length of 'cex' for highlighted points.")}}else{point.cex=rep(point.cex,length(x))}
+            if(length(pch)!=1){if(length(pch)==length(x)){pch=pch[indx]}else{stop("unequal length of 'pch' for highlighted points.")}}else{pch=rep(pch,length(x))}
+            if(length(point.col)!=1){if(length(point.col)==length(x)){point.col=point.col[indx]}else{stop("unequal length of 'col' for highlighted points.")}}else{point.col=rep(point.col,length(x))}
+            if(length(text.col)!=1){if(length(text.col)==length(x)){text.col=text.col[indx]}else{stop("unequal length of 'col' for highlighted text.")}}else{text.col=rep(text.col,length(x))}
+            if(length(text.cex)!=1){if(length(text.cex)==length(x)){text.cex=text.cex[indx]}else{stop("unequal length of 'cex' for highlighted text.")}}else{text.cex=rep(text.cex,length(x))}
+            
+            words_ety <- words[words == "" | is.na(words)]
+            if(length(words_ety)){
+                logical_idx <- words == "" | is.na(words)
+                if(type=="h"){
+                    points(x[logical_idx],y[logical_idx],pch=pch[logical_idx],type="h",col=point.col[logical_idx], lwd=point.cex[logical_idx]+1)
+                    points(x[logical_idx],y[logical_idx],pch=pch[logical_idx],type="p",col=point.col[logical_idx], cex=point.cex[logical_idx])
+                }else if(type=="l"){
+                    segments(x[logical_idx], ylim[1], x[logical_idx], ylim[2], col=point.col[logical_idx], lwd=point.cex[logical_idx], lty=2)
+                }else{
+                    points(x[logical_idx],y[logical_idx],pch=pch[logical_idx],type="p",col=point.col[logical_idx],cex=point.cex[logical_idx])
+                }
+                words <- words[!logical_idx]
+                x <- x[!logical_idx]
+                y <- y[!logical_idx]
+                point.cex <- point.cex[!logical_idx]
+                pch <- pch[!logical_idx]
+                point.col <- point.col[!logical_idx]
+                text.col <- text.col[!logical_idx]
+                text.cex <- text.cex[!logical_idx]
             }
-            if(is.null(yadj)){
-                yadj = rep(-0.5, n)
-                # yadj[y<=median(y)] = 1.5
-                # yadj[y>median(y)] = -0.5
-            }else{
-                if(length(yadj) != n)   stop("length of yadj not equals to length of y")
-                if(sum(!yadj %in% c(-1,0,1)) > 0)   stop("-1, 0, 1 limited for yadj")
-                yadj[yadj==-1] = 1.5
-                yadj[yadj==1] = -0.5
-                yadj = yadj[indx]
-            }
-            for(i in 1:n){
+
+            x1 <- x
+            y1 <- y
+            xadj <- rep(c(1.5, 0, -0.5), length=length(x))
+            yadj <- rep(c(1.5, 0, -0.5), length=length(x))
+            for(i in 1:length(x)){
                 if(xadj[i] == 0){
                     if(yadj[i] == -0.5){
                         if((y[i] + 2*strheight(words[i],cex=text.cex)) > max(ylim)){
@@ -251,63 +226,65 @@ CMplot <- function(
                 }
                 if(xadj[i] == 1.5){
                     if((x[i] - 1.2*strwidth(words[i],cex=text.cex)) < min(xlim)){
-                        x[i] = x[i] + 0.7*strwidth(words[i],cex=text.cex)
+                        x[i] = x[i] + 0.6*strwidth(words[i],cex=text.cex)
                     }else{
-                        x[i] = x[i] - 0.7*strwidth(words[i],cex=text.cex)
+                        x[i] = x[i] - 0.6*strwidth(words[i],cex=text.cex)
                     }
                 }
                 if(xadj[i] == -0.5){
                     if((x[i] + 1.2*strwidth(words[i],cex=text.cex)) > max(xlim)){
-                        x[i] = x[i] - 0.7*strwidth(words[i],cex=text.cex)
+                        x[i] = x[i] - 0.6*strwidth(words[i],cex=text.cex)
                     }else{
-                        x[i] = x[i] + 0.7*strwidth(words[i],cex=text.cex)
+                        x[i] = x[i] + 0.6*strwidth(words[i],cex=text.cex)
                     }
                 }
             }
+
             x <- c(x1,x)
             y <- c(y1,y)
-            words <- c(rep("OO", n), as.character(words))
-            lay <- layout(x,y,words,cex=text.cex,xlim=xlim,ylim=ylim)
+            words <- c(rep("OO", length(words)), as.character(words))
+            lay <- layout(x=x,y=y,words=words,cex=c(rep(text.cex[1],length(x1)),text.cex),xlim=xlim,ylim=ylim)
+            n <- length(x1)
             indd <- (n+1):length(x)
             for(i in indd){
                 xl <- lay[i,1]
                 yl <- lay[i,2]
                 w <- lay[i,3]
                 h <- lay[i,4]
-                nx <- xl+.5*w
-                ny <- yl+.5*h
-                if((nx + 0.5 * strwidth(words[i],cex=text.cex)) < x1[i-n]){
-                    nx = nx + 0.5 * strwidth(words[i],cex=text.cex)
-                }else if((nx - 0.5 * strwidth(words[i],cex=text.cex)) > x1[i-n]){
-                    nx = nx - 0.5 * strwidth(words[i],cex=text.cex)
+                nx <- xl + 0.5 * w
+                ny <- yl + 0.5 * h
+                if((nx + 0.5 * strwidth(words[i],cex=text.cex[i-n])) < x1[i-n]){
+                    nx=nx + 0.5 * strwidth(words[i],cex=text.cex[i-n])
+                }else if((nx - 0.5 * strwidth(words[i],cex=text.cex[i-n])) > x1[i-n]){
+                    nx=nx - 0.5 * strwidth(words[i],cex=text.cex[i-n])
                 }
-                if((ny + strheight(words[i],cex=text.cex)) < y1[i-n]){
-                    ny = ny + 0.5 * strheight(words[i],cex=text.cex)
-                }else if((ny - strheight(words[i],cex=text.cex)) > y1[i-n]){
-                    ny = ny - 0.5 * strheight(words[i],cex=text.cex)
+                if((ny + strheight(words[i],cex=text.cex[i-n])) < y1[i-n]){
+                    ny=ny + 0.5 * strheight(words[i],cex=text.cex[i-n])
+                }else if((ny - strheight(words[i],cex=text.cex[i-n])) > y1[i-n]){
+                    ny=ny - 0.5 * strheight(words[i],cex=text.cex[i-n])
                 }
-                arrows(x1[i-n], y1[i-n], nx, ny, length=.08, angle=15, code=2, col="grey", lwd=2)
-                # segments(x1[i], y1[i], nx, ny, col="grey", lwd=2)
+                # arrows(x1[i-n], y1[i-n], nx, ny, length=.08, angle=15, code=2, col="grey", lwd=2)
+                segments(x1[i-n], y1[i-n], nx, ny, col="black", lwd=text.cex[i-n])
             }
             if(type=="h"){
-                points(x1,y1,pch = pch,type="h",col = point.col, lwd = point.cex+1)
-                points(x1,y1,pch = pch,type="p",col = point.col, cex = point.cex)
+                points(x1,y1,pch=pch,type="h",col=point.col, lwd=point.cex+1)
+                points(x1,y1,pch=pch,type="p",col=point.col, cex=point.cex)
             }else if(type=="l"){
                 segments(x1, ylim[1], x1, ylim[2], col=point.col, lwd=point.cex, lty=2)
-                # points(x1,y1,pch = pch,type="p",col = point.col, cex = point.cex)
+                # points(x1,y1,pch=pch,type="p",col=point.col, cex=point.cex)
             }else{
-                points(x1,y1,pch = pch,type=type,col = point.col,cex = point.cex)
+                points(x1,y1,pch=pch,type=type,col=point.col,cex=point.cex)
             }
-            text(lay[indd,1]+.5*lay[indd,3],lay[indd,2]+.5*lay[indd,4],words[indd],xpd=TRUE,cex = text.cex,col=text.col,font=text.font)
+            text(lay[indd,1]+0.5*lay[indd,3],lay[indd,2]+0.5*lay[indd,4],words[indd],xpd=TRUE,cex=text.cex,col=text.col,font=text.font)
         }else{
             if(type=="h"){
-                points(x,y,pch = pch,type="h",col = point.col, lwd = point.cex+1)
-                points(x,y,pch = pch,type="p",col = point.col, cex = point.cex)
+                points(x,y,pch=pch,type="h",col=point.col, lwd=point.cex+1)
+                points(x,y,pch=pch,type="p",col=point.col, cex=point.cex)
             }else if(type=="l"){
                 segments(x, ylim[1], x, ylim[2], col=point.col, lwd=point.cex, lty=2)
-                # points(x,y,pch = pch,type="p",col = point.col, cex = point.cex)
+                # points(x,y,pch=pch,type="p",col=point.col, cex=point.cex)
             }else{
-                points(x,y,pch = pch,type=type,col = point.col,cex = point.cex)
+                points(x,y,pch=pch,type=type,col=point.col,cex=point.cex)
             }
         }
     }
@@ -352,8 +329,8 @@ CMplot <- function(
 
     # created by Haohao Zhang
     filter.points <- function(x, y, w, h, dpi, scale=1) {
-        x <- ceiling((x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE)) * w * dpi / scale)
-        y <- ceiling((y - min(y, na.rm = TRUE)) / (max(y, na.rm = TRUE) - min(y, na.rm = TRUE)) * h * dpi / scale)
+        x <- ceiling((x - min(x, na.rm=TRUE)) / (max(x, na.rm=TRUE) - min(x, na.rm=TRUE)) * w * dpi / scale)
+        y <- ceiling((y - min(y, na.rm=TRUE)) / (max(y, na.rm=TRUE) - min(y, na.rm=TRUE)) * h * dpi / scale)
         index <- !duplicated(cbind(x, y))
     }
 
@@ -377,12 +354,12 @@ CMplot <- function(
         legend.x.intersp=1,
         file.output=TRUE,
         plot=TRUE,
-        dpi = NULL,
-        wh = NULL,
-        ht = NULL
+        dpi=NULL,
+        wh=NULL,
+        ht=NULL
     )
     {
-        if(is.null(legend.min)) legend.min = 1
+        if(is.null(legend.min)) legend.min=1
         if(is.null(col) | length(col) == 1){col=c("darkgreen", "yellow", "red")}
         map <- map[map[, 2] != "0", ]
         map <- as.matrix(map)
@@ -443,7 +420,7 @@ CMplot <- function(
                 polygon(c(0, 0, chr.pos.max.v[i], chr.pos.max.v[i]), 
                 c(-width/5 - band * (i - length(chr.num) - 1), width/5 - band * (i - length(chr.num) - 1), 
                 width/5 - band * (i - length(chr.num) - 1), -width/5 - band * (i - length(chr.num) - 1)), col="grey95", border="grey95")
-                rect(xleft = 0, ybottom = -width/5 - band * (i - length(chr.num) - 1), xright = chr.pos.max.v[i], ytop = width/5 - band * (i - length(chr.num) - 1), border="grey80")
+                rect(xleft=0, ybottom = -width/5 - band * (i - length(chr.num) - 1), xright=chr.pos.max.v[i], ytop=width/5 - band * (i - length(chr.num) - 1), border="grey80")
             }
             if(!is.null(legend.max)){
                 if(legend.max < Maxbin.num){
@@ -453,7 +430,7 @@ CMplot <- function(
             col.index[[i]][col.index[[i]] < legend.min] <- legend.min
             col.seg <- c(col.seg, col[round(col.index[[i]] * length(col) / maxbin.num)])
             if(file.output){
-                is_visable <-  filter.points(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), wh, ht, dpi = dpi)
+                is_visable <-  filter.points(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), wh, ht, dpi=dpi)
             }else{
                 is_visable <- rep(TRUE, length(pos.x[[i]]))
             }
@@ -468,27 +445,27 @@ CMplot <- function(
         chr.num <- rev(chr.num)
         if(plot){
             if(!is.null(chr.labels)){
-                mtext(at=seq(band, length(chr.num) * band, band),text=chr.labels, side=2, las=2, font=1, cex=cex.axis*0.6, line=0.2, xpd=TRUE)
+                mtext(at=seq(band, length(chr.num) * band, band),text=chr.labels, side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
             }else{
-                if(max.chr == 0)    mtext(at=seq(band, length(chr.num) * band, band),text=chr.num, side=2, las=2, font=1, cex=cex.axis*0.6, line=0.2, xpd=TRUE)
-                if(max.chr != 0)    mtext(at=seq(band, length(chr.num) * band, band),text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=cex.axis*0.6, line=0.2, xpd=TRUE)
+                if(max.chr == 0)    mtext(at=seq(band, length(chr.num) * band, band),text=chr.num, side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
+                if(max.chr != 0)    mtext(at=seq(band, length(chr.num) * band, band),text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
             }
         }
         if(plot){
-            xticks = seq(0, chorm.maxlen / bp, length=10)
+            xticks=seq(0, chorm.maxlen / bp, length=10)
             
             if(round(xticks[2]) <= 10){
-                xticks = seq(0, chorm.maxlen / bp, round(xticks[2], 1))
+                xticks=seq(0, chorm.maxlen / bp, round(xticks[2], 1))
             }else{
-                xticks = seq(0, chorm.maxlen / bp, round(xticks[2]))    
+                xticks=seq(0, chorm.maxlen / bp, round(xticks[2]))    
             }
             
             if((chorm.maxlen/bp - max(xticks)) > 0.5*xticks[2]){
-                xticks = c(xticks, round(chorm.maxlen / bp))
+                xticks=c(xticks, round(chorm.maxlen / bp))
             }
             axis(3, at=xticks*bp, labels=paste(xticks, bp_label, sep=""),
-            font=1, cex.axis=cex.axis*0.8, tck=0.01, lwd=lwd.axis, padj=1.2)
-            axis(3, at=c(0, chorm.maxlen), labels=c("",""), tcl=0, lwd=lwd.axis)
+            font=1, cex.axis=axis.cex*0.8, tck=0.01, lwd=axis.lwd, padj=1.2)
+            axis(3, at=c(0, chorm.maxlen), labels=c("",""), tcl=0, lwd=axis.lwd)
         }
         # image(c(chorm.maxlen-chorm.maxlen * legend.width / 20 , chorm.maxlen), 
         # round(seq(band - width/5, (length(chr.num) * band + band) * legend.height / 2 , length=maxbin.num+1), 2), 
@@ -529,13 +506,12 @@ CMplot <- function(
         legend.y <- c(0, legend.y)
         legend.y.col <- as.numeric(legend.y.col)
         legend.col <- c("grey95", col[round(legend.y.col * length(col) / (maxbin.num - legend.min + 1)) - legend.min + 1])
-        if(plot)    legend(x=(chorm.maxlen + chorm.maxlen/100), y=( -width/2.5 - band * (length(chr.num) - length(chr.num) - 1)), title="", legend=legend.y, pch=15, pt.cex = legend.pt.cex, col=legend.col,
+        if(plot)    legend(x=(chorm.maxlen + chorm.maxlen/100), y=( -width/2.5 - band * (length(chr.num) - length(chr.num) - 1)), title="", legend=legend.y, pch=15, pt.cex=legend.pt.cex, col=legend.col,
             cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=legend.x.intersp, yjust=0, xjust=0, xpd=TRUE)
         if(!plot)   return(list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y))
     }
 
-    if(!all(plot.type %in% c("b","c","m","q","d"))) stop("unknown 'plot.type'.")
-    if(sum(plot.type %in% "b")==1) plot.type <- c("c","m","q","d")
+    if(!all(plot.type %in% c("c","m","q","d"))) stop("unknown 'plot.type'.")
     trait.legend.pos <- match.arg(trait.legend.pos)
     file <- match.arg(file)
     trait <- colnames(Pmap)[-c(1:3)]
@@ -557,22 +533,23 @@ CMplot <- function(
         if(file.output){
             ht=ifelse(is.null(height), 6, height)
             wh=ifelse(is.null(width), 9, width)
-            if(file=="jpg") jpeg(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-            if(file=="pdf") pdf(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht)
-            if(file=="tiff")    tiff(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+            if(file=="jpg") jpeg(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,quality=100)
+            if(file=="pdf") pdf(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width=wh,height=ht)
+            if(file=="tiff")    tiff(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width=wh*dpi,height=ht*dpi,res=dpi)
+            if(file=="png") png(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".png",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,bg=NA)
             # par(xpd=TRUE)
             par(mar=c(mar[1], mar[2], mar[3]+1, mar[4]))
         }else{
             ht=ifelse(is.null(height), 6, height)
             wh=ifelse(is.null(width), 9, width)
-            if(is.null(dev.list())) dev.new(width = wh,height=ht)
+            if(is.null(dev.list())) dev.new(width=wh,height=ht)
             # par(xpd=TRUE)
         }
         if(!is.null(bin.range)){
             if(length(bin.range) != 2)  stop("Two values (min and max) should be provided for bin.range!")
             if(bin.range[1] == 0)   stop("Min value of bin.range should be more than 1!")
         }
-        DensityPlot(map=Pmap[,c(1:3)], file.output = file.output, chr.pos.max=chr.pos.max, dpi = dpi, wh = wh, ht = ht, chr.labels = chr.labels, col=chr.den.col, bin=bin.size, legend.len=bin.legend.num, legend.min=bin.range[1], legend.max=bin.range[2], main = main[1], main.cex=main.cex, main.font=main.font)
+        DensityPlot(map=Pmap[,c(1:3)], file.output=file.output, chr.pos.max=chr.pos.max, dpi=dpi, wh=wh, ht=ht, chr.labels=chr.labels, col=chr.den.col, bin=bin.size, legend.len=bin.legend.num, legend.min=bin.range[1], legend.max=bin.range[2], main=main[1], main.cex=main.cex, main.font=main.font)
         if(file.output) dev.off()
     }
 
@@ -674,7 +651,7 @@ CMplot <- function(
             highlight_col <- list()
             if(is.list(highlight.col)){
                 if(length(highlight.col) != R){stop("length of 'highlight.col' not equals to the number of traits.")}
-                highlight_col = highlight.col
+                highlight_col=highlight.col
             }
             if(!is.list(highlight)){
                 highlight <- list(highlight)
@@ -704,27 +681,6 @@ CMplot <- function(
             }else{
                 if(length(highlight.text) != R){stop("length of 'highlight.text' not equals to the number of traits.")}  
             }
-            for(i in 1:length(highlight.text)){
-                highlight.text[[i]] <- highlight.text[[i]][!is.na(highlight.text[[i]])]
-            }
-        }
-
-        if(!is.null(highlight.text.xadj)){
-            if(!is.list(highlight.text.xadj)){
-                highlight.text.xadj <- list(highlight.text.xadj)
-                for(i in 1:R){highlight.text.xadj[[i]] = highlight.text.xadj[[1]]}
-            }else{
-                if(length(highlight.text.xadj) != R){stop("length of 'highlight.text.xadj' not equals to the number of traits.")}  
-            }  
-        }
-
-        if(!is.null(highlight.text.yadj)){
-            if(!is.list(highlight.text.yadj)){
-                highlight.text.yadj <- list(highlight.text.yadj)
-                for(i in 1:R){highlight.text.yadj[[i]] = highlight.text.yadj[[1]]}
-            }else{
-                if(length(highlight.text.yadj) != R){stop("length of 'highlight.text.yadj' not equals to the number of traits.")}  
-            }  
         }
 
         #get the index of chromosome
@@ -749,7 +705,7 @@ CMplot <- function(
         if(band==0) band=1
         
         if(LOG10){
-            if(sum(pvalueT <= 0, na.rm = TRUE) != 0 || sum(pvalueT > 1, na.rm = TRUE) != 0) stop("p values should be at range of (0, 1).")
+            if(sum(pvalueT <= 0, na.rm=TRUE) != 0 || sum(pvalueT > 1, na.rm=TRUE) != 0) stop("p values should be at range of (0, 1).")
             pvalueT[pvalueT <= 0] <- NA
             pvalueT[pvalueT > 1] <- NA
         }
@@ -808,7 +764,7 @@ CMplot <- function(
                     chr.border.pos[i+1] <- max_no_na(pvalue.posN) + 0.5 * band
                 }
             }
-            chr.border.pos = chr.border.pos[-length(chr.border.pos)]
+            chr.border.pos=chr.border.pos[-length(chr.border.pos)]
         }
 
         if(!is.null(chr.labels) & Nchr != 1){
@@ -846,7 +802,7 @@ CMplot <- function(
         if(length(chr.den.col) > 1){
             cir.density=TRUE
             den.fold <- 20
-            density.list <- DensityPlot(map=Pmap[,c(1,1,2)], file.output = FALSE, chr.pos.max=FALSE, col=chr.den.col, plot=FALSE, bin=bin.size, legend.len=bin.legend.num, legend.min=bin.range[1], legend.max=bin.range[2])
+            density.list <- DensityPlot(map=Pmap[,c(1,1,2)], file.output=FALSE, chr.pos.max=FALSE, col=chr.den.col, plot=FALSE, bin=bin.size, legend.len=bin.legend.num, legend.min=bin.range[1], legend.max=bin.range[2])
             #list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y)
         }else{
             cir.density=FALSE
@@ -876,9 +832,10 @@ CMplot <- function(
         if(file.output){
             ht=ifelse(is.null(height), 10, height)
             wh=ifelse(is.null(width), 10, width)
-            if(file=="jpg") jpeg(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-            if(file=="pdf") pdf(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht)
-            if(file=="tiff")    tiff(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
+            if(file=="jpg") jpeg(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,quality=100)
+            if(file=="pdf") pdf(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width=wh,height=ht)
+            if(file=="tiff")    tiff(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width=wh*dpi,height=ht*dpi,res=dpi)
+            if(file=="png") png(paste("Cir_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".png",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,bg=NA)
             par(pty="s", xpd=TRUE, mar=c(1,1,1,1))
         }
         if(!file.output){
@@ -973,7 +930,7 @@ CMplot <- function(
                     if(cir.density){
 
                         if(file.output){
-                            is_visable <- filter.points((RR+cir.chr.h)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), (RR+cir.chr.h)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), wh, ht, dpi = dpi)
+                            is_visable <- filter.points((RR+cir.chr.h)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), (RR+cir.chr.h)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), wh, ht, dpi=dpi)
                         }else{
                             is_visable <- rep(TRUE, length(pvalue.posN))
                         }
@@ -987,7 +944,7 @@ CMplot <- function(
                         legend(
                             x=RR+4*cir.chr.h,
                             y=(RR+4*cir.chr.h)/2,
-                            title="", legend=density.list$legend.y, pch=15, pt.cex = 3, col=density.list$legend.col,
+                            title="", legend=density.list$legend.y, pch=15, pt.cex=3, col=density.list$legend.col,
                             cex=1, bty="n",
                             y.intersp=1,
                             x.intersp=1,
@@ -1012,7 +969,7 @@ CMplot <- function(
                 X=(Cpvalue[ylimIndx]+r+H*(i-1)+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
                 Y=(Cpvalue[ylimIndx]+r+H*(i-1)+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
                 if(file.output){
-                    is_visable <- filter.points(X, Y, wh, ht, dpi = dpi)
+                    is_visable <- filter.points(X, Y, wh, ht, dpi=dpi)
                 }else{
                     is_visable <- rep(TRUE, length(X))
                 }
@@ -1046,12 +1003,12 @@ CMplot <- function(
                     segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
 
-                    lab = seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length = 5)
-                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    lab=seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length=5)
+                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
                 }
                 
                 if(!is.null(threshold[[i]])){
@@ -1138,18 +1095,18 @@ CMplot <- function(
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                             angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis, adj=c(0.5, 0))
+                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=axis.cex, adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab, sep=""),srt=angle, adj=c(0.5, 0),font=2,cex=cex.axis)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab, sep=""),srt=angle, adj=c(0.5, 0),font=lab.font,cex=axis.cex)
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis, adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=axis.cex, adj=c(0.5, 0))
                             }
                         }
                     }
@@ -1161,18 +1118,18 @@ CMplot <- function(
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                         angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                        text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                        text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab, sep=""),srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab, sep=""),srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                             }
                         }
                     }
@@ -1221,7 +1178,7 @@ CMplot <- function(
                     if(cir.density){
 
                         if(file.output){
-                            is_visable <- filter.points((RR+cir.chr.h)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), (RR+cir.chr.h)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), wh, ht, dpi = dpi)
+                            is_visable <- filter.points((RR+cir.chr.h)*sin(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), (RR+cir.chr.h)*cos(2*base::pi*(pvalue.posN-round(band/2)-circleMin)/TotalN), wh, ht, dpi=dpi)
                         }else{
                             is_visable <- rep(TRUE, length(pvalue.posN))
                         }
@@ -1235,7 +1192,7 @@ CMplot <- function(
                         legend(
                             x=RR+4*cir.chr.h,
                             y=(RR+4*cir.chr.h)/2,
-                            title="", legend=density.list$legend.y, pch=15, pt.cex = 3, col=density.list$legend.col,
+                            title="", legend=density.list$legend.y, pch=15, pt.cex=3, col=density.list$legend.col,
                             cex=1, bty="n",
                             y.intersp=1,
                             x.intersp=1,
@@ -1257,7 +1214,7 @@ CMplot <- function(
                 X=(-Cpvalue[ylimIndx]+r+H*i+cir.band*(i-1))*sin(2*base::pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
                 Y=(-Cpvalue[ylimIndx]+r+H*i+cir.band*(i-1))*cos(2*base::pi*(pvalue.posN[ylimIndx]-round(band/2)-circleMin)/TotalN)
                 if(file.output){
-                    is_visable <- filter.points(X, Y, wh, ht, dpi = dpi)
+                    is_visable <- filter.points(X, Y, wh, ht, dpi=dpi)
                 }else{
                     is_visable <- rep(TRUE, length(X))
                 }
@@ -1291,12 +1248,12 @@ CMplot <- function(
                     segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
                     
-                    lab = seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length = 5)
-                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
-                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=2)
+                    lab=seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length=5)
+                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
                 }
                 
                 if(!is.null(threshold[[i]])){
@@ -1379,18 +1336,18 @@ CMplot <- function(
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                           angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                          text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                          text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab,sep=""),srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab,sep=""),srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                             }
                         }
                     }
@@ -1404,18 +1361,18 @@ CMplot <- function(
                         
                             #adjust the angle of labels of circle plot
                             angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab,sep=""),srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab,sep=""),srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=2,cex=cex.axis,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
                             }
                         }
                     }   
@@ -1433,13 +1390,470 @@ CMplot <- function(
             if(file.output){
                 ht=ifelse(is.null(height), 6, height)
                 wh=ifelse(is.null(width), 14, width)
-                is_visable[[i]] <- filter.points(pvalue.posN, logpvalueT[,i], wh, ht, dpi = dpi)
+                is_visable[[i]] <- filter.points(pvalue.posN, logpvalueT[,i], wh, ht, dpi=dpi)
             }else{
                 is_visable[[i]] <- rep(TRUE, nrow(logpvalueT))
             }
         }
 
-        if(multracks==FALSE){
+        if(multracks | multraits){
+            if(R < 2)   stop("need more than one trait.")
+            if(multracks){
+                if(file.output){
+                    ht=ifelse(is.null(height), 6, height)
+                    wh=ifelse(is.null(width), 14, width)
+                    if(file=="jpg") jpeg(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width=wh*dpi,height=ht*dpi*R,res=dpi,quality=100)
+                    if(file=="pdf") pdf(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width=wh,height=ht*R)
+                    if(file=="tiff")    tiff(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width=wh*dpi,height=ht*dpi*R,res=dpi)
+                    if(file=="png") png(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".png",sep=""), width=wh*dpi,height=ht*dpi*R,res=dpi,bg=NA)
+                    par(mfcol=c(R,1), xaxs="i")
+                }
+                if(!file.output){
+                    ht=ifelse(is.null(height), 6, height)
+                    wh=ifelse(is.null(width), 14, width)
+                    if(is.null(dev.list())) dev.new(width=wh, height=ht)
+                    # par(xpd=TRUE)
+                }
+                for(i in 1:R){
+                    # Add room for x axis, if there are multiple
+                    btwn_adj=if(multracks.xaxis) 2 else 0
+                    if(i == 1)  par(mar=c(mar.between + btwn_adj, mar[2]+1, mar[3], 0))
+                    if(i == R)  par(mar=c(mar[1]+1, mar[2]+1, 0, 0))
+                    if(i != 1 & i != R) par(mar=c(mar.between + btwn_adj, mar[2]+1, 0, 0))
+                    if(verbose) cat(paste(" Multi-tracks Manhattan plotting ",trait[i],".\n",sep=""))
+                    colx=col[i,]
+                    colx=colx[!is.na(colx)]
+                    pvalue=pvalueT[,i]
+                    logpvalue=logpvalueT[,i]
+                    if(is.null(ylim)){
+                        if(!is.null(threshold[[i]])){
+                            # if(sum(threshold!=0)==length(threshold)){
+                                if(LOG10){
+                                    Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold[[i]])))))
+                                    Min <- min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(threshold[[i]])))))
+                                }else{
+                                    Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold[[i]]))))
+                                    #if(abs(Max)<=1)    Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
+                                    Min<-min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold[[i]]))))
+                                    #if(abs(Min)<=1)    Min=min_no_na(min_no_na(pvalue),min_no_na(threshold))
+                                }
+                        }else{
+                            if(LOG10){
+                                    Max=max_ylim((-log10(min_no_na(pvalue))))
+                                    Min<-min_ylim((-log10(max_no_na(pvalue))))
+                            }else{
+                                    Max=max_ylim((max_no_na(pvalue)))
+                                    #if(abs(Max)<=1)    Max=max_no_na(max_no_na(pvalue))
+                                    Min=min_ylim((min_no_na(pvalue)))
+                                    #if(abs(Min)<=1)    Min=min_no_na(min_no_na(pvalue))
+                                    # }else{
+                                        # Max=max_no_na(ceiling(max_no_na(pvalue)))
+                                    # }
+                            }
+                        }
+                        if((Max-Min)<=1){
+                            plot(pvalue.posN[is_visable[[i]]],logpvalue[is_visable[[i]]],pch=pch,type=type,lwd=cex[2]*(R/2)+1,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ann=FALSE,
+                                cex.axis=axis.cex*(R/2),font=lab.font,axes=FALSE,yaxs="r")
+                        }else{
+                            plot(pvalue.posN[is_visable[[i]]],logpvalue[is_visable[[i]]],pch=pch,type=type,lwd=cex[2]*(R/2)+1,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ann=FALSE,
+                                cex.axis=axis.cex*(R/2),font=lab.font,axes=FALSE,yaxs="r")
+                        }
+                        mtext(side=2, text=ylab, line=ylab.pos, cex=lab.cex*(R/2), font=lab.font, xpd=TRUE)
+                    }else{
+                        Max <- max_no_na(ylim[[i]])
+                        Min <- min_no_na(ylim[[i]])
+                        plot(pvalue.posN[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]*(R/2)+1,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim[[i]],ann=FALSE,
+                            cex.axis=axis.cex*(R/2),font=lab.font,axes=FALSE,yaxs="r")
+                        mtext(side=2, text=ylab, line=ylab.pos, cex=lab.cex*(R/2), font=lab.font, xpd=TRUE)
+                    }
+
+                    if(chr.border){
+                        for(b in 1:length(chr.border.pos)){
+                            segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=axis.lwd, lty=2)
+                        }
+                    }
+
+                    #add the names of traits on plot 
+                    if(trait.legend.pos=="left"){
+                        text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),lab.cex*(R/2),trait.legend.cex),xpd=TRUE) 
+                    }else if(trait.legend.pos=="middle"){
+                        text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),lab.cex*(R/2),trait.legend.cex),xpd=TRUE) 
+                    }else{
+                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),lab.cex*(R/2),trait.legend.cex),xpd=TRUE) 
+                    }
+                
+                    if(i == R || multracks.xaxis){
+                        if(chr.labels.angle == 0){
+                            if(is.null(chr.labels)){
+                                axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd*(R/2),cex.axis=axis.cex*(R/2),font=lab.font,labels=c("Chr",chr.ori),padj=1)
+                            }else{
+                                if(Nchr == 1){
+                                    axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd*(R/2), cex.axis=axis.cex*(R/2),font=lab.font,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
+                                }else{
+                                    axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd*(R/2), cex.axis=axis.cex*(R/2),font=lab.font,labels=c("Chr",chr.labels))
+                                }
+                            }
+                        }else{
+                            axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd*(R/2),labels=FALSE)
+                            if(is.null(chr.labels)){
+                                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex*(R/2), font=lab.font, labels=c("Chr",chr.ori), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                                # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd,cex.axis=axis.cex*(R/2),font=lab.font,labels=c("Chr",chr.ori),padj=1)
+                            }else{
+                                if(Nchr == 1){
+                                    # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd*(R/2), cex.axis=axis.cex*(R/2),font=lab.font,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
+                                    text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex*(R/2), font=lab.font, labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                                }else{
+                                    # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd*(R/2), cex.axis=axis.cex*(R/2),font=lab.font,labels=c("Chr",chr.labels))
+                                    text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex*(R/2), font=lab.font, labels=c("Chr",chr.labels), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                                }
+                            }
+                        }
+                        axis(1, mgp=c(3,xticks.pos,0), at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd*(R/2))
+                    }
+                    #if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=lab.font,cex=xn)
+                    if(is.null(ylim)){
+                        if((Max-Min)>1){
+                            axis(2, las=1,lwd=axis.lwd*(R/2),cex.axis=axis.cex*(R/2),font=lab.font)
+                            axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=axis.lwd*(R/2))
+                        }else{
+                            axis(2,las=1,lwd=axis.lwd*(R/2),cex.axis=axis.cex*(R/2),font=lab.font)
+                            axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=axis.lwd*(R/2))
+                        }
+                    }else{
+                        axis(2, las=1,lwd=axis.lwd*(R/2),cex.axis=axis.cex*(R/2),font=lab.font)
+                        axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=axis.lwd*(R/2))
+                    }
+                    if(!is.null(threshold[[i]])){
+                        for(thr in 1:length(threshold[[i]])){
+                            h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
+                            segments(0, h, max_no_na(pvalue.posN), h, col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+                        }
+                        if(amplify==TRUE){
+                            if(LOG10){
+                                threshold[[i]] <- sort(threshold[[i]])
+                                sgline1=-log10(max_no_na(threshold[[i]]))
+                            }else{
+                                threshold[[i]] <- sort(threshold[[i]], decreasing=TRUE)
+                                sgline1=min_no_na(threshold[[i]])
+                            }
+                            sgindex=which(logpvalue>=sgline1)
+                            HY1=logpvalue[sgindex]
+                            HX1=pvalue.posN[sgindex]
+                            
+                            #cover the points that exceed the threshold with the color "white"
+                            points(HX1,HY1,pch=pch,cex=cex[2]*R,col="white")
+                            
+                            for(ll in 1:length(threshold[[i]])){
+                                if(ll == 1){
+                                    if(LOG10){
+                                        sgline1=-log10(threshold[[i]][ll])
+                                    }else{
+                                        sgline1=threshold[[i]][ll]
+                                    }
+                                    sgindex=which(logpvalue>=sgline1)
+                                    HY1=logpvalue[sgindex]
+                                    HX1=pvalue.posN[sgindex]
+                                }else{
+                                    if(LOG10){
+                                        sgline0=-log10(threshold[[i]][ll-1])
+                                        sgline1=-log10(threshold[[i]][ll])
+                                    }else{
+                                        sgline0=threshold[[i]][ll-1]
+                                        sgline1=threshold[[i]][ll]
+                                    }
+                                    sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
+                                    HY1=logpvalue[sgindex]
+                                    HX1=pvalue.posN[sgindex]
+                                }
+
+                                if(is.null(signal.col)){
+                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*R,col=rep(rep(colx,N[i]),add[[i]])[sgindex])
+                                }else{
+                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*R,col=signal.col[ll])
+                                }
+                            }
+                        }
+                    }
+
+                    if(!is.null(highlight)){
+                        # points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2]*R,col="white")
+                        if(!is.na(highlight_index[[i]][1])){
+                            if(is.null(highlight.col)){
+                                highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,type=highlight.type,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
+                            }else{
+                                highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,type=highlight.type,point.col=highlight_col[[i]],text.col=highlight.text.col,text.font=highlight.text.font)
+                            }
+                        }
+                    }
+                    if(!is.null(main) & R == 1)  title(main=main[1], cex.main=main.cex, font.main= main.font)
+                    if(box) box(lwd=axis.lwd)
+                    #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
+                }
+                if(file.output) dev.off()
+            }
+            if(multraits){
+                if(file.output){
+                    ht=ifelse(is.null(height), 6, height)
+                    wh=ifelse(is.null(width), 14, width)
+                    if(file=="jpg") jpeg(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,quality=100)
+                    if(file=="pdf") pdf(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width=wh,height=ht)
+                    if(file=="tiff")    tiff(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width=wh*dpi,height=ht*dpi,res=dpi)
+                    if(file=="png") png(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".png",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,bg=NA)
+                    if(!is.null(trait.legend.ncol) && trait.legend.pos=="middle"){
+                        mar[3] = mar[3] + ceiling(length(trait) / trait.legend.ncol)
+                    }
+                    par(mar=mar,xaxs="i",yaxs="r")
+                }
+                if(!file.output){
+                    ht=ifelse(is.null(height), 6, height)
+                    wh=ifelse(is.null(width), 14, width)
+                    if(is.null(dev.list())) dev.new(width=wh, height=ht)
+                    # par(xpd=TRUE)
+                }
+                
+                pvalue <- as.vector(Pmap[,3:(R+2)])
+                if(is.null(ylim)){
+                    if(!is.null(threshold)){
+                        if(LOG10){
+                            Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(unlist(threshold))))))
+                            Min<-min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(unlist(threshold))))))
+                        }else{
+                            Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(unlist(threshold)))))
+                            # if(abs(Max)<=1)   Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
+                            Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(unlist(threshold)))))
+                            # if(abs(Min)<=1)   Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
+                        }
+                    }else{
+                        if(LOG10){
+                                Max=max_ylim((-log10(min_no_na(pvalue))))
+                                Min=min_ylim((-log10(max_no_na(pvalue))))
+                        }else{
+                                Max=max_ylim((max_no_na(pvalue)))
+                                # if(abs(Max)<=1)   Max=max_no_na(max_no_na(pvalue))
+                                Min<- min_ylim((min_no_na(pvalue)))
+                                # if(abs(Min)<=1)   Min=min_no_na(min_no_na(pvalue))
+                                # }else{
+                                    # Max=max_no_na(ceiling(max_no_na(pvalue)))
+                        }
+                    }
+                    if((Max-Min)<=1){
+                        if(cir.density){
+                            plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ann=FALSE,
+                                cex.axis=axis.cex,font=lab.font,axes=FALSE)
+                        }else{
+                            plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
+                                cex.axis=axis.cex,font=lab.font,axes=FALSE)
+                        }
+                    }else{
+                        if(cir.density){
+                            plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ann=FALSE,
+                                cex.axis=axis.cex,font=lab.font,axes=FALSE)
+                        }else{
+                            plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
+                                cex.axis=axis.cex,font=lab.font,axes=FALSE)
+                        }
+                    }
+                    mtext(side=2, text=ylab, line=ylab.pos, cex=lab.cex, font=lab.font, xpd=TRUE)
+                }else{
+                    Max <- max_no_na(unlist(ylim))
+                    Min <- min_no_na(unlist(ylim))
+                    if(cir.density){
+                        plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-Max/den.fold,Max),ann=FALSE,
+                            cex.axis=axis.cex,font=lab.font,axes=FALSE)
+                    }else{
+                        plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min, Max),ann=FALSE,
+                            cex.axis=axis.cex,font=lab.font,axes=FALSE)
+                    }
+                    mtext(side=2, text=ylab, line=ylab.pos, cex=lab.cex, font=lab.font, xpd=TRUE)
+                }
+
+                # Max1 <- Max
+                # Min1 <- Min
+                # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
+                # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
+                if(trait.legend.pos=="middle"){
+                    if(is.null(trait.legend.ncol)){
+                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),lab.cex,trait.legend.cex),box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
+                    }else{
+                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),lab.cex,trait.legend.cex),box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
+                    }
+                }else{
+                    if(is.null(trait.legend.ncol)){
+                        legend(ifelse(trait.legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),lab.cex,trait.legend.cex),box.col=NA,horiz=FALSE,xpd=TRUE)
+                    }else{
+                        legend(ifelse(trait.legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),lab.cex,trait.legend.cex),box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xpd=TRUE)
+                    }
+                }
+
+                if(chr.labels.angle == 0){
+                    if(is.null(chr.labels)){
+                        axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks),lwd=axis.lwd,cex.axis=axis.cex,font=lab.font,labels=c("Chr",chr.ori))
+                    }else{
+                        if(Nchr == 1){
+                            axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
+                        }else{
+                            axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c("Chr",chr.labels))
+                        }
+                    }
+                }else{
+                    axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd,labels=FALSE)
+                    if(is.null(chr.labels)){
+                        text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex, font=lab.font, labels=c("Chr",chr.ori), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                        # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks),lwd=axis.lwd,cex.axis=axis.cex,font=lab.font,labels=c("Chr",chr.ori)) 
+                    }else{
+                        if(Nchr == 1){
+                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex, font=lab.font, labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                            # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
+                        }else{
+                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex, font=lab.font, labels=c("Chr",chr.labels), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                            # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c("Chr",chr.labels))
+                        }
+                    }
+                }
+                axis(1, mgp=c(3,xticks.pos,0), at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
+                if(is.null(ylim)){
+                    if((Max-Min)>1){
+                        #print(seq(0,(Max+1),ceiling((Max+1)/10)))
+                        axis(2,las=1,lwd=axis.lwd,cex.axis=axis.cex,font=lab.font)
+                        axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=axis.lwd)
+                        legend.y <- Max
+                    }else{
+                        axis(2,las=1,lwd=axis.lwd,cex.axis=axis.cex,font=lab.font)
+                        axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=axis.lwd)
+                        legend.y <- Max
+                    }
+                }else{
+                    axis(2, las=1,lwd=axis.lwd,cex.axis=axis.cex,font=lab.font)
+                    axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=axis.lwd)
+                    legend.y <- Max
+                }
+                if(chr.border){
+                    for(b in 1:length(chr.border.pos)){
+                        segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=axis.lwd, lty=2)
+                    }
+                }
+                sam.index <- list()
+                trait_max_n <- 0
+                trait_max <- 0
+                for(l in 1:R){
+                    sam.index[[l]] <- c(1:nrow(Pmap))[is_visable[[l]] & !is.na(logpvalueT[,l])]
+                    if(length(sam.index[[l]]) >= trait_max_n){
+                        trait_max_n=length(sam.index[[l]])
+                        trait_max=l
+                    }
+                }
+                
+                #change the sample number according to Pmap
+                #sam.num <- ceiling(nrow(Pmap)/100)
+                sam.num <- 1000
+                cat_bar <- seq(1, 100, 1)
+                trait_n <- sapply(sam.index, length)
+                trait_sams <- ceiling(trait_n / sam.num)
+                trait_max_sams <- max(trait_sams)
+                trait_1st_sam <- trait_max_sams - trait_sams + 1
+                trait_full_sams <- floor(trait_n / sam.num)
+                trait_1st_full_sam <- trait_max_sams - trait_full_sams + 1
+                for(sam in 1:trait_max_sams) {
+                    for(i in 1:R){
+                        if(sam < trait_1st_sam[i]){
+                            # nothing
+                        }else{
+                            if(sam < trait_1st_full_sam[i]){
+                                plot.index <- sample(sam.index[[i]], trait_n[i] %% sam.num, replace=FALSE)
+                            }else{
+                                plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
+                            }
+                            sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
+                            logpvalue=logpvalueT[plot.index,i]
+                            if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
+                            points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
+                        }
+                    }
+                    if(verbose){
+                        progress <- round((nrow(Pmap) - length(sam.index[[trait_max]])) * 100 / nrow(Pmap))
+                        if(progress %in% cat_bar){
+                            cat(" Multi-traits Rectangular plotting ... (finished ", progress, "%)\r", sep="")
+                            cat_bar <- cat_bar[cat_bar != progress]
+                            if(progress == 100) cat("\n")
+                        }
+                    }
+                }
+
+                if(!is.null(threshold)){
+                    for(thr in 1:length(threshold[[i]])){
+                        h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
+                        segments(0, h, max_no_na(pvalue.posN), h, col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
+                    }
+                    if(amplify==TRUE){
+                    # if(sum(threshold!=0)==length(threshold)){
+                        for(i in 1:R){
+                            logpvalue=logpvalueT[, i]
+                            for(ll in 1:length(threshold[[i]])){
+                                if(ll == 1){
+                                    if(LOG10){
+                                        sgline1=-log10(threshold[[i]][ll])
+                                    }else{
+                                        sgline1=threshold[[i]][ll]
+                                    }
+                                    sgindex=which(logpvalue>=sgline1)
+                                    HY1=logpvalue[sgindex]
+                                    HX1=pvalue.posN[sgindex]
+                                }else{
+                                    if(LOG10){
+                                        sgline0=-log10(threshold[[i]][ll-1])
+                                        sgline1=-log10(threshold[[i]][ll])
+                                    }else{
+                                        sgline0=threshold[[i]][ll-1]
+                                        sgline1=threshold[[i]][ll]
+                                    }
+                                    sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
+                                    HY1=logpvalue[sgindex]
+                                    HX1=pvalue.posN[sgindex]
+                                }
+                                points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
+                                if(is.null(signal.col)){
+                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rep(rep(colx,N[i]),add[[i]])[sgindex])
+                                }else{
+                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=signal.col[ll])
+                                }
+                                
+                            }
+                        }
+                    }
+                    # }
+                }
+
+                if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(unlist(ylim))}
+                if(cir.density){
+                    for(yll in 1:length(pvalue.posN.list)){
+                        polygon(c(min_no_na(pvalue.posN.list[[yll]]), min_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]])), 
+                            c(ymin-0.5*(Max-Min)/den.fold, ymin-1.5*(Max-Min)/den.fold, 
+                            ymin-1.5*(Max-Min)/den.fold, ymin-0.5*(Max-Min)/den.fold), 
+                            col="grey", border="grey")
+                    }
+                    is_visable_den <- filter.points(pvalue.posN, ymin-0.5*(Max-Min)/den.fold, wh, ht, dpi=dpi)
+                    segments(
+                        pvalue.posN[is_visable_den],
+                        ymin-0.5*(Max-Min)/den.fold,
+                        pvalue.posN[is_visable_den],
+                        ymin-1.5*(Max-Min)/den.fold,
+                        col=density.list$den.col[is_visable_den], lwd=0.5
+                    )
+                    legend(
+                        x=max_no_na(pvalue.posN)+band,
+                        y=legend.y,
+                        title="", legend=density.list$legend.y, pch=15, pt.cex=2.5, col=density.list$legend.col,
+                        cex=0.8, bty="n",
+                        y.intersp=1,
+                        x.intersp=1,
+                        yjust=0.9, xjust=0, xpd=TRUE
+                    )          
+                }
+                if(!is.null(main))  title(main=main[1], cex.main=main.cex, font.main= main.font)
+                if(box) box(lwd=axis.lwd)
+                if(file.output) dev.off()
+            }
+        }else{
             #print("Starting Rectangular-Manhattan plot!",quote=F)
             if(file.name != "" && length(file.name) != R)   stop(paste("please provide a vector containing file names of all", R, "traits."))
             for(i in 1:R){
@@ -1449,15 +1863,16 @@ CMplot <- function(
                     if(file.output){
                         ht=ifelse(is.null(height), 6, height)
                         wh=ifelse(is.null(width), 14, width)
-                        if(file=="jpg") jpeg(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                        if(file=="pdf") pdf(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".pdf",sep=""), width = wh,height=ht)
-                        if(file=="tiff")    tiff(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-                        par(mar = mar,xaxs="i",yaxs="r")
+                        if(file=="jpg") jpeg(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".jpg",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,quality=100)
+                        if(file=="pdf") pdf(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".pdf",sep=""), width=wh,height=ht)
+                        if(file=="tiff")    tiff(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".tiff",sep=""), width=wh*dpi,height=ht*dpi,res=dpi)
+                        if(file=="png") png(paste("Rect_Manhtn.",ifelse(file.name=="",trait[i],file.name[i]),".png",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,bg=NA)
+                        par(mar=mar,xaxs="i",yaxs="r")
                     }
                     if(!file.output){
                         ht=ifelse(is.null(height), 6, height)
                         wh=ifelse(is.null(width), 14, width)
-                        if(is.null(dev.list())) dev.new(width = wh, height = ht)
+                        if(is.null(dev.list())) dev.new(width=wh, height=ht)
                         # par(xpd=TRUE)
                     }
                     
@@ -1506,32 +1921,32 @@ CMplot <- function(
                         if((Max-Min)<=1){
                             if(cir.density){
                                 plot(pvalue.posN[is_visable[[i]]],logpvalue[is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ann=FALSE,
-                                    cex.axis=cex.axis,font=2,axes=FALSE)
+                                    cex.axis=axis.cex,font=lab.font,axes=FALSE)
                             }else{
                                 plot(pvalue.posN[is_visable[[i]]],logpvalue[is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
-                                cex.axis=cex.axis,font=2,axes=FALSE)
+                                cex.axis=axis.cex,font=lab.font,axes=FALSE)
                             }
                         }else{
                             if(cir.density){
                                 plot(pvalue.posN[is_visable[[i]]],logpvalue[is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ann=FALSE,
-                                cex.axis=cex.axis,font=2,axes=FALSE)
+                                cex.axis=axis.cex,font=lab.font,axes=FALSE)
                             }else{
                                 plot(pvalue.posN[is_visable[[i]]],logpvalue[is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
-                                cex.axis=cex.axis,font=2,axes=FALSE)
+                                cex.axis=axis.cex,font=lab.font,axes=FALSE)
                             }
                         }
-                        mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
+                        mtext(side=2, text=ylab, line=ylab.pos, cex=lab.cex, font=lab.font, xpd=TRUE)
                     }else{
                         Max <- max_no_na(ylim[[i]])
                         Min <- min_no_na(ylim[[i]])
                         if(cir.density){
                             plot(pvalue.posN[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(min_no_na(ylim[[i]])-(Max-Min)/den.fold, max_no_na(ylim[[i]])),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE)
+                            cex.axis=axis.cex,font=lab.font,axes=FALSE)
                         }else{
                             plot(pvalue.posN[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]+1,cex=cex[2],col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=ylim[[i]],ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE)
+                            cex.axis=axis.cex,font=lab.font,axes=FALSE)
                         }
-                        mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
+                        mtext(side=2, text=ylab, line=ylab.pos, cex=lab.cex, font=lab.font, xpd=TRUE)
                     }
                     # Max1 <- Max
                     # Min1 <- Min
@@ -1539,52 +1954,52 @@ CMplot <- function(
                     # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
                     if(chr.border){
                         for(b in 1:length(chr.border.pos)){
-                            segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=lwd.axis, lty=2)
+                            segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=axis.lwd, lty=2)
                         }
                     }
 
                     if(chr.labels.angle == 0){
                         if(!is.null(chr.labels)){
                             if(Nchr == 1){
-                                axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
+                                axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
                             }else{
-                                axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c("Chr",chr.labels))
-                                #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
+                                axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c("Chr",chr.labels))
+                                #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
                             }
                         }else{
-                            axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
-                            #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
+                            axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c("Chr",chr.ori))
+                            #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
                         }
                     }else{
-                        axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis,labels=FALSE)
+                        axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd,labels=FALSE)
                         if(!is.null(chr.labels)){
                             if(Nchr == 1){
-                                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex, font=lab.font, labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
                             }else{
-                                # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=)
-                                #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
-                                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                                # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=2,labels=)
+                                #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
+                                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex, font=lab.font, labels=c("Chr",chr.labels), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
                             }
                         }else{
-                            # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
-                            #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
-                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
+                            # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=2,labels=c("Chr",chr.ori))
+                            #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
+                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=axis.cex, font=lab.font, labels=c("Chr",chr.ori), srt=chr.labels.angle, xpd=TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
                         }
                     }
-                    axis(1, mgp=c(3,xticks.pos,0), at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
+                    axis(1, mgp=c(3,xticks.pos,0), at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
                     if(is.null(ylim)){
                         if((Max-Min)>1){
-                            axis(2, las=1, lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                            axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
+                            axis(2, las=1, lwd=axis.lwd,cex.axis=axis.cex,font=lab.font)
+                            axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=axis.lwd)
                             legend.y <- Max
                         }else{
-                            axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                            axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
+                            axis(2, las=1,lwd=axis.lwd,cex.axis=axis.cex,font=lab.font)
+                            axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=axis.lwd)
                             legend.y <- Max
                         }
                     }else{
-                        axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                        axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
+                        axis(2, las=1,lwd=axis.lwd,cex.axis=axis.cex,font=lab.font)
+                        axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=axis.lwd)
                         legend.y <- tail(ylim[[i]][2], 1)
                     }
                     if(!is.null(threshold[[i]])){
@@ -1650,9 +2065,9 @@ CMplot <- function(
                         # points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2],col="white")
                         if(!is.na(highlight_index[[i]][1])){
                             if(is.null(highlight.col)){
-                                highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,type=highlight.type,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
+                                highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,type=highlight.type,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
                             }else{
-                                highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,type=highlight.type,point.col=highlight_col[[i]],text.col=highlight.text.col,text.font=highlight.text.font)
+                                highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),words=highlight.text[[i]],point.cex=highlight.cex,text.cex=highlight.text.cex, pch=highlight.pch,type=highlight.type,point.col=highlight_col[[i]],text.col=highlight.text.col,text.font=highlight.text.font)
                             }
                         }
                     }
@@ -1667,7 +2082,7 @@ CMplot <- function(
                                 ymin-1.5*(Max-Min)/den.fold, ymin-0.5*(Max-Min)/den.fold), 
                                 col="grey", border="grey", xpd=TRUE)
                         }
-                        is_visable_den <- filter.points(pvalue.posN, ymin-0.5*(Max-Min)/den.fold, wh, ht, dpi = dpi)
+                        is_visable_den <- filter.points(pvalue.posN, ymin-0.5*(Max-Min)/den.fold, wh, ht, dpi=dpi)
                         segments(
                             pvalue.posN[is_visable_den],
                             ymin-0.5*(Max-Min)/den.fold,
@@ -1678,7 +2093,7 @@ CMplot <- function(
                         legend(
                             x=max_no_na(pvalue.posN)+band,
                             y=legend.y,
-                            title="", legend=density.list$legend.y, pch=15, pt.cex = 2.5, col=density.list$legend.col,
+                            title="", legend=density.list$legend.y, pch=15, pt.cex=2.5, col=density.list$legend.col,
                             cex=0.8, bty="n",
                             y.intersp=1,
                             x.intersp=1,
@@ -1686,460 +2101,10 @@ CMplot <- function(
                         )
                         
                     }
-                if(!is.null(main))  title(main = main[i], cex.main = main.cex, font.main= main.font)
-                if(box) box(lwd=lwd.axis)
+                if(!is.null(main))  title(main=main[i], cex.main=main.cex, font.main= main.font)
+                if(box) box(lwd=axis.lwd)
                 if(file.output)  dev.off()
             }
-        }else{
-            if(file.output){
-                ht=ifelse(is.null(height), 6, height)
-                wh=ifelse(is.null(width), 14, width)
-                if(file=="jpg") jpeg(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi,quality = 100)
-                if(file=="pdf") pdf(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht*R)
-                if(file=="tiff")    tiff(paste("Multi-tracks_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi*R,res=dpi)
-                par(mfcol=c(R,1), xaxs="i")
-            }
-            if(!file.output){
-                ht=ifelse(is.null(height), 6, height)
-                wh=ifelse(is.null(width), 14, width)
-                if(is.null(dev.list())) dev.new(width = wh, height = ht)
-                # par(xpd=TRUE)
-            }
-            for(i in 1:R){
-                if(i == 1)  par(mar=c(0, mar[2]+1, mar[3], 0))
-                if(i == R)  par(mar=c(mar[1]+1, mar[2]+1, 0, 0))
-                if(i != 1 & i != R) par(mar=c(0, mar[2]+1, 0, 0))
-                if(verbose) cat(paste(" Multi-tracks Manhattan plotting ",trait[i],".\n",sep=""))
-                colx=col[i,]
-                colx=colx[!is.na(colx)]
-                pvalue=pvalueT[,i]
-                logpvalue=logpvalueT[,i]
-                if(is.null(ylim)){
-                    if(!is.null(threshold[[i]])){
-                        # if(sum(threshold!=0)==length(threshold)){
-                            if(LOG10){
-                                Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(threshold[[i]])))))
-                                Min <- min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(threshold[[i]])))))
-                            }else{
-                                Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(threshold[[i]]))))
-                                #if(abs(Max)<=1)    Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-                                Min<-min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(threshold[[i]]))))
-                                #if(abs(Min)<=1)    Min=min_no_na(min_no_na(pvalue),min_no_na(threshold))
-                            }
-                    }else{
-                        if(LOG10){
-                                Max=max_ylim((-log10(min_no_na(pvalue))))
-                                Min<-min_ylim((-log10(max_no_na(pvalue))))
-                        }else{
-                                Max=max_ylim((max_no_na(pvalue)))
-                                #if(abs(Max)<=1)    Max=max_no_na(max_no_na(pvalue))
-                                Min=min_ylim((min_no_na(pvalue)))
-                                #if(abs(Min)<=1)    Min=min_no_na(min_no_na(pvalue))
-                                # }else{
-                                    # Max=max_no_na(ceiling(max_no_na(pvalue)))
-                                # }
-                        }
-                    }
-                    if((Max-Min)<=1){
-                        plot(pvalue.posN[is_visable[[i]]],logpvalue[is_visable[[i]]],pch=pch,type=type,lwd=cex[2]*(R/2)+1,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ann=FALSE,
-                            cex.axis=cex.axis*(R/2),font=2,axes=FALSE,yaxs="r")
-                    }else{
-                        plot(pvalue.posN[is_visable[[i]]],logpvalue[is_visable[[i]]],pch=pch,type=type,lwd=cex[2]*(R/2)+1,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=c(Min,Max),ann=FALSE,
-                            cex.axis=cex.axis*(R/2),font=2,axes=FALSE,yaxs="r")
-                    }
-                    mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab*(R/2), font=1, xpd=TRUE)
-                }else{
-                    Max <- max_no_na(ylim[[i]])
-                    Min <- min_no_na(ylim[[i]])
-                    plot(pvalue.posN[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],logpvalue[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],pch=pch,type=type,lwd=cex[2]*(R/2)+1,cex=cex[2]*(R/2),col=rep(rep(colx,N[i]),add[[i]])[logpvalue>=min_no_na(ylim[[i]]) & is_visable[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)+band),ylim=ylim[[i]],ann=FALSE,
-                        cex.axis=cex.axis*(R/2),font=1,axes=FALSE,yaxs="r")
-                    mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab*(R/2), font=1, xpd=TRUE)
-                }
-
-                if(chr.border){
-                    for(b in 1:length(chr.border.pos)){
-                        segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=lwd.axis, lty=2)
-                    }
-                }
-
-                #add the names of traits on plot 
-                if(trait.legend.pos=="left"){
-                    text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
-                }else if(trait.legend.pos=="middle"){
-                    text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
-                }else{
-                    text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),cex.lab*(R/2),trait.legend.cex),xpd=TRUE) 
-                }
-            
-                if(i == R){
-                    if(chr.labels.angle == 0){
-                        if(is.null(chr.labels)){
-                            axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.ori),padj=1)
-                        }else{
-                            if(Nchr == 1){
-                                axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2), cex.axis=cex.axis*(R/2),font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
-                            }else{
-                                axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2), cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.labels))
-                            }
-                        }
-                    }else{
-                        axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2),labels=FALSE)
-                        if(is.null(chr.labels)){
-                            text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis*(R/2), font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
-                            # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis,cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.ori),padj=1)
-                        }else{
-                            if(Nchr == 1){
-                                # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2), cex.axis=cex.axis*(R/2),font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
-                                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis*(R/2), font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
-                            }else{
-                                # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis*(R/2), cex.axis=cex.axis*(R/2),font=2,labels=c("Chr",chr.labels))
-                                text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis*(R/2), font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
-                            }
-                        }
-                    }
-                    axis(1, mgp=c(3,xticks.pos,0), at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-                }
-                #if(i==1) mtext("Manhattan plot",side=3,padj=-1,font=2,cex=xn)
-                if(is.null(ylim)){
-                    if((Max-Min)>1){
-                        axis(2, las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
-                        axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-                    }else{
-                        axis(2,las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
-                        axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-                    }
-                }else{
-                    axis(2, las=1,lwd=lwd.axis*(R/2),cex.axis=cex.axis*(R/2),font=2)
-                    axis(2, at=c((Min), Max), labels=c("",""), tcl=0, lwd=lwd.axis*(R/2))
-                }
-                if(!is.null(threshold[[i]])){
-                    for(thr in 1:length(threshold[[i]])){
-                        h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
-                        segments(0, h, max_no_na(pvalue.posN), h, col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
-                    }
-                    if(amplify==TRUE){
-                        if(LOG10){
-                            threshold[[i]] <- sort(threshold[[i]])
-                            sgline1=-log10(max_no_na(threshold[[i]]))
-                        }else{
-                            threshold[[i]] <- sort(threshold[[i]], decreasing=TRUE)
-                            sgline1=min_no_na(threshold[[i]])
-                        }
-                        sgindex=which(logpvalue>=sgline1)
-                        HY1=logpvalue[sgindex]
-                        HX1=pvalue.posN[sgindex]
-                        
-                        #cover the points that exceed the threshold with the color "white"
-                        points(HX1,HY1,pch=pch,cex=cex[2]*R,col="white")
-                        
-                        for(ll in 1:length(threshold[[i]])){
-                            if(ll == 1){
-                                if(LOG10){
-                                    sgline1=-log10(threshold[[i]][ll])
-                                }else{
-                                    sgline1=threshold[[i]][ll]
-                                }
-                                sgindex=which(logpvalue>=sgline1)
-                                HY1=logpvalue[sgindex]
-                                HX1=pvalue.posN[sgindex]
-                            }else{
-                                if(LOG10){
-                                    sgline0=-log10(threshold[[i]][ll-1])
-                                    sgline1=-log10(threshold[[i]][ll])
-                                }else{
-                                    sgline0=threshold[[i]][ll-1]
-                                    sgline1=threshold[[i]][ll]
-                                }
-                                sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
-                                HY1=logpvalue[sgindex]
-                                HX1=pvalue.posN[sgindex]
-                            }
-
-                            if(is.null(signal.col)){
-                                points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*R,col=rep(rep(colx,N[i]),add[[i]])[sgindex])
-                            }else{
-                                points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll]*R,col=signal.col[ll])
-                            }
-                        }
-                    }
-                }
-
-                if(!is.null(highlight)){
-                    # points(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],pch=pch,cex=cex[2]*R,col="white")
-                    if(!is.na(highlight_index[[i]][1])){
-                        if(is.null(highlight.col)){
-                            highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,type=highlight.type,point.col=rep(rep(colx,N[i]),add[[i]])[highlight_index[[i]]],text.col=highlight.text.col,text.font=highlight.text.font)
-                        }else{
-                            highlight_text(x=pvalue.posN[highlight_index[[i]]],y=logpvalue[highlight_index[[i]]],xlim=c(min_no_na(pvalue.posN)-band,max_no_na(pvalue.posN)),ylim=c(Min,Max),xadj=highlight.text.xadj[[i]],yadj=highlight.text.yadj[[i]],words=highlight.text[[i]],point.cex=highlight.cex*R,text.cex=highlight.text.cex*R/2, pch=highlight.pch,type=highlight.type,point.col=highlight_col[[i]],text.col=highlight.text.col,text.font=highlight.text.font)
-                        }
-                    }
-                }
-
-                #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
-            }
-            
-            #add the labels of X-axis
-            #mtext(xlab,side=1,padj=2.5,font=2,cex=R*2/3)
-            if(file.output) dev.off()
-            
-            if(file.output){
-                ht=ifelse(is.null(height), 6, height)
-                wh=ifelse(is.null(width), 14, width)
-                if(file=="jpg") jpeg(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                if(file=="pdf") pdf(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht)
-                if(file=="tiff")    tiff(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-                if(!is.null(trait.legend.ncol) && trait.legend.pos=="middle"){
-                    mar[3] = mar[3] + ceiling(length(trait) / trait.legend.ncol)
-                }
-                par(mar = mar,xaxs="i",yaxs="r")
-            }
-            if(!file.output){
-                ht=ifelse(is.null(height), 6, height)
-                wh=ifelse(is.null(width), 14, width)
-                if(is.null(dev.list())) dev.new(width = wh, height = ht)
-                # par(xpd=TRUE)
-            }
-            
-            pvalue <- as.vector(Pmap[,3:(R+2)])
-            if(is.null(ylim)){
-                if(!is.null(threshold)){
-                    if(LOG10){
-                        Max=max_ylim(max_no_na(c((-log10(min_no_na(pvalue))),-log10(min_no_na(unlist(threshold))))))
-                        Min<-min_ylim(min_no_na(c((-log10(max_no_na(pvalue))),-log10(max_no_na(unlist(threshold))))))
-                    }else{
-                        Max=max_ylim(max_no_na(c((max_no_na(pvalue)),max_no_na(unlist(threshold)))))
-                        # if(abs(Max)<=1)   Max=max_no_na(c(max_no_na(pvalue),max_no_na(threshold)))
-                        Min <- min_ylim(min_no_na(c((min_no_na(pvalue)),min_no_na(unlist(threshold)))))
-                        # if(abs(Min)<=1)   Min=min_no_na(c(min_no_na(pvalue),min_no_na(threshold)))
-                    }
-                }else{
-                    if(LOG10){
-                            Max=max_ylim((-log10(min_no_na(pvalue))))
-                            Min=min_ylim((-log10(max_no_na(pvalue))))
-                    }else{
-                            Max=max_ylim((max_no_na(pvalue)))
-                            # if(abs(Max)<=1)   Max=max_no_na(max_no_na(pvalue))
-                            Min<- min_ylim((min_no_na(pvalue)))
-                            # if(abs(Min)<=1)   Min=min_no_na(min_no_na(pvalue))
-                            # }else{
-                                # Max=max_no_na(ceiling(max_no_na(pvalue)))
-                    }
-                }
-                if((Max-Min)<=1){
-                    if(cir.density){
-                        plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold, Max),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE)
-                    }else{
-                        plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE)
-                    }
-                }else{
-                    if(cir.density){
-                        plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-(Max-Min)/den.fold,Max),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE)
-                    }else{
-                        plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min,Max),ann=FALSE,
-                            cex.axis=cex.axis,font=2,axes=FALSE)
-                    }
-                }
-                mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
-            }else{
-                Max <- max_no_na(unlist(ylim))
-                Min <- min_no_na(unlist(ylim))
-                if(cir.density){
-                    plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+1.05*max_no_na(pvalue.posN)),ylim=c(Min-Max/den.fold,Max),ann=FALSE,
-                        cex.axis=cex.axis,font=2,axes=FALSE)
-                }else{
-                    plot(NULL,xlim=c(min_no_na(pvalue.posN)-band,band+max_no_na(pvalue.posN)),ylim=c(Min, Max),ann=FALSE,
-                        cex.axis=cex.axis,font=2,axes=FALSE)
-                }
-                mtext(side = 2, text = ylab, line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
-            }
-
-            # Max1 <- Max
-            # Min1 <- Min
-            # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
-            # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
-            if(trait.legend.pos=="middle"){
-                if(is.null(trait.legend.ncol)){
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),cex.lab,trait.legend.cex),box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
-                }else{
-                    legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),cex.lab,trait.legend.cex),box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
-                }
-            }else{
-                if(is.null(trait.legend.ncol)){
-                    legend(ifelse(trait.legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),cex.lab,trait.legend.cex),box.col=NA,horiz=FALSE,xpd=TRUE)
-                }else{
-                    legend(ifelse(trait.legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),cex.lab,trait.legend.cex),box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xpd=TRUE)
-                }
-            }
-
-            if(chr.labels.angle == 0){
-                if(is.null(chr.labels)){
-                    axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks),lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori))
-                }else{
-                    if(Nchr == 1){
-                        axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
-                    }else{
-                        axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c("Chr",chr.labels))
-                    }
-                }
-            }else{
-                axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis,labels=FALSE)
-                if(is.null(chr.labels)){
-                    text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c("Chr",chr.ori), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
-                    # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks),lwd=lwd.axis,cex.axis=cex.axis,font=2,labels=c("Chr",chr.ori)) 
-                }else{
-                    if(Nchr == 1){
-                        text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
-                        # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c(paste("Chr.", unique(Pmap[,1]), bp_lab, sep=""),chr.labels))
-                    }else{
-                        text(c(min_no_na(pvalue.posN)-band,ticks), par("usr")[3]*2-ifelse(cir.density, Min-(Max-Min)/den.fold, Min), cex=cex.axis, font = 2, labels = c("Chr",chr.labels), srt = chr.labels.angle, xpd = TRUE,adj=c(ifelse(chr.labels.angle < 0, 0, ifelse(chr.labels.angle == 0, 0.5, 1)), ifelse(chr.labels.angle == 0, 0.5, ifelse(abs(chr.labels.angle) > 45, 0.5, 1))))
-                        # axis(1, at=c(min_no_na(pvalue.posN)-band,ticks), lwd=lwd.axis, cex.axis=cex.axis,font=2,labels=c("Chr",chr.labels))
-                    }
-                }
-            }
-            axis(1, mgp=c(3,xticks.pos,0), at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=lwd.axis)
-            if(is.null(ylim)){
-                if((Max-Min)>1){
-                    #print(seq(0,(Max+1),ceiling((Max+1)/10)))
-                    axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                    axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
-                    legend.y <- Max
-                }else{
-                    axis(2,las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                    axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
-                    legend.y <- Max
-                }
-            }else{
-                axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis,font=2)
-                axis(2, at=c(Min, Max), labels=c("",""), tcl=0, lwd=lwd.axis)
-                legend.y <- Max
-            }
-            if(chr.border){
-                for(b in 1:length(chr.border.pos)){
-                    segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=lwd.axis, lty=2)
-                }
-            }
-            sam.index <- list()
-            trait_max_n <- 0
-            trait_max <- 0
-            for(l in 1:R){
-                sam.index[[l]] <- c(1:nrow(Pmap))[is_visable[[l]] & !is.na(logpvalueT[,l])]
-                if(length(sam.index[[l]]) >= trait_max_n){
-                    trait_max_n = length(sam.index[[l]])
-                    trait_max = l
-                }
-            }
-            
-            #change the sample number according to Pmap
-            #sam.num <- ceiling(nrow(Pmap)/100)
-            sam.num <- 1000
-            cat_bar <- seq(1, 100, 1)
-            trait_n <- sapply(sam.index, length)
-            trait_sams <- ceiling(trait_n / sam.num)
-            trait_max_sams <- max(trait_sams)
-            trait_1st_sam <- trait_max_sams - trait_sams + 1
-            trait_full_sams <- floor(trait_n / sam.num)
-            trait_1st_full_sam <- trait_max_sams - trait_full_sams + 1
-            for(sam in 1:trait_max_sams) {
-                for(i in 1:R){
-                    if(sam < trait_1st_sam[i]){
-                        # nothing
-                    }else{
-                        if(sam < trait_1st_full_sam[i]){
-                            plot.index <- sample(sam.index[[i]], trait_n[i] %% sam.num, replace=FALSE)
-                        }else{
-                            plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
-                        }
-                        sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
-                        logpvalue=logpvalueT[plot.index,i]
-                        if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
-                        points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
-                    }
-                }
-                if(verbose){
-                    progress <- round((nrow(Pmap) - length(sam.index[[trait_max]])) * 100 / nrow(Pmap))
-                    if(progress %in% cat_bar){
-                        cat(" Multi-traits Rectangular plotting ... (finished ", progress, "%)\r", sep="")
-                        cat_bar <- cat_bar[cat_bar != progress]
-                        if(progress == 100) cat("\n")
-                    }
-                }
-            }
-
-            if(!is.null(threshold)){
-                for(thr in 1:length(threshold[[i]])){
-                    h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
-                    segments(0, h, max_no_na(pvalue.posN), h, col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
-                }
-                if(amplify==TRUE){
-                # if(sum(threshold!=0)==length(threshold)){
-                    for(i in 1:R){
-                        logpvalue=logpvalueT[, i]
-                        for(ll in 1:length(threshold[[i]])){
-                            if(ll == 1){
-                                if(LOG10){
-                                    sgline1=-log10(threshold[[i]][ll])
-                                }else{
-                                    sgline1=threshold[[i]][ll]
-                                }
-                                sgindex=which(logpvalue>=sgline1)
-                                HY1=logpvalue[sgindex]
-                                HX1=pvalue.posN[sgindex]
-                            }else{
-                                if(LOG10){
-                                    sgline0=-log10(threshold[[i]][ll-1])
-                                    sgline1=-log10(threshold[[i]][ll])
-                                }else{
-                                    sgline0=threshold[[i]][ll-1]
-                                    sgline1=threshold[[i]][ll]
-                                }
-                                sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
-                                HY1=logpvalue[sgindex]
-                                HX1=pvalue.posN[sgindex]
-                            }
-                            points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
-                            if(is.null(signal.col)){
-                                points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rep(rep(colx,N[i]),add[[i]])[sgindex])
-                            }else{
-                                points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=signal.col[ll])
-                            }
-                            
-                        }
-                    }
-                }
-                # }
-            }
-
-            if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(unlist(ylim))}
-            if(cir.density){
-                for(yll in 1:length(pvalue.posN.list)){
-                    polygon(c(min_no_na(pvalue.posN.list[[yll]]), min_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]]), max_no_na(pvalue.posN.list[[yll]])), 
-                        c(ymin-0.5*(Max-Min)/den.fold, ymin-1.5*(Max-Min)/den.fold, 
-                        ymin-1.5*(Max-Min)/den.fold, ymin-0.5*(Max-Min)/den.fold), 
-                        col="grey", border="grey")
-                }
-                is_visable_den <- filter.points(pvalue.posN, ymin-0.5*(Max-Min)/den.fold, wh, ht, dpi = dpi)
-                segments(
-                    pvalue.posN[is_visable_den],
-                    ymin-0.5*(Max-Min)/den.fold,
-                    pvalue.posN[is_visable_den],
-                    ymin-1.5*(Max-Min)/den.fold,
-                    col=density.list$den.col[is_visable_den], lwd=0.5
-                )
-                legend(
-                    x=max_no_na(pvalue.posN)+band,
-                    y=legend.y,
-                    title="", legend=density.list$legend.y, pch=15, pt.cex = 2.5, col=density.list$legend.col,
-                    cex=0.8, bty="n",
-                    y.intersp=1,
-                    x.intersp=1,
-                    yjust=0.9, xjust=0, xpd=TRUE
-                )          
-            }
-
-            if(file.output) dev.off()
         }
     }
         
@@ -2149,131 +2114,142 @@ CMplot <- function(
         signal.pch <- rep(signal.pch,R)
         signal.cex <- rep(signal.cex*1.1,R)
 
-        if(multracks){
-            if(file.output){
-                ht=ifelse(is.null(height), 5.5, height)
-                wh=ifelse(is.null(width), 3.5, width)
-                if(file=="jpg") jpeg(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                if(file=="pdf") pdf(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = R*wh,height=ht)
-                if(file=="tiff")    tiff(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = R*wh*dpi,height=ht*dpi,res=dpi)
-                par(mfcol=c(1,R),xpd=TRUE)
-            }else{
-                ht=ifelse(is.null(height), 5.5, height)
-                wh=ifelse(is.null(width), 3.5, width)
-                if(is.null(dev.list())) dev.new(width = wh*R, height = ht)
-                par(xpd=TRUE)
-            }
-            log.Quantiles.max_no_na <- NULL
-            for(i in 1:R){
-                if(i == 1)  par(mar=c(mar[2], mar[2], mar[3], 0))
-                if(i == R)  par(mar=c(mar[2], 1.5, mar[3], mar[4]))
-                if(i != 1 & i != R) par(mar=c(mar[2], 1.5, mar[3], 0))
-                if(verbose) cat(paste(" Multi-tracks Q-Q plotting ",trait[i],".\n",sep=""))        
-                P.values=as.numeric(Pmap[,i+2])
-                P.values=P.values[!is.na(P.values)]
-                if(LOG10){
-                    P.values=P.values[P.values>0]
-                    P.values=P.values[P.values<1]
-                    N=length(P.values)
-                    P.values=P.values[order(P.values)]
+        if(multracks | multraits){
+            if(R < 2)   stop("need more than one trait.")
+            if(multracks){
+                if(file.output){
+                    ht=ifelse(is.null(height), 5.5, height)
+                    wh=ifelse(is.null(width), 3.5, width)
+                    if(file=="jpg") jpeg(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width=R*wh*dpi,height=ht*dpi,res=dpi,quality=100)
+                    if(file=="pdf") pdf(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width=R*wh,height=ht)
+                    if(file=="tiff")    tiff(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width=R*wh*dpi,height=ht*dpi,res=dpi)
+                    if(file=="png") png(paste("Multi-tracks_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".png",sep=""), width=R*wh*dpi,height=ht*dpi,res=dpi,bg=NA)
+                    par(mfcol=c(1,R),xpd=TRUE)
                 }else{
-                    N=length(P.values)
-                    P.values=P.values[order(P.values,decreasing=TRUE)]
+                    ht=ifelse(is.null(height), 5.5, height)
+                    wh=ifelse(is.null(width), 3.5, width)
+                    if(is.null(dev.list())) dev.new(width=wh*R, height=ht)
+                    par(xpd=TRUE)
                 }
-                p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
-                log.Quantiles <- -log10(p_value_quantiles)
-                log.Quantiles.max_no_na <- c(log.Quantiles.max_no_na, max_no_na(log.Quantiles))
-                if(LOG10){
-                    log.P.values <- -log10(P.values)
-                }else{
-                    log.P.values <- P.values
-                }
-                
-                #calculate the confidence interval of QQ-plot
-                if(conf.int){
-                    N1=length(log.Quantiles)
-                    c95 <- rep(NA,N1)
-                    c05 <- rep(NA,N1)
-                    for(j in 1:N1){
-                        xi=ceiling((10^-log.Quantiles[j])*N)
-                        if(xi==0)xi=1
-                        c95[j] <- qbeta(0.95,xi,N-xi+1)
-                        c05[j] <- qbeta(0.05,xi,N-xi+1)
-                    }
-                    index=length(c95):1
-                }else{
-                    c05 <- 1
-                    c95 <- 1
-                }
-                
-                YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), floor(max_no_na(log.P.values)+1)))
-                if(is.null(ylim)){
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab ="", ylab="")
-                }else{
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim[[i]])),xlab ="", ylab="")
-                }
-                axis(1, mgp=c(3,xticks.pos,0), at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
-                axis(2, las=1, lwd=lwd.axis,cex.axis=cex.axis)
-                axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(ylim[[i]]))), labels=c("",""), tcl=0, lwd=lwd.axis)
-                
-                #plot the confidence interval of QQ-plot
-                if(conf.int){
-                    if(is.null(conf.int.col)){
-                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
+                for(i in 1:R){
+                    if(i == 1)  par(mar=c(mar[2], mar[2], mar[3], 0))
+                    if(i == R)  par(mar=c(mar[2], 1.5, mar[3], mar[4]))
+                    if(i != 1 & i != R) par(mar=c(mar[2], 1.5, mar[3], 0))
+                    if(verbose) cat(paste(" Multi-tracks Q-Q plotting ",trait[i],".\n",sep=""))        
+                    P.values=as.numeric(Pmap[,i+2])
+                    P.values=P.values[!is.na(P.values)]
+                    if(LOG10){
+                        P.values=P.values[P.values>0]
+                        P.values=P.values[P.values<1]
+                        N=length(P.values)
+                        P.values=P.values[order(P.values)]
                     }else{
-                        polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255))
+                        N=length(P.values)
+                        P.values=P.values[order(P.values,decreasing=TRUE)]
                     }
-                }
-                if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1,lwd=threshold.lty[1], lty=threshold.lty[1], col = threshold.col[1]); par(xpd=TRUE)}
-                is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi = dpi)
-                if(!is.null(threshold[[i]])){
-                    # if(sum(threshold!=0)==length(threshold)){
-                        thre.line=-log10(min_no_na(threshold[[i]]))
-                        if(amplify==TRUE){
-                            thre.index <- log.P.values<thre.line
-                            if(sum(!thre.index)!=0){
-                                points(log.Quantiles[thre.index & is_visable], log.P.values[thre.index & is_visable], col = t(col)[i],pch=19,cex=cex[3])
-                            
-                                #cover the points that exceed the threshold with the color "white"
-                                # points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
-                                if(is.null(signal.col)){
-                                    points(log.Quantiles[!thre.index],log.P.values[!thre.index],col = t(col)[i],pch=signal.pch[i],cex=signal.cex[i])
+                    p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
+                    log.Quantiles <- -log10(p_value_quantiles)
+                    if(LOG10){
+                        log.P.values <- -log10(P.values)
+                    }else{
+                        log.P.values <- P.values
+                    }
+                    
+                    #calculate the confidence interval of QQ-plot
+                    if(conf.int){
+                        N1=length(log.Quantiles)
+                        c95 <- rep(NA,N1)
+                        c05 <- rep(NA,N1)
+                        for(j in 1:N1){
+                            xi=ceiling((10^-log.Quantiles[j])*N)
+                            if(xi==0)xi=1
+                            c95[j] <- qbeta(0.95,xi,N-xi+1)
+                            c05[j] <- qbeta(0.05,xi,N-xi+1)
+                        }
+                        index=length(c95):1
+                    }else{
+                        c05 <- 1
+                        c95 <- 1
+                    }
+                    
+                    YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), floor(max_no_na(log.P.values)+1)))
+                    if(is.null(ylim)){
+                        plot(NULL, xlim=c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=axis.cex, cex.lab=lab.cex,ylim=c(0,YlimMax),xlab ="", ylab="")
+                    }else{
+                        plot(NULL, xlim=c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=axis.cex, cex.lab=lab.cex,ylim=c(0,max(ylim[[i]])),xlab ="", ylab="")
+                    }
+                    axis(1, mgp=c(3,xticks.pos,0), at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=axis.lwd,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=axis.cex)
+                    axis(2, las=1, lwd=axis.lwd,cex.axis=axis.cex)
+                    axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(ylim[[i]]))), labels=c("",""), tcl=0, lwd=axis.lwd)
+                    
+                    #plot the confidence interval of QQ-plot
+                    if(conf.int){
+                        if(is.null(conf.int.col)){
+                            polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
+                        }else{
+                            polygon(c(log.Quantiles[index],log.Quantiles),c(-log10(c05)[index],-log10(c95)),col=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255),border=rgb(t(col2rgb(conf.int.col[i])), alpha=points.alpha, maxColorValue=255))
+                        }
+                    }
+                    if(!is.null(threshold.col)){par(xpd=FALSE); abline(a=0, b=1,lwd=threshold.lty[1], lty=threshold.lty[1], col=threshold.col[1]); par(xpd=TRUE)}
+                    is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi=dpi)
+                    if(!is.null(threshold[[i]])){
+                        # if(sum(threshold!=0)==length(threshold)){
+                            thre.line=-log10(min_no_na(threshold[[i]]))
+                            if(amplify==TRUE){
+                                thre.index <- log.P.values<thre.line
+                                if(sum(!thre.index)!=0){
+                                    points(log.Quantiles[thre.index & is_visable], log.P.values[thre.index & is_visable], col=t(col)[i],pch=19,cex=cex[3])
+                                
+                                    #cover the points that exceed the threshold with the color "white"
+                                    # points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
+                                    if(is.null(signal.col)){
+                                        points(log.Quantiles[!thre.index],log.P.values[!thre.index],col=t(col)[i],pch=signal.pch[i],cex=signal.cex[i])
+                                    }else{
+                                        points(log.Quantiles[!thre.index],log.P.values[!thre.index],col=signal.col[i],pch=signal.pch[i],cex=signal.cex[i])
+                                    }
                                 }else{
-                                    points(log.Quantiles[!thre.index],log.P.values[!thre.index],col = signal.col[i],pch=signal.pch[i],cex=signal.cex[i])
+                                    points(log.Quantiles[is_visable], log.P.values[is_visable], col=t(col)[i],pch=19,cex=cex[3])
                                 }
                             }else{
-                                points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                                points(log.Quantiles[is_visable], log.P.values[is_visable], col=t(col)[i],pch=19,cex=cex[3])
                             }
-                        }else{
-                            points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
-                        }
-                    # }
-                }else{
-                    points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                        # }
+                    }else{
+                        points(log.Quantiles[is_visable], log.P.values[is_visable], col=t(col)[i],pch=19,cex=cex[3])
+                    }
+                    mtext(side=1, text=expression(Expected~~-log[10](italic(p))), line=ylab.pos+2, cex=lab.cex, font=lab.font, xpd=TRUE)
+                    if(i == 1)  mtext(side=2, text=expression(Observed~~-log[10](italic(p))), line=ylab.pos, cex=lab.cex, font=lab.font, xpd=TRUE)
+                    if(!is.null(main)) {
+                        title(main=main[i], cex.main=main.cex, font.main= main.font)
+                    }else{
+                        title(main=trait[i], cex.main=main.cex, font.main= main.font) 
+                    }
+                    if(box) box(lwd=axis.lwd)
                 }
-                if(!is.null(main)) {
-                    title(main = main[i], cex.main = main.cex, font.main= main.font)
-                }else{
-                    title(main = trait[i], cex.main = main.cex, font.main= main.font) 
-                }
-                mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+2, cex=cex.lab, font=1, xpd=TRUE)
-                if(i == 1)  mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
+                if(file.output) dev.off()
             }
-            if(box) box(lwd=lwd.axis)
-            if(file.output) dev.off()
-            if(R > 1){
+            if(multraits){
                 signal.col <- NULL
+                log.Quantiles.max_no_na <- NULL
+                for(i in 1:R){
+                    P.values=as.numeric(Pmap[,i+2])
+                    P.values=P.values[!is.na(P.values)]
+                    p_value_quantiles=(1:length(P.values))/(length(P.values)+1)
+                    log.Quantiles <- -log10(p_value_quantiles)
+                    log.Quantiles.max_no_na <- c(log.Quantiles.max_no_na, max_no_na(log.Quantiles))
+                }
                 if(file.output){
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
-                    if(file=="jpg") jpeg(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                    if(file=="pdf") pdf(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width = wh,height=ht)
-                    if(file=="tiff")    tiff(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-                    par(mar = c(mar[2],mar[2],mar[3],mar[4]),xpd=TRUE)
+                    if(file=="jpg") jpeg(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".jpg",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,quality=100)
+                    if(file=="pdf") pdf(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width=wh,height=ht)
+                    if(file=="tiff")    tiff(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width=wh*dpi,height=ht*dpi,res=dpi)
+                    if(file=="png") png(paste("Multi-traits_QQplot.",ifelse(file.name=="",taxa,file.name[1]),".png",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,bg=NA)
+                    par(mar=c(mar[2],mar[2],mar[3],mar[4]),xpd=TRUE)
                 }else{  
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
-                    dev.new(width = wh, height = ht)
+                    dev.new(width=wh, height=ht)
                     par(xpd=TRUE)
                 }
                 p_value_quantiles=(1:nrow(Pmap))/(nrow(Pmap)+1)
@@ -2298,17 +2274,17 @@ CMplot <- function(
                 if(is.null(ylim)){
                     Pmap.min_no_na <- Pmap[,3:(R+2)]
                     YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), -log10(min_no_na(Pmap.min_no_na[Pmap.min_no_na > 0]))))
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, floor(YlimMax+1)), main = "QQplot", cex.main=main.cex, font.main=main.font)
+                    plot(NULL, xlim=c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=axis.cex, cex.lab=lab.cex,ylim=c(0, floor(YlimMax+1)), main = "QQplot", cex.main=main.cex, font.main=main.font)
                 }else{
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0, max(unlist(ylim))),main = "QQplot", cex.main=main.cex, font.main=main.font)
+                    plot(NULL, xlim=c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=axis.cex, cex.lab=lab.cex,ylim=c(0, max(unlist(ylim))),main = "QQplot", cex.main=main.cex, font.main=main.font)
                 }
                 legend("topleft",trait,col=rgb(t(col2rgb(t(col)[1:R])), alpha=points.alpha, maxColorValue=255),pch=19,text.font=6,box.col=NA, xpd=TRUE)
-                axis(1, mgp=c(3,xticks.pos,0), at=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), cex.axis=cex.axis)
-                axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
-                axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(unlist(ylim)))), labels=c("",""), tcl=0, lwd=lwd.axis)
+                axis(1, mgp=c(3,xticks.pos,0), at=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), lwd=axis.lwd,labels=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), cex.axis=axis.cex)
+                axis(2, las=1,lwd=axis.lwd,cex.axis=axis.cex)
+                axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(unlist(ylim)))), labels=c("",""), tcl=0, lwd=axis.lwd)
 
-                mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+1, cex=cex.lab, font=1, xpd=TRUE)
-                mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
+                mtext(side=1, text=expression(Expected~~-log[10](italic(p))), line=ylab.pos+1, cex=lab.cex, font=lab.font, xpd=TRUE)
+                mtext(side=2, text=expression(Observed~~-log[10](italic(p))), line=ylab.pos, cex=lab.cex, font=lab.font, xpd=TRUE)
                 
                 for(i in 1:R){
                     if(verbose) cat(paste(" Multi-traits Q-Q plotting ",trait[i],".\n",sep=""))
@@ -2357,9 +2333,9 @@ CMplot <- function(
                         }
                     }
                        
-                    if((i == R) & !is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1,lwd=threshold.lty[1], lty=threshold.lty[1], col = threshold.col[1]); par(xpd=TRUE)}
-                    # points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
-                    is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi = dpi)
+                    if((i == R) & !is.null(threshold.col)){par(xpd=FALSE); abline(a=0, b=1,lwd=threshold.lty[1], lty=threshold.lty[1], col=threshold.col[1]); par(xpd=TRUE)}
+                    # points(log.Quantiles, log.P.values, col=t(col)[i],pch=19,cex=cex[3])
+                    is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi=dpi)
                     if(!is.null(threshold[[i]])){
                         # if(sum(threshold!=0)==length(threshold)){
                             thre.line=-log10(min_no_na(threshold[[i]]))
@@ -2386,7 +2362,10 @@ CMplot <- function(
                         points(log.Quantiles[is_visable], log.P.values[is_visable], col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255),pch=19,cex=cex[3])
                     }
                 }
-                if(box) box(lwd=lwd.axis)
+                if(!is.null(main)) {
+                    title(main=main[1], cex.main=main.cex, font.main= main.font)
+                }
+                if(box) box(lwd=axis.lwd)
                 if(file.output) dev.off()
             }
         }else{
@@ -2396,14 +2375,15 @@ CMplot <- function(
                 if(file.output){
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
-                    if(file=="jpg") jpeg(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".jpg",sep=""), width = wh*dpi,height=ht*dpi,res=dpi,quality = 100)
-                    if(file=="pdf") pdf(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".pdf",sep=""), width = wh,height=ht)
-                    if(file=="tiff") tiff(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".tiff",sep=""), width = wh*dpi,height=ht*dpi,res=dpi)
-                     par(mar = c(mar[2],mar[2],mar[3],mar[4]),xpd=TRUE)
+                    if(file=="jpg") jpeg(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".jpg",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,quality=100)
+                    if(file=="pdf") pdf(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".pdf",sep=""), width=wh,height=ht)
+                    if(file=="tiff") tiff(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".tiff",sep=""), width=wh*dpi,height=ht*dpi,res=dpi)
+                    if(file=="png") png(paste("QQplot.",ifelse(file.name=="",trait[i],file.name[i]),".png",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,bg=NA)
+                    par(mar=c(mar[2],mar[2],mar[3],mar[4]),xpd=TRUE)
                 }else{
                     ht=ifelse(is.null(height), 5.5, height)
                     wh=ifelse(is.null(width), 5.5, width)
-                    if(is.null(dev.list())) dev.new(width = wh, height = ht)
+                    if(is.null(dev.list())) dev.new(width=wh, height=ht)
                     par(xpd=TRUE)
                 }
                 P.values=as.numeric(Pmap[,i+2])
@@ -2443,16 +2423,16 @@ CMplot <- function(
                 }
                 if(is.null(ylim)){
                     YlimMax <- max_no_na(c(floor(max_no_na(c(max_no_na(-log10(c05)), max_no_na(-log10(c95))))+1), floor(max_no_na(log.P.values)+1)))
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,YlimMax),xlab="",ylab="")
+                    plot(NULL, xlim=c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=axis.cex, cex.lab=lab.cex,ylim=c(0,YlimMax),xlab="",ylab="")
                 }else{
-                    plot(NULL, xlim = c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=cex.axis, cex.lab=cex.lab,ylim=c(0,max(ylim[[i]])),xlab="",ylab="")      
+                    plot(NULL, xlim=c(0,floor(max_no_na(log.Quantiles)+1)), axes=FALSE, cex.axis=axis.cex, cex.lab=lab.cex,ylim=c(0,max(ylim[[i]])),xlab="",ylab="")      
                 }
-                axis(1, mgp=c(3,xticks.pos,0),at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=lwd.axis,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=cex.axis)
-                axis(2, las=1,lwd=lwd.axis,cex.axis=cex.axis)
-                axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(ylim[[i]]))), labels=c("",""), tcl=0, lwd=lwd.axis)
+                axis(1, mgp=c(3,xticks.pos,0),at=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), lwd=axis.lwd,labels=seq(0,floor(max_no_na(log.Quantiles)+1),ceiling((max_no_na(log.Quantiles)+1)/10)), cex.axis=axis.cex)
+                axis(2, las=1,lwd=axis.lwd,cex.axis=axis.cex)
+                axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(ylim[[i]]))), labels=c("",""), tcl=0, lwd=axis.lwd)
 
-                mtext(side = 1, text = expression(Expected~~-log[10](italic(p))), line = ylab.pos+1, cex=cex.lab, font=1, xpd=TRUE)
-                mtext(side = 2, text = expression(Observed~~-log[10](italic(p))), line = ylab.pos, cex=cex.lab, font=1, xpd=TRUE)
+                mtext(side=1, text=expression(Expected~~-log[10](italic(p))), line=ylab.pos+1, cex=lab.cex, font=lab.font, xpd=TRUE)
+                mtext(side=2, text=expression(Observed~~-log[10](italic(p))), line=ylab.pos, cex=lab.cex, font=lab.font, xpd=TRUE)
                 
                 #plot the confidence interval of QQ-plot
                 if(conf.int){
@@ -2463,16 +2443,16 @@ CMplot <- function(
                     }
                 }
 
-                if(!is.null(threshold.col)){par(xpd=FALSE); abline(a = 0, b = 1,lwd=threshold.lty[1], lty=threshold.lty[1], col = threshold.col[1]); par(xpd=TRUE)}
-                # points(log.Quantiles, log.P.values, col = t(col)[i],pch=19,cex=cex[3])
-                is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi = dpi)
+                if(!is.null(threshold.col)){par(xpd=FALSE); abline(a=0, b=1,lwd=threshold.lty[1], lty=threshold.lty[1], col=threshold.col[1]); par(xpd=TRUE)}
+                # points(log.Quantiles, log.P.values, col=t(col)[i],pch=19,cex=cex[3])
+                is_visable <- filter.points(log.Quantiles, log.P.values, wh, ht, dpi=dpi)
                 if(!is.null(threshold[[i]])){
                     # if(sum(threshold!=0)==length(threshold)){
                         thre.line=-log10(min_no_na(threshold[[i]]))
                         if(amplify==TRUE){
                             thre.index <- log.P.values<thre.line
                             if(sum(!thre.index)!=0){
-                                points(log.Quantiles[thre.index & is_visable], log.P.values[thre.index & is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                                points(log.Quantiles[thre.index & is_visable], log.P.values[thre.index & is_visable], col=t(col)[i],pch=19,cex=cex[3])
                             
                                 #cover the points that exceed the threshold with the color "white"
                                 # points(log.Quantiles[thre.index],log.P.values[thre.index], col = "white",pch=19,cex=cex[3])
@@ -2480,26 +2460,26 @@ CMplot <- function(
                                 # print(signal.pch)
                                 # print(signal.cex)
                                 if(is.null(signal.col)){
-                                    points(log.Quantiles[!thre.index],log.P.values[!thre.index],col = t(col)[i],pch=signal.pch[i],cex=signal.cex[i])
+                                    points(log.Quantiles[!thre.index],log.P.values[!thre.index],col=t(col)[i],pch=signal.pch[i],cex=signal.cex[i])
                                 }else{
-                                    points(log.Quantiles[!thre.index],log.P.values[!thre.index],col = signal.col[i],pch=signal.pch[i],cex=signal.cex[i])
+                                    points(log.Quantiles[!thre.index],log.P.values[!thre.index],col=signal.col[i],pch=signal.pch[i],cex=signal.cex[i])
                                 }
                             }else{
-                                points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                                points(log.Quantiles[is_visable], log.P.values[is_visable], col=t(col)[i],pch=19,cex=cex[3])
                             }
                         }else{
-                            points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                            points(log.Quantiles[is_visable], log.P.values[is_visable], col=t(col)[i],pch=19,cex=cex[3])
                         }
                     # }
                 }else{
-                    points(log.Quantiles[is_visable], log.P.values[is_visable], col = t(col)[i],pch=19,cex=cex[3])
+                    points(log.Quantiles[is_visable], log.P.values[is_visable], col=t(col)[i],pch=19,cex=cex[3])
                 }
                 if(!is.null(main)) {
-                    title(main = main[i], cex.main = main.cex, font.main= main.font)
+                    title(main=main[i], cex.main=main.cex, font.main= main.font)
                 }else{
-                    title(main = trait[i], cex.main = main.cex, font.main= main.font) 
+                    title(main=trait[i], cex.main=main.cex, font.main= main.font) 
                 }
-                if(box) box(lwd=lwd.axis)
+                if(box) box(lwd=axis.lwd)
                 if(file.output) dev.off()
             }
         }

@@ -1,5 +1,5 @@
 # CMplot 
-[![GitHub issues](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=green)](https://github.com/YinLiLin/CMplot/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-4.3.1-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FYinLiLin%2FCMplot"/></a>
+[![GitHub issues](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=green)](https://github.com/YinLiLin/CMplot/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-4.4.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FYinLiLin%2FCMplot"/></a>
 
 ## A high-quality drawing tool designed for Manhattan plot of genomic analysis
 
@@ -155,7 +155,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 
 ---
 
-### Single_track Rectangular-Manhattan plot
+### Rectangular-Manhattan plot
 
 #### Genome-wide association study(GWAS)
 
@@ -301,17 +301,15 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > genes <- paste("GENE", 1:length(SNPs), sep="_")
 > set.seed(666666)
 > CMplot(pig60K[,c(1:3,5)], plot.type="m",LOG10=TRUE,col=c("grey30","grey60"),highlight=SNPs,
-        highlight.col=c("red","blue","green"),highlight.cex=1,highlight.pch=c(15:17), highlight.text=genes,      
-        highlight.text.col=c("red","blue","green"),threshold=0.05/nrow(pig60K),threshold.lty=2,   
+        highlight.col=rep(c("green","blue"),length=length(SNPs)),highlight.cex=1, highlight.text=genes,      
+        highlight.text.col=rep("red",length(SNPs)),threshold=0.05/nrow(pig60K),threshold.lty=2,   
         amplify=FALSE,file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,width=14,height=6)
 # Note:
-# 'highlight', 'highlight.text', 'highlight.text.xadj', 'highlight.text.yadj' could be vector or list, if it is a vector, 
-# all traits will use the same highlighted SNPs index and text, if it is a list, the length of the list should equal to the number of traits.
+# 'highlight', 'highlight.text' could be vector or list, if it is a vector, all traits will 
+# use the same highlighted SNPs index and text, if it is a list, the length of the list should equal to the number of traits.
 # the order of 'highlight.text' must be consistent with 'highlight'
 # highlight.text.cex: value or vecter, control the size of added text
 # highlight.text.font: value or vecter, control the font of added text
-# highlight.text.xadj: value or vecter or list for multiple traits, -1, 0, 1 limited, control the position of text around the highlighted SNPs: -1(left), 0(center), 1(right)
-# highlight.text.yadj: value or vector or list for multiple traits, same as above, -1(down), 0(center), 1(up)
 ```
 
 </p>
@@ -352,7 +350,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 </a>
 </p>
 
-### Multi_tracks Rectangular-Manhattan plot
+### Multiple tracks Rectangular-Manhattan plot
 
 ```r
 > SNPs <- list(
@@ -361,23 +359,12 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 	pig60K$SNP[pig60K$trait3<1e-6]
 )
 > CMplot(pig60K, plot.type="m",multracks=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
-        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
-        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),
-        signal.cex=1, file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,
-        highlight=SNPs, highlight.text=SNPs, highlight.text.cex=1.4)
+        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE, signal.col=
+        c("red","green"), signal.cex=1, file="jpg",file.name="",dpi=300,file.output=TRUE,
+        verbose=TRUE, highlight=SNPs, highlight.text=SNPs, highlight.text.cex=1.4)
 #Note: if you are not supposed to change the color of signal, 
 #          please set signal.col=NULL and highlight.col=NULL.
 ```
-
-#### a. all traits in one axes:
-
-<p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4_1.jpg">
-<img src="Figure/4_1.jpg" height="385px" width="900px">
-</a>
-</p>
-
-#### b. all traits in separated axes:
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/5_new.jpg">
@@ -385,9 +372,25 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 </a>
 </p>
 
+### Multiple traits Rectangular-Manhattan plot
+```r
+> CMplot(pig60K, plot.type="m",multraits=TRUE,threshold=c(1e-6,1e-4),threshold.lty=c(1,2), 
+        threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
+        chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),
+        signal.cex=1, file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,
+        highlight=SNPs, highlight.text=SNPs, highlight.text.cex=1.4, 
+        trait.legend.ncol=1, trait.legend.pos="left")
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4_1.jpg">
+<img src="Figure/4_1.jpg" height="385px" width="900px">
+</a>
+</p>
+
 ---
 
-### Single_track Q-Q plot
+### Q-Q plot
 
 ```r
 > CMplot(pig60K,plot.type="q",box=FALSE,file="jpg",file.name="",dpi=300,
@@ -401,29 +404,35 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 </a>
 </p>
 
-### Multi_tracks Q-Q plot
+### Multiple tracks Q-Q plot
 
 ```r
 > pig60K$trait1[sample(1:nrow(pig60K), round(nrow(pig60K)*0.80))] <- NA
 > pig60K$trait2[sample(1:nrow(pig60K), round(nrow(pig60K)*0.25))] <- NA
-> CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),threshold=1e-6,
-        ylab.pos=2,signal.pch=c(19,6,4),signal.cex=1.2,signal.col="red",conf.int=TRUE,box=FALSE,multracks=
-        TRUE,cex.axis=2,file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,ylim=c(0,8),width=5,height=5)
+> CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),multracks=TRUE,
+        threshold=1e-6,ylab.pos=2,signal.pch=c(19,6,4),signal.cex=1.2,signal.col="red",
+        conf.int=TRUE,box=FALSE,axis.cex=2,file="jpg",file.name="",dpi=300,file.output=TRUE,
+        verbose=TRUE,ylim=c(0,8),width=5,height=5)
 ```
-
-#### a. all traits in a axes:
-
-<p align="center">
-<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/8.jpg">
-<img src="Figure/8.jpg" height="450px" width="450px">
-</a>
-</p>
-
-#### b. all traits in separated axes:
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/7.jpg">
 <img src="Figure/7.jpg" height="280px" width="1400px">
+</a>
+</p>
+
+### Multiple traits Q-Q plot
+
+```r
+> CMplot(pig60K,plot.type="q",col=c("dodgerblue1", "olivedrab3", "darkgoldenrod1"),multraits=TRUE,
+        threshold=1e-6,ylab.pos=2,signal.pch=c(19,6,4),signal.cex=1.2,signal.col="red",
+        conf.int=TRUE,box=FALSE,axis.cex=1,file="jpg",file.name="",dpi=300,file.output=TRUE,
+        verbose=TRUE,ylim=c(0,8),width=5,height=5)
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/8.jpg">
+<img src="Figure/8.jpg" height="450px" width="450px">
 </a>
 </p>
 
@@ -435,10 +444,3 @@ Questions, suggestions, and bug reports are welcome and appreciated.
 - **Contact:** ylilin@163.com
 - **QQ group:** 166305848
 - **Institution:** [*Huazhong agricultural university*](http://www.hzau.edu.cn/en/HOME.htm)
-
-<p align="center">
-<a href="https://ga-beacon.appspot.com/UA-132438702-1/R-CMplot/readme?pixel">
-<img src="https://ga-beacon.appspot.com/UA-132438702-1/R-CMplot/readme?pixel">
-</a>
-</p>
-
