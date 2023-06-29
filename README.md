@@ -103,8 +103,8 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 #### (1) Genome-wide association study(GWAS)
 
 ```r
-> CMplot(pig60K,type="p",plot.type="c",chr.labels=paste("Chr",c(1:18,"X","Y"),sep=""),r=0.4,cir.legend=TRUE,
-        outward=FALSE,cir.legend.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
+> CMplot(pig60K,type="p",plot.type="c",chr.labels=paste("Chr",c(1:18,"X","Y"),sep=""),r=0.4,cir.axis=TRUE,
+        outward=FALSE,cir.axis.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
         file.name="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
 # file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '
 ```
@@ -139,7 +139,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ```r
 > CMplot(cattle50K,type="p",plot.type="c",LOG10=FALSE,outward=TRUE,col=matrix(c("#4DAF4A",NA,NA,"dodgerblue4",
          "deepskyblue",NA,"dodgerblue1", "olivedrab3", "darkgoldenrod1"), nrow=3, byrow=TRUE),
-         chr.labels=paste("Chr",c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,cir.legend.cex=0.5,
+         chr.labels=paste("Chr",c(1:29),sep=""),threshold=NULL,r=1.2,cir.chr.h=1.5,axis.cex=1,
          cir.band=1,file="jpg", file.name="",dpi=300,chr.den.col="black",file.output=TRUE,verbose=TRUE,
          width=10,height=10)
         
@@ -315,7 +315,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 </p>
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/2-5.jpg">
-<img src="Figure/2-5.jpg" height="365px" width="900px">
+<img src="Figure/2-5.jpg" height="350px" width="900px">
 </a>
  
 #### Genomic Selection/Prediction(GS/GP) or other none p-values

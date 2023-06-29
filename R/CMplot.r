@@ -18,8 +18,8 @@ CMplot <- function(
     multracks.xaxis=FALSE,
     multraits=FALSE,
     points.alpha=100L,
-    cex=c(0.5,1,1),
     r=0.3,
+    cex=c(0.5,1,1),
     outward=FALSE,
     ylab=expression(-log[10](italic(p))),
     ylab.pos=3,
@@ -52,9 +52,8 @@ CMplot <- function(
     cir.band=1,
     cir.chr=TRUE,
     cir.chr.h=1.5,
-    cir.legend=TRUE,
-    cir.legend.cex=0.6,
-    cir.legend.col="black",
+    cir.axis=TRUE,
+    cir.axis.col="black",
     LOG10=TRUE,
     box=FALSE,
     conf.int=TRUE,
@@ -974,7 +973,7 @@ CMplot <- function(
                     is_visable <- rep(TRUE, length(X))
                 }
 
-                if(cir.legend==TRUE){
+                if(cir.axis==TRUE){
                     circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
@@ -985,7 +984,7 @@ CMplot <- function(
                 points(X[is_visable],Y[is_visable],pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]])[ylimIndx][is_visable])
                 
                 #plot the legend for each trait
-                if(cir.legend==TRUE){
+                if(cir.axis==TRUE){
                     #try to get the number after radix point
                     if((Max-Min) > 1) {
                         round.n=2
@@ -996,19 +995,19 @@ CMplot <- function(
                             round.n=nchar(as.character(10^(-ceiling(-log10(Max)))))-1
                         }
                     }
-                    segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-0.75)+cir.band*(i-1),H/20,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+                    segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-0.75)+cir.band*(i-1),H/20,r+H*(i-0.75)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
 
                     lab=seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length=5)
-                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
-                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
-                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
-                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
-                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[1],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
+                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[2],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
+                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
+                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[4],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
+                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[5],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
                 }
                 
                 if(!is.null(threshold[[i]])){
@@ -1095,18 +1094,18 @@ CMplot <- function(
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                             angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=axis.cex, adj=c(0.5, 0))
+                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=lab.cex-0.5, adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab, sep=""),srt=angle, adj=c(0.5, 0),font=lab.font,cex=axis.cex)
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab, sep=""),srt=angle, adj=c(0.5, 0),font=lab.font,cex=lab.cex-0.5)
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=axis.cex, adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=lab.cex-0.5, adj=c(0.5, 0))
                             }
                         }
                     }
@@ -1118,18 +1117,18 @@ CMplot <- function(
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                         angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                        text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                        text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab, sep=""),srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab, sep=""),srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                             }
                         }
                     }
@@ -1219,7 +1218,7 @@ CMplot <- function(
                     is_visable <- rep(TRUE, length(X))
                 }
 
-                if(cir.legend==TRUE){
+                if(cir.axis==TRUE){
                     circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
@@ -1229,7 +1228,7 @@ CMplot <- function(
 
                 points(X[is_visable],Y[is_visable],pch=19,cex=cex[1],col=rep(rep(colx,N[i]),add[[i]])[ylimIndx][is_visable])
                 
-                if(cir.legend==TRUE){
+                if(cir.axis==TRUE){
                     
                     #try to get the number after radix point
                     if((Max-Min)<=1) {
@@ -1241,19 +1240,19 @@ CMplot <- function(
                     }else{
                         round.n=2
                     }
-                    segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-0.75)+cir.band*(i-1),H/20,r+H*(i-0.75)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
-                    segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.legend.col,lwd=1.5)
+                    segments(0,r+H*(i-1)+cir.band*(i-1),0,r+H*i+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-1)+cir.band*(i-1),H/20,r+H*(i-1)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-0.75)+cir.band*(i-1),H/20,r+H*(i-0.75)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-0.5)+cir.band*(i-1),H/20,r+H*(i-0.5)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-0.25)+cir.band*(i-1),H/20,r+H*(i-0.25)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
+                    segments(0,r+H*(i-0)+cir.band*(i-1),H/20,r+H*(i-0)+cir.band*(i-1),col=cir.axis.col,lwd=axis.lwd)
                     
                     lab=seq(round(Min+(Max-Min)*0,round.n), round(Min+(Max-Min)*1,round.n), length=5)
-                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[1],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
-                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[2],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
-                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
-                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[4],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
-                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[5],adj=1,col=cir.legend.col,cex=cir.legend.cex,font=lab.font)
+                    text(-H/20,r+H*(i-0.06)+cir.band*(i-1),lab[1],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
+                    text(-H/20,r+H*(i-0.25)+cir.band*(i-1),lab[2],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
+                    text(-H/20,r+H*(i-0.5)+cir.band*(i-1),lab[3],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
+                    text(-H/20,r+H*(i-0.75)+cir.band*(i-1),lab[4],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
+                    text(-H/20,r+H*(i-0.94)+cir.band*(i-1),lab[5],adj=1,col=cir.axis.col,cex=axis.cex*0.5,font=lab.font)
                 }
                 
                 if(!is.null(threshold[[i]])){
@@ -1336,18 +1335,18 @@ CMplot <- function(
                     if(is.null(chr.labels)){
                         for(t in 1:length(ticks)){
                           angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                          text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                          text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab,sep=""),srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab,sep=""),srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                             }
                         }
                     }
@@ -1361,18 +1360,18 @@ CMplot <- function(
                         
                             #adjust the angle of labels of circle plot
                             angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                            text(ticks1[t],ticks2[t],chr.ori[t],srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                         }
                     }else{
                         if(Nchr == 1){
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab,sep=""),srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],paste(chr.labels[t], bp_lab,sep=""),srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                             }
                         }else{
                             for(t in 1:length(ticks)){
                                 angle=360*(1-(ticks-round(band/2)-circleMin)[t]/TotalN)
-                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=axis.cex,adj=c(0.5, 0))
+                                text(ticks1[t],ticks2[t],chr.labels[t],srt=angle,font=lab.font,cex=lab.cex-0.5,adj=c(0.5, 0))
                             }
                         }
                     }   
