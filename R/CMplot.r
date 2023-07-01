@@ -4,6 +4,7 @@ CMplot <- function(
     bin.size=1e6,
     bin.range=NULL,
     bin.legend.num=10,
+    LOG10=TRUE,
     pch=19,
     type="p",
     band=1,
@@ -54,8 +55,7 @@ CMplot <- function(
     cir.chr.h=1.5,
     cir.axis=TRUE,
     cir.axis.col="black",
-    LOG10=TRUE,
-    box=FALSE,
+    cir.axis.grid=TRUE,
     conf.int=TRUE,
     conf.int.col=NULL,
     file.output=TRUE,
@@ -70,6 +70,7 @@ CMplot <- function(
     trait.legend.ncol=NULL,
     trait.legend.cex=NULL,
     trait.legend.pos=c("left","middle","right"),
+    box=FALSE,
     verbose=TRUE
 )
 {   
@@ -973,7 +974,7 @@ CMplot <- function(
                     is_visable <- rep(TRUE, length(X))
                 }
 
-                if(cir.axis==TRUE){
+                if(cir.axis && cir.axis.grid){
                     circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
@@ -1218,7 +1219,7 @@ CMplot <- function(
                     is_visable <- rep(TRUE, length(X))
                 }
 
-                if(cir.axis==TRUE){
+                if(cir.axis && cir.axis.grid){
                     circle.plot(myr=r+H*(i-1)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     circle.plot(myr=r+H*(i-0.75)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')
                     circle.plot(myr=r+H*(i-0.5)+cir.band*(i-1),lwd=0.5,add=TRUE,col='grey')

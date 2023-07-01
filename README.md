@@ -79,13 +79,11 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ```r
 > CMplot(pig60K,type="p",plot.type="d",bin.size=1e6,chr.den.col=c("darkgreen", "yellow", "red"),file="jpg",file.name="",dpi=300,
     main="illumilla_60K",file.output=TRUE,verbose=TRUE,width=9,height=6)
-# users can personally set the windowsize and the min/max of legend by:
-# bin.size=1e6
-# bin.range=c(min, max)
-# file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '
+# users can personally set the window size and the min/max of legend by: bin.size=1e6, bin.range=c(min, max)
+# file: the format of the output file, if file="png", CMplot will output a transparent background file 
+# file.name: specify the output file name, the default is corresponding column name when setting file.name=""
 # chr.labels: change the chromosome names
-# main: change the title of the plots, for manhattan plot, if there are more than one trait, main can be
-#       assigned as a character vector containing the desired title for each trait
+# main: change the title of the plots
 # NOTE: to show the full length of each chromosome, users can manually add every chromosome with one SNP, whose
 # position equals to the length of corresponding chromosome, then assign the parameter in CMplot: CMplot(..., "chr.pos.max=TRUE").
 ```
@@ -106,8 +104,8 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(pig60K,type="p",plot.type="c",chr.labels=paste("Chr",c(1:18,"X","Y"),sep=""),r=0.4,cir.axis=TRUE,
         outward=FALSE,cir.axis.col="black",cir.chr.h=1.3,chr.den.col="black",file="jpg",
         file.name="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
-# file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '
-```
+# to remove the grid line in circles, add parameter cir.axis.grid=FALSE
+# file.name: specify the output file name, the default is corresponding column name
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/9.jpg">
@@ -202,9 +200,9 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
         signal.pch=c(19,19),file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,
         width=14,height=6)
 
-# Note: if the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts 
-# file.name: specify the output file name, the default is corresponding column name when setting ' file.name="" '
-   the number of SNP within given size('bin.size') will be plotted.
+# Note: if the length of parameter 'chr.den.col' is bigger than 1, SNP density that counts
+#       the number of SNP within given size('bin.size') will be plotted. 
+# file.name: specify the output file name, the default is corresponding column name when setting file.name=""
 ```
 
 </p>
@@ -340,7 +338,6 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 > CMplot(cattle50K, type="h",plot.type="m", band=0.5, LOG10=FALSE, ylab="SNP effect",ylim=c(-0.02,0.02),
         threshold.lty=2, threshold.lwd=1, threshold.col="red", amplify=FALSE,cex=0.6,
         chr.den.col=NULL, file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE)
-
 #Note: Positive and negative values are acceptable.
 ```
 
