@@ -106,7 +106,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
         file.name="",dpi=300,file.output=TRUE,verbose=TRUE,width=10,height=10)
 # to remove the grid line in circles, add parameter cir.axis.grid=FALSE
 # file.name: specify the output file name, the default is corresponding column name
-
+```
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/9.jpg">
 <img src="Figure/9.jpg" height="480px" width="480px">
