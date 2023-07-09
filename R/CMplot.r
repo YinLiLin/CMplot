@@ -2,8 +2,7 @@ CMplot <- function(
     Pmap,
     col=c("#4197d8", "#f8c120", "#413496", "#495226", "#d60b6f", "#e66519", "#d581b7", "#83d3ad", "#7c162c", "#26755d"),
     bin.size=1e6,
-    bin.range=NULL,
-    bin.legend.num=10,
+    bin.breaks=NULL,
     LOG10=TRUE,
     pch=19,
     type="p",
@@ -335,7 +334,9 @@ CMplot <- function(
     }
 
     DensityPlot <- function(
-        map,
+        chr,
+        pos,
+        chr.orig.labels,
         col=c("darkgreen", "yellow", "red"),
         main=NULL,
         main.cex=1.2,
@@ -343,41 +344,32 @@ CMplot <- function(
         chr.labels=NULL, 
         chr.pos.max=FALSE,
         bin=1e6,
+        bin.breaks=NULL,
         band=3,
         width=5,
-        legend.len=10,
-        legend.max=NULL,
-        legend.min=1,
-        legend.pt.cex=3,
         legend.cex=1,
         legend.y.intersp=1,
         legend.x.intersp=1,
-        file.output=TRUE,
         plot=TRUE,
         dpi=NULL,
         wh=NULL,
         ht=NULL
     )
     {
-        if(is.null(legend.min)) legend.min=1
-        if(is.null(col) | length(col) == 1){col=c("darkgreen", "yellow", "red")}
-        map <- map[map[, 2] != "0", ]
-        map <- as.matrix(map)
-        map <- map[!is.na(map[, 2]), ]
-        suppressWarnings(map <- map[!is.na(as.numeric(map[, 3])), ])
-        #map <- map[map[, 3] != 0, ]
-        suppressWarnings(max.chr <- max(as.numeric(map[, 2]), na.rm=TRUE))
-        if(is.infinite(max.chr))    max.chr <- 0
-        suppressWarnings(map.xy.index <- which(!as.numeric(map[, 2]) %in% c(0 : max.chr)))
-        if(length(map.xy.index) != 0){
-            chr.xy <- unique(map[map.xy.index, 2])
-            for(i in 1:length(chr.xy)){
-                map[map[, 2] == chr.xy[i], 2] <- max.chr + i
+        legend.min <- 1
+        legend.max <- NULL
+        if(!is.null(bin.breaks)){
+            bin.breaks <- sort(bin.breaks)
+            if(sum(bin.breaks < 0)) stop("breaks should not contain a negative value.")
+            if(bin.breaks[1]){
+                legend.min <- bin.breaks[1]
+            }else{
+                bin.breaks <- bin.breaks[-1]
             }
+            legend.max <- bin.breaks[length(bin.breaks)]
         }
-        map <- map[order(as.numeric(map[, 2]), as.numeric(map[, 3])), ]
-        chr <- as.numeric(map[, 2])
-        pos <- as.numeric(map[, 3])
+        if(is.null(col) | length(col) == 1){col=c("darkgreen", "yellow", "red")}
+        max.chr <- max(chr)
         chr.num <- unique(chr)
         chorm.maxlen <- max(pos)
         bp <- ifelse(chorm.maxlen < 1e3, 1, ifelse(chorm.maxlen < 1e6, 1e3, 1e6))
@@ -388,8 +380,9 @@ CMplot <- function(
         chr.pos.max.v <- NULL
         col.index <- list()
         maxbin.num <- NULL
+        windinfo <- list()
         for(i in 1 : length(chr.num)){
-            pos.x[[i]] <- pos[which(chr == chr.num[i])]
+            pos.x[[i]] <- pos[chr == chr.num[i]]
             maxposindx <- which.max(pos.x[[i]])
             max.pos <- pos.x[[i]][maxposindx]
             chr.pos.max.v <- c(chr.pos.max.v, max.pos)
@@ -398,8 +391,9 @@ CMplot <- function(
                 pos.x[[i]] <- pos.x[[i]][-maxposindx]
             }
             if(cut.len <= 1){
-                maxbin.num <- c(maxbin.num,length(pos.x[[i]]))
+                maxbin.num <- c(maxbin.num, length(pos.x[[i]]))
                 col.index[[i]] <- rep(length(pos.x[[i]]), length(pos.x[[i]]))
+                names(col.index[[i]]) <- 1
             }else{
                 cut.r <- cut(c(0, pos.x[[i]], max.pos), cut.len, labels=FALSE)
                 cut.r <- cut.r[-c(1, length(cut.r))]
@@ -407,12 +401,25 @@ CMplot <- function(
                 maxbin.num <- c(maxbin.num, max(eachbin.num))
                 col.index[[i]] <- rep(eachbin.num, eachbin.num)
             }
+            if(plot){
+                windinfo <- c(windinfo, tapply(pos.x[[i]], as.numeric(names(col.index[[i]])), function(x){
+                    return(c(ifelse(!is.null(chr.labels), chr.labels[i], chr.orig.labels[i]),
+                        min(x),max(x),length(x)))})
+                )
+            }
+        }
+        if(plot){
+            windinfo <- as.data.frame(do.call(rbind, windinfo))
+            colnames(windinfo) <- c("Chr", "Start", "End", "Num")
+            rownames(windinfo) <- NULL
+            for(i in 2:ncol(windinfo)){windinfo[, i]<-as.numeric(windinfo[, i])}
         }
         Maxbin.num <- max(maxbin.num)
         maxbin.num <- Maxbin.num
         if(!is.null(legend.max)){
             maxbin.num <- legend.max
         }
+        if(Maxbin.num <= legend.min)    stop("the maximum number of markers in windows is smaller than the lower boundary of breaks.")
         col=colorRampPalette(col)(maxbin.num - legend.min + 1)
         col.seg=NULL
         for(i in 1 : length(chr.num)){
@@ -428,27 +435,24 @@ CMplot <- function(
                 }
             }
             col.index[[i]][col.index[[i]] < legend.min] <- legend.min
-            col.seg <- c(col.seg, col[round(col.index[[i]] * length(col) / maxbin.num)])
-            if(file.output){
-                is_visable <-  filter.points(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), wh, ht, dpi=dpi)
+            if(!plot)   col.seg <- c(col.seg, col[col.index[[i]] - legend.min + 1])
+            if(!is.null(ht) && !is.null(wh) && !is.null(dpi)){
+                is_visable <-  filter.points(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), wh * (max(pos.x[[i]])/chorm.maxlen), ht, dpi=dpi)
+                if(plot)    segments(pos.x[[i]][is_visable], -width/5 - band * (i - length(chr.num) - 1), pos.x[[i]][is_visable], width/5 - band * (i - length(chr.num) - 1), 
+                                col=col[col.index[[i]][is_visable] - legend.min + 1], lwd=1)
             }else{
-                is_visable <- rep(TRUE, length(pos.x[[i]]))
-            }
-            if(plot)    segments(pos.x[[i]][is_visable], -width/5 - band * (i - length(chr.num) - 1), pos.x[[i]][is_visable], width/5 - band * (i - length(chr.num) - 1), 
-            col=col[round(col.index[[i]] * length(col) / (maxbin.num - legend.min + 1)) - legend.min + 1][is_visable], lwd=1)
-        }
-        if(length(map.xy.index) != 0){
-            for(i in 1:length(chr.xy)){
-                chr.num[chr.num == max.chr + i] <- chr.xy[i]
+                if(plot)    segments(pos.x[[i]], -width/5 - band * (i - length(chr.num) - 1), pos.x[[i]], width/5 - band * (i - length(chr.num) - 1), 
+                                col=col[col.index[[i]] - legend.min + 1], lwd=1)
             }
         }
-        chr.num <- rev(chr.num)
+        
+        chr.num <- rev(chr.orig.labels)
         if(plot){
             if(!is.null(chr.labels)){
-                mtext(at=seq(band, length(chr.num) * band, band),text=chr.labels, side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
+                mtext(at=seq(band, length(chr.num) * band, band), text=chr.labels, side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
             }else{
-                if(max.chr == 0)    mtext(at=seq(band, length(chr.num) * band, band),text=chr.num, side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
-                if(max.chr != 0)    mtext(at=seq(band, length(chr.num) * band, band),text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
+                if(max.chr == 0)    mtext(at=seq(band, length(chr.num) * band, band), text=chr.num, side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
+                if(max.chr != 0)    mtext(at=seq(band, length(chr.num) * band, band), text=paste("Chr", chr.num, sep=""), side=2, las=2, font=1, cex=axis.cex*0.6, line=0.2, xpd=TRUE)
             }
         }
         if(plot){
@@ -463,52 +467,44 @@ CMplot <- function(
             if((chorm.maxlen/bp - max(xticks)) > 0.5*xticks[2]){
                 xticks=c(xticks, round(chorm.maxlen / bp))
             }
-            axis(3, at=xticks*bp, labels=paste(xticks, bp_label, sep=""),
-            font=1, cex.axis=axis.cex*0.8, tck=0.01, lwd=axis.lwd, padj=1.2)
+            axis(3, at=xticks*bp, labels=paste(xticks, bp_label, sep=""), font=1, cex.axis=axis.cex*0.8, tck=0.01, lwd=axis.lwd, padj=1.2)
             axis(3, at=c(0, chorm.maxlen), labels=c("",""), tcl=0, lwd=axis.lwd)
         }
-        # image(c(chorm.maxlen-chorm.maxlen * legend.width / 20 , chorm.maxlen), 
-        # round(seq(band - width/5, (length(chr.num) * band + band) * legend.height / 2 , length=maxbin.num+1), 2), 
-        # t(matrix(0 : maxbin.num)), col=c("white", rev(heat.colors(maxbin.num))), add=TRUE)
-                
-        if(maxbin.num <= legend.len)    legend.len <- maxbin.num        
-        
-        legend.y <- round(seq(legend.min, maxbin.num, length=legend.len))
-        legend.y <- unique(legend.y)
-        len <- ifelse(length(legend.y)==1, 1, legend.y[2] - legend.y[1])
-        legend.y <- seq(legend.min, maxbin.num, len)
-        if(!is.null(legend.max)){
-            if(legend.max < Maxbin.num){
-                if(!maxbin.num %in% legend.y){
-                    legend.y <- c(legend.y, paste(">=", maxbin.num, sep=""))
-                    legend.y.col <- c(legend.y[c(-length(legend.y))], maxbin.num)
-                }else{
-                    legend.y[length(legend.y)] <- paste(">=", maxbin.num, sep="")
-                    legend.y.col <- c(legend.y[c(-length(legend.y))], maxbin.num)
-                }
-            }else{
-                if(!maxbin.num %in% legend.y){
-                    legend.y <- c(legend.y, maxbin.num)
-                }
-                legend.y.col <- c(legend.y)
-            }
+
+        if(is.null(bin.breaks)){
+            legend.len <- 10
+            if(maxbin.num <= legend.len)    legend.len <- maxbin.num
+            legend.y <- round(seq(0, maxbin.num, length=legend.len + 1))
+            legend.y <- unique(legend.y)
+            len <- ifelse(length(legend.y)==1, 1, legend.y[2])
+            legend.y <- seq(legend.y[2], maxbin.num, len)
         }else{
-            if(!maxbin.num %in% legend.y){
-                legend.y <- c(legend.y, paste(">", max(legend.y), sep=""))
+            legend.y <- bin.breaks
+        }
+        
+        if(!is.null(bin.breaks)){
+            if(legend.max < Maxbin.num){
+                legend.y[length(legend.y)] <- paste(">=", maxbin.num, sep="")
                 legend.y.col <- c(legend.y[c(-length(legend.y))], maxbin.num)
             }else{
-                legend.y.col <- c(legend.y)
+                legend.y.col <- legend.y
             }
+        }else{
+            legend.y.col <- legend.y
         }
         if(legend.min != 1){
             legend.y[1] <- paste("<=", legend.min, sep="")
         }
-        legend.y <- c(0, legend.y)
+        legend.y <- c("0", legend.y)
         legend.y.col <- as.numeric(legend.y.col)
-        legend.col <- c("grey95", col[round(legend.y.col * length(col) / (maxbin.num - legend.min + 1)) - legend.min + 1])
-        if(plot)    legend(x=(chorm.maxlen + chorm.maxlen/100), y=( -width/2.5 - band * (length(chr.num) - length(chr.num) - 1)), title="", legend=legend.y, pch=15, pt.cex=legend.pt.cex, col=legend.col,
+        legend.col <- c("grey95", col[legend.y.col - legend.min + 1])
+        if(plot){
+            legend(x=(chorm.maxlen + chorm.maxlen/100), y=(-width/2.5 - band * (length(chr.num) - length(chr.num) - 1)), title="", legend=legend.y, pch=15, pt.cex=legend.cex*3, col=legend.col,
             cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=legend.x.intersp, yjust=0, xjust=0, xpd=TRUE)
-        if(!plot)   return(list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y))
+            return(windinfo)
+        }else{
+            return(list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y))
+        }
     }
 
     if(!all(plot.type %in% c("c","m","q","d"))) stop("unknown 'plot.type'.")
@@ -527,7 +523,47 @@ CMplot <- function(
     if(!is.integer(points.alpha))    stop("invalid 'points.alpha': must an integer between")
     if(points.alpha < 0L || points.alpha > 255L)   stop("out-of range 'points.alpha': must be between 0 and 255")
 
+    #get the number of traits
+    R=ncol(Pmap)-3
+
+    #remove illegal SNPs
+    suppressWarnings(Pmap <- Pmap[Pmap[, 2] != "0", ])
+    Pmap <- as.matrix(Pmap)
+    Pmap <- Pmap[!is.na(Pmap[, 2]), ]
+    suppressWarnings(Pmap <- Pmap[!is.na(as.numeric(Pmap[, 3])), ])
+
+    #replace the non-euchromosome
+    suppressWarnings(numeric.chr <- as.numeric(Pmap[, 2]))
+    suppressWarnings(max.chr <- max(numeric.chr, na.rm=TRUE))
+    if(is.infinite(max.chr))    max.chr <- 0
+    suppressWarnings(map.xy.index <- which(!numeric.chr %in% c(0:max.chr)))
+    if(length(map.xy.index) != 0){
+        chr.xy <- unique(Pmap[map.xy.index, 2])
+        for(i in 1:length(chr.xy)){
+            Pmap[Pmap[, 2] == chr.xy[i], 2] <- max.chr + i
+        }
+    }
+    SNP_id <- Pmap[,1]
+
+    #delete the column of SNPs names
+    Pmap <- Pmap[, -1]
+    Pmap <- apply(Pmap, 2, as.numeric)
+    order_index <- order(Pmap[, 1], Pmap[,2])
+
+    #order the GWAS results by chromosome and position
+    Pmap <- Pmap[order_index, ]
+    SNP_id <- SNP_id[order_index]
+
+    chr <- unique(Pmap[,1])
+    chr.ori <- chr
+    if(length(map.xy.index) != 0){
+        for(i in 1:length(chr.xy)){
+            chr.ori[chr.ori == max.chr + i] <- chr.xy[i]
+        }
+    }
+
     #SNP-Density plot
+    wind_snp_num <- NULL
     if("d" %in% plot.type){
         if(verbose) cat(" Marker density plotting.\n")
         if(file.output){
@@ -538,32 +574,18 @@ CMplot <- function(
             if(file=="tiff")    tiff(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width=wh*dpi,height=ht*dpi,res=dpi)
             if(file=="png") png(paste("Marker_Density.",ifelse(file.name=="",taxa,file.name[1]),".png",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,bg=NA)
             # par(xpd=TRUE)
-            par(mar=c(mar[1], mar[2], mar[3]+1, mar[4]))
+            par(mar=c(mar[1]-2, mar[2]-1, mar[3]+1, mar[4]))
         }else{
             ht=ifelse(is.null(height), 6, height)
             wh=ifelse(is.null(width), 9, width)
             if(is.null(dev.list())) dev.new(width=wh,height=ht)
             # par(xpd=TRUE)
         }
-        if(!is.null(bin.range)){
-            if(length(bin.range) != 2)  stop("Two values (min and max) should be provided for bin.range!")
-            if(bin.range[1] == 0)   stop("Min value of bin.range should be more than 1!")
-        }
-        DensityPlot(map=Pmap[,c(1:3)], file.output=file.output, chr.pos.max=chr.pos.max, dpi=dpi, wh=wh, ht=ht, chr.labels=chr.labels, col=chr.den.col, bin=bin.size, legend.len=bin.legend.num, legend.min=bin.range[1], legend.max=bin.range[2], main=main[1], main.cex=main.cex, main.font=main.font)
+        wind_snp_num <- DensityPlot(Pmap[, 1], Pmap[, 2], chr.ori, chr.pos.max=chr.pos.max, dpi=dpi, wh=wh, ht=ht, chr.labels=chr.labels, col=chr.den.col, bin=bin.size, bin.breaks=bin.breaks, main=main[1], main.cex=main.cex, main.font=main.font)
         if(file.output) dev.off()
     }
-
-    if(length(plot.type) !=1 | (!"d" %in% plot.type)){
     
-        #order Pmap by the name of SNP
-        #Pmap=Pmap[order(Pmap[,1]),]
-        suppressWarnings(Pmap <- Pmap[Pmap[, 2] != "0", ])
-        Pmap <- as.matrix(Pmap)
-        Pmap <- Pmap[!is.na(Pmap[, 2]), ]
-        suppressWarnings(Pmap <- Pmap[!is.na(as.numeric(Pmap[, 3])), ])
-
-        #get the number of traits
-        R=ncol(Pmap)-3
+    if(length(plot.type) > 1 | (!"d" %in% plot.type)){
 
         #scale and adjust the parameters
         cir.chr.h <- cir.chr.h/5
@@ -613,39 +635,8 @@ CMplot <- function(
         if(!is.null(main)) main <- rep(main, R)
         if(length(mar) != 4)    stop("length of 'mar' shoud equal to 4.")
         if(chr.labels.angle > 90 | chr.labels.angle < -90)  stop("'chr.labels.angle' should be > -90 and < 90.")
-        # if(is.na(conf.int.col)){
-        #   conf.int=FALSE
-        # }else{
-        #   conf.int=TRUE
-        # }
-
         pch=rep(pch, R)
-
-        #replace the non-euchromosome
-        suppressWarnings(numeric.chr <- as.numeric(Pmap[, 2]))
-        suppressWarnings(max.chr <- max(numeric.chr, na.rm=TRUE))
-        if(is.infinite(max.chr))    max.chr <- 0
-        suppressWarnings(map.xy.index <- which(!numeric.chr %in% c(0:max.chr)))
-        if(length(map.xy.index) != 0){
-            chr.xy <- unique(Pmap[map.xy.index, 2])
-            for(i in 1:length(chr.xy)){
-                Pmap[Pmap[, 2] == chr.xy[i], 2] <- max.chr + i
-            }
-        }
-
-        SNP_id <- Pmap[,1]
-
-        #delete the column of SNPs names
-        Pmap <- Pmap[,-1]
-
-        Pmap <- apply(Pmap, 2, as.numeric)
-        # Pmap <- matrix(as.numeric(Pmap), nrow(Pmap))
-        order_index <- order(Pmap[, 1], Pmap[,2])
-
-        #order the GWAS results by chromosome and position
-        Pmap <- Pmap[order_index, ]
-        SNP_id <- SNP_id[order_index]
-
+        
         if(!is.null(highlight)){
             highlight_index <- list()
             highlight_col <- list()
@@ -683,19 +674,10 @@ CMplot <- function(
             }
         }
 
-        #get the index of chromosome
-        chr <- unique(Pmap[,1])
-        chr.ori <- chr
-        if(length(map.xy.index) != 0){
-            for(i in 1:length(chr.xy)){
-                chr.ori[chr.ori == max.chr + i] <- chr.xy[i]
-            }
-        }
-
         pvalueT <- as.matrix(Pmap[,-c(1:2)])
         pvalue.pos <- Pmap[, 2]
         pvalue.pos.list <- tapply(pvalue.pos, Pmap[, 1], list)
-        
+
         #scale the space parameter between chromosomes
         if(!missing(band)){
             band <- floor(band*(sum(sapply(pvalue.pos.list, max))/100))
@@ -802,13 +784,12 @@ CMplot <- function(
         if(length(chr.den.col) > 1){
             cir.density=TRUE
             den.fold <- 20
-            density.list <- DensityPlot(map=Pmap[,c(1,1,2)], file.output=FALSE, chr.pos.max=FALSE, col=chr.den.col, plot=FALSE, bin=bin.size, legend.len=bin.legend.num, legend.min=bin.range[1], legend.max=bin.range[2])
-            #list(den.col=col.seg, legend.col=legend.col, legend.y=legend.y)
+            density.list <- DensityPlot(Pmap[, 1], Pmap[, 2], chr.ori, chr.pos.max=FALSE, col=chr.den.col, plot=FALSE, bin=bin.size, bin.breaks=bin.breaks)
         }else{
             cir.density=FALSE
         }
     }
-    
+
     #plot circle Manhattan
     if("c" %in% plot.type){
 
@@ -864,10 +845,7 @@ CMplot <- function(
             #get the colors for each trait
             colx <- col[i,]
             colx <- colx[!is.na(colx)]
-            
-            #debug
-            #print(colx)
-            
+
             if(verbose) cat(paste(" Circular Manhattan plotting ",trait[i],".\n",sep=""))
             pvalue <- pvalueT[,i]
             logpvalue <- logpvalueT[,i]
@@ -2485,4 +2463,5 @@ CMplot <- function(
         }
     }
     if(file.output & verbose)   cat(paste(" Plots are stored in: ", getwd(), sep=""), "\n")
+    if(!is.null(wind_snp_num))  return(invisible(wind_snp_num))
 }
