@@ -77,9 +77,11 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 ### SNP-density plot
 
 ```r
-> CMplot(pig60K,type="p",plot.type="d",bin.size=1e6,chr.den.col=c("darkgreen", "yellow", "red"),file="jpg",file.name="",dpi=300,
+> CMplot(pig60K,plot.type="d",bin.size=1e6,chr.den.col=c("darkgreen", "yellow", "red"),file="jpg",file.name="",dpi=300,
     main="illumilla_60K",file.output=TRUE,verbose=TRUE,width=9,height=6)
-# users can personally set the window size and the min/max of legend by: bin.size=1e6, bin.range=c(min, max)
+# set the window size: bin.size=1e6, bin.range=c(min, max)
+# set the legend breaks by: bin.breaks=seq(min, max, step), e.g., bin.breaks=seq(0, 50, 10), the windows out of the breaks will be plotted in the same color with min or max.
+# to get the detailed information of windows, use the format as "windinfo <- CMplot(pig60K, ...)"
 # file: the format of the output file, if file="png", CMplot will output a transparent background file 
 # file.name: specify the output file name, the default is corresponding column name when setting file.name=""
 # chr.labels: change the chromosome names
