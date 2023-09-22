@@ -386,7 +386,9 @@ CMplot <- function(
             maxposindx <- which.max(pos.x[[i]])
             max.pos <- pos.x[[i]][maxposindx]
             chr.pos.max.v <- c(chr.pos.max.v, max.pos)
-            cut.len <- ceiling(max.pos / bin)
+            cut.breaks <- seq(0, max.pos, bin)
+            cut.len <- length(cut.breaks)
+            if(cut.breaks[length(cut.breaks)] < max.pos)  cut.breaks <- c(cut.breaks, cut.breaks[length(cut.breaks)] + bin)
             if(chr.pos.max){
                 pos.x[[i]] <- pos.x[[i]][-maxposindx]
             }
@@ -395,8 +397,7 @@ CMplot <- function(
                 col.index[[i]] <- rep(length(pos.x[[i]]), length(pos.x[[i]]))
                 names(col.index[[i]]) <- 1
             }else{
-                cut.r <- cut(c(0, pos.x[[i]], max.pos), cut.len, labels=FALSE)
-                cut.r <- cut.r[-c(1, length(cut.r))]
+                cut.r <- cut(pos.x[[i]], cut.breaks, labels=FALSE)
                 eachbin.num <- table(cut.r)
                 maxbin.num <- c(maxbin.num, max(eachbin.num))
                 col.index[[i]] <- rep(eachbin.num, eachbin.num)
