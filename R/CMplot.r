@@ -66,9 +66,9 @@ CMplot <- function(
     main=NULL,
     main.cex=1.5,
     main.font=2,
-    trait.legend.ncol=NULL,
-    trait.legend.cex=NULL,
-    trait.legend.pos=c("left","middle","right"),
+    legend.ncol=NULL,
+    legend.cex=NULL,
+    legend.pos=c("left","middle","right"),
     box=FALSE,
     verbose=TRUE
 )
@@ -350,6 +350,7 @@ CMplot <- function(
         legend.cex=1,
         legend.y.intersp=1,
         legend.x.intersp=1,
+        xticks.pos=1,
         plot=TRUE,
         dpi=NULL,
         wh=NULL,
@@ -358,6 +359,7 @@ CMplot <- function(
     {
         legend.min <- 1
         legend.max <- NULL
+        if(is.null(legend.cex)) legend.cex = 1
         if(!is.null(bin.breaks)){
             bin.breaks <- sort(bin.breaks)
             if(sum(bin.breaks < 0)) stop("breaks should not contain a negative value.")
@@ -420,7 +422,7 @@ CMplot <- function(
         if(!is.null(legend.max)){
             maxbin.num <- legend.max
         }
-        if(Maxbin.num <= legend.min)    stop("the maximum number of markers in windows is smaller than the lower boundary of breaks.")
+        if(Maxbin.num < legend.min)    stop("the maximum number of markers in windows is smaller than the lower boundary of breaks.")
         col=colorRampPalette(col)(maxbin.num - legend.min + 1)
         col.seg=NULL
         for(i in 1 : length(chr.num)){
@@ -468,7 +470,7 @@ CMplot <- function(
             if((chorm.maxlen/bp - max(xticks)) > 0.5*xticks[2]){
                 xticks=c(xticks, round(chorm.maxlen / bp))
             }
-            axis(3, at=xticks*bp, labels=paste(xticks, bp_label, sep=""), font=1, cex.axis=axis.cex*0.8, tck=0.01, lwd=axis.lwd, padj=1.2)
+            axis(3, mgp=c(3,xticks.pos,0), at=xticks*bp, labels=paste(xticks, bp_label, sep=""), font=1, cex.axis=axis.cex*0.8, tck=0.01, lwd=axis.lwd, padj=1.2)
             axis(3, at=c(0, chorm.maxlen), labels=c("",""), tcl=0, lwd=axis.lwd)
         }
 
@@ -500,7 +502,7 @@ CMplot <- function(
         legend.y.col <- as.numeric(legend.y.col)
         legend.col <- c("grey95", col[legend.y.col - legend.min + 1])
         if(plot){
-            legend(x=(chorm.maxlen + chorm.maxlen/100), y=(-width/2.5 - band * (length(chr.num) - length(chr.num) - 1)), title="", legend=legend.y, pch=15, pt.cex=legend.cex*3, col=legend.col,
+            legend(x=(chorm.maxlen + chorm.maxlen/50), y=(-width/2.5 + band), title="", legend=legend.y, pch=15, pt.cex=legend.cex*3, col=legend.col,
             cex=legend.cex, bty="n", y.intersp=legend.y.intersp, x.intersp=legend.x.intersp, yjust=0, xjust=0, xpd=TRUE)
             return(windinfo)
         }else{
@@ -509,7 +511,7 @@ CMplot <- function(
     }
 
     if(!all(plot.type %in% c("c","m","q","d"))) stop("unknown 'plot.type'.")
-    trait.legend.pos <- match.arg(trait.legend.pos)
+    legend.pos <- match.arg(legend.pos)
     file <- match.arg(file)
     trait <- colnames(Pmap)[-c(1:3)]
     if(length(trait) == 0)   trait <- paste("Trait", 1:(ncol(Pmap)-3), sep="")
@@ -582,7 +584,7 @@ CMplot <- function(
             if(is.null(dev.list())) dev.new(width=wh,height=ht)
             # par(xpd=TRUE)
         }
-        wind_snp_num <- DensityPlot(Pmap[, 1], Pmap[, 2], chr.ori, chr.pos.max=chr.pos.max, dpi=dpi, wh=wh, ht=ht, chr.labels=chr.labels, col=chr.den.col, bin=bin.size, bin.breaks=bin.breaks, main=main[1], main.cex=main.cex, main.font=main.font)
+        wind_snp_num <- DensityPlot(Pmap[, 1], Pmap[, 2], chr.ori, chr.pos.max=chr.pos.max, dpi=dpi, wh=wh, ht=ht, chr.labels=chr.labels, col=chr.den.col, bin=bin.size, bin.breaks=bin.breaks, main=main[1], main.cex=main.cex, main.font=main.font, legend.cex=legend.cex, xticks.pos=xticks.pos)
         if(file.output) dev.off()
     }
     
@@ -924,7 +926,7 @@ CMplot <- function(
                             x=RR+4*cir.chr.h,
                             y=(RR+4*cir.chr.h)/2,
                             title="", legend=density.list$legend.y, pch=15, pt.cex=3, col=density.list$legend.col,
-                            cex=1, bty="n",
+                            cex=legend.cex, bty="n",
                             y.intersp=1,
                             x.intersp=1,
                             yjust=0.3, xjust=0, xpd=TRUE
@@ -1172,7 +1174,7 @@ CMplot <- function(
                             x=RR+4*cir.chr.h,
                             y=(RR+4*cir.chr.h)/2,
                             title="", legend=density.list$legend.y, pch=15, pt.cex=3, col=density.list$legend.col,
-                            cex=1, bty="n",
+                            cex=legend.cex, bty="n",
                             y.intersp=1,
                             x.intersp=1,
                             yjust=0.3, xjust=0, xpd=TRUE
@@ -1453,12 +1455,12 @@ CMplot <- function(
                     }
 
                     #add the names of traits on plot 
-                    if(trait.legend.pos=="left"){
-                        text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),lab.cex*(R/2),trait.legend.cex),xpd=TRUE) 
-                    }else if(trait.legend.pos=="middle"){
-                        text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),lab.cex*(R/2),trait.legend.cex),xpd=TRUE) 
+                    if(legend.pos=="left"){
+                        text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=ifelse(is.null(legend.cex),lab.cex*(R/2),legend.cex),xpd=TRUE) 
+                    }else if(legend.pos=="middle"){
+                        text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=ifelse(is.null(legend.cex),lab.cex*(R/2),legend.cex),xpd=TRUE) 
                     }else{
-                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(trait.legend.cex),lab.cex*(R/2),trait.legend.cex),xpd=TRUE) 
+                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(legend.cex),lab.cex*(R/2),legend.cex),xpd=TRUE) 
                     }
                 
                     if(i == R || multracks.xaxis){
@@ -1578,8 +1580,8 @@ CMplot <- function(
                     if(file=="pdf") pdf(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".pdf",sep=""), width=wh,height=ht)
                     if(file=="tiff")    tiff(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".tiff",sep=""), width=wh*dpi,height=ht*dpi,res=dpi)
                     if(file=="png") png(paste("Multi-traits_Manhtn.",ifelse(file.name=="",taxa,file.name[1]),".png",sep=""), width=wh*dpi,height=ht*dpi,res=dpi,bg=NA)
-                    if(!is.null(trait.legend.ncol) && trait.legend.pos=="middle"){
-                        mar[3] = mar[3] + ceiling(length(trait) / trait.legend.ncol)
+                    if(!is.null(legend.ncol) && legend.pos=="middle"){
+                        mar[3] = mar[3] + ceiling(length(trait) / legend.ncol)
                     }
                     par(mar=mar,xaxs="i",yaxs="r")
                 }
@@ -1650,17 +1652,17 @@ CMplot <- function(
                 # Min1 <- Min
                 # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
                 # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
-                if(trait.legend.pos=="middle"){
-                    if(is.null(trait.legend.ncol)){
-                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),lab.cex,trait.legend.cex),box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
+                if(legend.pos=="middle"){
+                    if(is.null(legend.ncol)){
+                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(legend.cex),lab.cex,legend.cex),box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
                     }else{
-                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),lab.cex,trait.legend.cex),box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
+                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(legend.cex),lab.cex,legend.cex),box.col=NA,horiz=FALSE,ncol=legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
                     }
                 }else{
-                    if(is.null(trait.legend.ncol)){
-                        legend(ifelse(trait.legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),lab.cex,trait.legend.cex),box.col=NA,horiz=FALSE,xpd=TRUE)
+                    if(is.null(legend.ncol)){
+                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(legend.cex),lab.cex,legend.cex),box.col=NA,horiz=FALSE,xpd=TRUE)
                     }else{
-                        legend(ifelse(trait.legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(trait.legend.cex),lab.cex,trait.legend.cex),box.col=NA,horiz=FALSE,ncol=trait.legend.ncol,xpd=TRUE)
+                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(legend.cex),lab.cex,legend.cex),box.col=NA,horiz=FALSE,ncol=legend.ncol,xpd=TRUE)
                     }
                 }
 
@@ -1822,7 +1824,7 @@ CMplot <- function(
                         x=max_no_na(pvalue.posN)+band,
                         y=legend.y,
                         title="", legend=density.list$legend.y, pch=15, pt.cex=2.5, col=density.list$legend.col,
-                        cex=0.8, bty="n",
+                        cex=legend.cex*0.8, bty="n",
                         y.intersp=1,
                         x.intersp=1,
                         yjust=0.9, xjust=0, xpd=TRUE
@@ -2073,7 +2075,7 @@ CMplot <- function(
                             x=max_no_na(pvalue.posN)+band,
                             y=legend.y,
                             title="", legend=density.list$legend.y, pch=15, pt.cex=2.5, col=density.list$legend.col,
-                            cex=0.8, bty="n",
+                            cex=legend.cex*0.8, bty="n",
                             y.intersp=1,
                             x.intersp=1,
                             yjust=0.9, xjust=0, xpd=TRUE
@@ -2257,7 +2259,7 @@ CMplot <- function(
                 }else{
                     plot(NULL, xlim=c(0,floor(max_no_na(log.Quantiles.max_no_na)+1)), axes=FALSE, xlab="", ylab="", cex.axis=axis.cex, cex.lab=lab.cex,ylim=c(0, max(unlist(ylim))),main = "QQplot", cex.main=main.cex, font.main=main.font)
                 }
-                legend("topleft",trait,col=rgb(t(col2rgb(t(col)[1:R])), alpha=points.alpha, maxColorValue=255),pch=19,text.font=6,box.col=NA, xpd=TRUE)
+                legend("topleft",trait,col=rgb(t(col2rgb(t(col)[1:R])), alpha=points.alpha, maxColorValue=255),pch=19,cex=legend.cex,text.font=6,box.col=NA, xpd=TRUE)
                 axis(1, mgp=c(3,xticks.pos,0), at=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), lwd=axis.lwd,labels=seq(0,floor(max_no_na(log.Quantiles.max_no_na)+1),ceiling((max_no_na(log.Quantiles.max_no_na)+1)/10)), cex.axis=axis.cex)
                 axis(2, las=1,lwd=axis.lwd,cex.axis=axis.cex)
                 axis(2, at=c(0, ifelse(is.null(ylim), YlimMax, max(unlist(ylim)))), labels=c("",""), tcl=0, lwd=axis.lwd)
