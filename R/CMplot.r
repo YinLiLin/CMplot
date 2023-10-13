@@ -67,7 +67,7 @@ CMplot <- function(
     main.cex=1.5,
     main.font=2,
     legend.ncol=NULL,
-    legend.cex=NULL,
+    legend.cex=1,
     legend.pos=c("left","middle","right"),
     box=FALSE,
     verbose=TRUE
@@ -1456,11 +1456,11 @@ CMplot <- function(
 
                     #add the names of traits on plot 
                     if(legend.pos=="left"){
-                        text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=ifelse(is.null(legend.cex),lab.cex*(R/2),legend.cex),xpd=TRUE) 
+                        text(min_no_na(pvalue.posN),Max,labels=trait[i],adj=c(-0.2, 1.2),font=4,cex=legend.cex*(R/2),xpd=TRUE) 
                     }else if(legend.pos=="middle"){
-                        text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=ifelse(is.null(legend.cex),lab.cex*(R/2),legend.cex),xpd=TRUE) 
+                        text((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))/2,Max,labels=trait[i],adj=c(0.5, 1.2),font=4,cex=legend.cex*(R/2),xpd=TRUE) 
                     }else{
-                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=ifelse(is.null(legend.cex),lab.cex*(R/2),legend.cex),xpd=TRUE) 
+                        text(max_no_na(pvalue.posN),Max,labels=trait[i],adj=c(1.2, 1.2),font=4,cex=legend.cex*(R/2),xpd=TRUE) 
                     }
                 
                     if(i == R || multracks.xaxis){
@@ -1654,15 +1654,15 @@ CMplot <- function(
                 # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
                 if(legend.pos=="middle"){
                     if(is.null(legend.ncol)){
-                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(legend.cex),lab.cex,legend.cex),box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
+                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
                     }else{
-                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(legend.cex),lab.cex,legend.cex),box.col=NA,horiz=FALSE,ncol=legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
+                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,ncol=legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
                     }
                 }else{
                     if(is.null(legend.ncol)){
-                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(legend.cex),lab.cex,legend.cex),box.col=NA,horiz=FALSE,xpd=TRUE)
+                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,xpd=TRUE)
                     }else{
-                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=ifelse(is.null(legend.cex),lab.cex,legend.cex),box.col=NA,horiz=FALSE,ncol=legend.ncol,xpd=TRUE)
+                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,ncol=legend.ncol,xpd=TRUE)
                     }
                 }
 
