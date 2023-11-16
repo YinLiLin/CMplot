@@ -1,5 +1,5 @@
 # CMplot 
-[![GitHub issues](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=green)](https://github.com/YinLiLin/CMplot/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-4.4.3-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FYinLiLin%2FCMplot"/></a>
+[![GitHub issues](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=green)](https://github.com/YinLiLin/CMplot/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-4.5.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <a href="https://hits.seeyoufarm.com"/><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FYinLiLin%2FCMplot"/></a>
 
 ## A high-quality drawing tool designed for Manhattan plot of genomic analysis
 
@@ -377,8 +377,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
         threshold.lwd=c(1,1), threshold.col=c("black","grey"), amplify=TRUE,bin.size=1e6,
         chr.den.col=c("darkgreen", "yellow", "red"), signal.col=c("red","green"),
         signal.cex=1, file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,
-        highlight=SNPs, highlight.text=SNPs, highlight.text.cex=1.4, 
-        trait.legend.ncol=1, trait.legend.pos="left")
+        points.alpha=100,legend.ncol=1, legend.pos="left")
 ```
 
 <p align="center">
@@ -387,6 +386,19 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 </a>
 </p>
 
+```r
+>CMplot(pig60K, plot.type="m",col="grey",multraits=TRUE,threshold=1e-4,threshold.lty=1, 
+        threshold.lwd=c(1,1), threshold.col=c("black","grey"),amplify=TRUE,
+        chr.den.col=NULL, signal.col=c("red","green","blue"),signal.cex=1, 
+        file="jpg",file.name="",dpi=300,file.output=TRUE,verbose=TRUE,
+        points.alpha=225,legend.ncol=3, legend.pos="middle")
+# note: length of 'col' should be equal to 1 for this case.
+```
+
+<p align="center">
+<a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4_2.jpg">
+<img src="Figure/4_2.jpg" height="365px" width="900px">
+</a>
 ---
 
 ### Q-Q plot

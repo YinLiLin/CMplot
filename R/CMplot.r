@@ -1652,17 +1652,21 @@ CMplot <- function(
                 # Min1 <- Min
                 # if(abs(Max) <= 1) Max <- round(Max, ceiling(-log10(abs(Max))))
                 # if(abs(Min) <= 1) Min <- round(Min, ceiling(-log10(abs(Min))))
+                if(length(unique(col)) == 1 && is.null(signal.col)) stop("'signal.col' is NULL.")
+                if(length(unique(col)) == 1 && amplify == FALSE)    stop("'amplify' is FALSE.")
+                legend_col <- t(col)[1:R]
+                if(length(unique(col)) == 1)    legend_col <- rep(signal.col, R)[1:R]
                 if(legend.pos=="middle"){
                     if(is.null(legend.ncol)){
-                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
+                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=legend_col,pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=TRUE,xjust=0.5,yjust=0,xpd=TRUE)
                     }else{
-                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=t(col)[1:R],pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,ncol=legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
+                        legend((max_no_na(pvalue.posN)+min_no_na(pvalue.posN))*0.5,Max,trait,col=legend_col,pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,ncol=legend.ncol,xjust=0.5,yjust=0,xpd=TRUE)
                     }
                 }else{
                     if(is.null(legend.ncol)){
-                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,xpd=TRUE)
+                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=legend_col,pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,xpd=TRUE)
                     }else{
-                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=t(col)[1:R],pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,ncol=legend.ncol,xpd=TRUE)
+                        legend(ifelse(legend.pos=="left","topleft","topright"),trait,col=legend_col,pch=pch,text.font=6,cex=legend.cex,box.col=NA,horiz=FALSE,ncol=legend.ncol,xpd=TRUE)
                     }
                 }
 
@@ -1713,95 +1717,116 @@ CMplot <- function(
                         segments(chr.border.pos[b], Min, chr.border.pos[b], Max, col="grey45", lwd=axis.lwd, lty=2)
                     }
                 }
-                sam.index <- list()
-                trait_max_n <- 0
-                trait_max <- 0
-                for(l in 1:R){
-                    sam.index[[l]] <- c(1:nrow(Pmap))[is_visable[[l]] & !is.na(logpvalueT[,l])]
-                    if(length(sam.index[[l]]) >= trait_max_n){
-                        trait_max_n=length(sam.index[[l]])
-                        trait_max=l
-                    }
-                }
-                
-                #change the sample number according to Pmap
-                #sam.num <- ceiling(nrow(Pmap)/100)
-                sam.num <- 1000
-                cat_bar <- seq(1, 100, 1)
-                trait_n <- sapply(sam.index, length)
-                trait_sams <- ceiling(trait_n / sam.num)
-                trait_max_sams <- max(trait_sams)
-                trait_1st_sam <- trait_max_sams - trait_sams + 1
-                trait_full_sams <- floor(trait_n / sam.num)
-                trait_1st_full_sam <- trait_max_sams - trait_full_sams + 1
-                for(sam in 1:trait_max_sams) {
-                    for(i in 1:R){
-                        if(sam < trait_1st_sam[i]){
-                            # nothing
-                        }else{
-                            if(sam < trait_1st_full_sam[i]){
-                                plot.index <- sample(sam.index[[i]], trait_n[i] %% sam.num, replace=FALSE)
-                            }else{
-                                plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
-                            }
-                            sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
-                            logpvalue=logpvalueT[plot.index,i]
-                            if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
-                            points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
-                        }
-                    }
-                    if(verbose){
-                        progress <- round((nrow(Pmap) - length(sam.index[[trait_max]])) * 100 / nrow(Pmap))
-                        if(progress %in% cat_bar){
-                            cat(" Multi-traits Rectangular plotting ... (finished ", progress, "%)\r", sep="")
-                            cat_bar <- cat_bar[cat_bar != progress]
-                            if(progress == 100) cat("\n")
-                        }
-                    }
-                }
 
+                if(length(unique(col)) != 1){
+                    sam.index <- list()
+                    trait_max_n <- 0
+                    trait_max <- 0
+                    for(l in 1:R){
+                        sam.index[[l]] <- c(1:nrow(Pmap))[is_visable[[l]] & !is.na(logpvalueT[,l])]
+                        if(length(sam.index[[l]]) >= trait_max_n){
+                            trait_max_n=length(sam.index[[l]])
+                            trait_max=l
+                        }
+                    }
+                    
+                    #change the sample number according to Pmap
+                    #sam.num <- ceiling(nrow(Pmap)/100)
+                    sam.num <- 1000
+                    cat_bar <- seq(1, 100, 1)
+                    trait_n <- sapply(sam.index, length)
+                    trait_sams <- ceiling(trait_n / sam.num)
+                    trait_max_sams <- max(trait_sams)
+                    trait_1st_sam <- trait_max_sams - trait_sams + 1
+                    trait_full_sams <- floor(trait_n / sam.num)
+                    trait_1st_full_sam <- trait_max_sams - trait_full_sams + 1
+                    for(sam in 1:trait_max_sams) {
+                        for(i in 1:R){
+                            if(sam < trait_1st_sam[i]){
+                                # nothing
+                            }else{
+                                if(sam < trait_1st_full_sam[i]){
+                                    plot.index <- sample(sam.index[[i]], trait_n[i] %% sam.num, replace=FALSE)
+                                }else{
+                                    plot.index <- sample(sam.index[[i]], sam.num, replace=FALSE)
+                                }
+                                sam.index[[i]] <- sam.index[[i]][-which(sam.index[[i]] %in% plot.index)]
+                                logpvalue=logpvalueT[plot.index,i]
+                                if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
+                                points(pvalue.posN[plot.index][indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
+                            }
+                        }
+                        if(verbose){
+                            progress <- round((nrow(Pmap) - length(sam.index[[trait_max]])) * 100 / nrow(Pmap))
+                            if(progress %in% cat_bar){
+                                cat(" Multi-traits Rectangular plotting ... (finished ", progress, "%)\r", sep="")
+                                cat_bar <- cat_bar[cat_bar != progress]
+                                if(progress == 100) cat("\n")
+                            }
+                        }
+                    }
+                }else{
+                    for(i in 1:R){
+                        logpvalue=logpvalueT[,i]
+                        if(!is.null(ylim)){indexx <- logpvalue>=min_no_na(ylim[[i]])}else{indexx <- 1:length(logpvalue)}
+                        points(pvalue.posN[indexx],logpvalue[indexx],pch=pch[i],type=type,lwd=cex[2]+1,cex=cex[2],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
+                    }
+                }
                 if(!is.null(threshold)){
                     for(thr in 1:length(threshold[[i]])){
                         h <- ifelse(LOG10, -log10(threshold[[i]][thr]), threshold[[i]][thr])
                         segments(0, h, max_no_na(pvalue.posN), h, col=threshold.col[thr],lwd=threshold.lwd[thr],lty=threshold.lty[thr])
                     }
                     if(amplify==TRUE){
-                    # if(sum(threshold!=0)==length(threshold)){
-                        for(i in 1:R){
-                            logpvalue=logpvalueT[, i]
-                            for(ll in 1:length(threshold[[i]])){
-                                if(ll == 1){
-                                    if(LOG10){
-                                        sgline1=-log10(threshold[[i]][ll])
+                        if(length(unique(col)) != 1){
+                            for(i in 1:R){
+                                logpvalue=logpvalueT[, i]
+                                for(ll in 1:length(threshold[[i]])){
+                                    if(ll == 1){
+                                        if(LOG10){
+                                            sgline1=-log10(threshold[[i]][ll])
+                                        }else{
+                                            sgline1=threshold[[i]][ll]
+                                        }
+                                        sgindex=which(logpvalue>=sgline1)
+                                        HY1=logpvalue[sgindex]
+                                        HX1=pvalue.posN[sgindex]
                                     }else{
-                                        sgline1=threshold[[i]][ll]
+                                        if(LOG10){
+                                            sgline0=-log10(threshold[[i]][ll-1])
+                                            sgline1=-log10(threshold[[i]][ll])
+                                        }else{
+                                            sgline0=threshold[[i]][ll-1]
+                                            sgline1=threshold[[i]][ll]
+                                        }
+                                        sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
+                                        HY1=logpvalue[sgindex]
+                                        HX1=pvalue.posN[sgindex]
                                     }
-                                    sgindex=which(logpvalue>=sgline1)
-                                    HY1=logpvalue[sgindex]
-                                    HX1=pvalue.posN[sgindex]
-                                }else{
-                                    if(LOG10){
-                                        sgline0=-log10(threshold[[i]][ll-1])
-                                        sgline1=-log10(threshold[[i]][ll])
+                                    points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
+                                    if(is.null(signal.col)){
+                                        points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rgb(t(col2rgb(rep(rep(colx,N[i]),add[[i]])[sgindex])), alpha=points.alpha, maxColorValue=255))
                                     }else{
-                                        sgline0=threshold[[i]][ll-1]
-                                        sgline1=threshold[[i]][ll]
+                                        points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rgb(t(col2rgb(signal.col[ll])), alpha=points.alpha, maxColorValue=255))
                                     }
-                                    sgindex=which(logpvalue>=sgline1 & logpvalue < sgline0)
-                                    HY1=logpvalue[sgindex]
-                                    HX1=pvalue.posN[sgindex]
+                                    
                                 }
+                            }
+                        }else{
+                            for(i in 1:R){
+                                logpvalue=logpvalueT[, i]
+                                if(LOG10){
+                                    sgindex = which(logpvalue > -log10(min(unlist(threshold))))
+                                }else{
+                                    sgindex = which(logpvalue > max(unlist(threshold)))
+                                }
+                                HY1=logpvalue[sgindex]
+                                HX1=pvalue.posN[sgindex]
                                 points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
-                                if(is.null(signal.col)){
-                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rep(rep(colx,N[i]),add[[i]])[sgindex])
-                                }else{
-                                    points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=signal.col[ll])
-                                }
-                                
+                                points(HX1,HY1,pch=rep(signal.pch, R)[i],cex=rep(signal.cex, R)[i],col=rgb(t(col2rgb(rep(signal.col, R)[i])), alpha=points.alpha, maxColorValue=255))
                             }
                         }
                     }
-                    # }
                 }
 
                 if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(unlist(ylim))}
