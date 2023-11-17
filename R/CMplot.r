@@ -1805,7 +1805,7 @@ CMplot <- function(
                                     }
                                     points(HX1,HY1,pch=pch[i],cex=cex[2],col="white")
                                     if(is.null(signal.col)){
-                                        points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rgb(t(col2rgb(rep(rep(colx,N[i]),add[[i]])[sgindex])), alpha=points.alpha, maxColorValue=255))
+                                        points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rgb(t(col2rgb(t(col)[i])), alpha=points.alpha, maxColorValue=255))
                                     }else{
                                         points(HX1,HY1,pch=signal.pch[ll],cex=signal.cex[ll],col=rgb(t(col2rgb(signal.col[ll])), alpha=points.alpha, maxColorValue=255))
                                     }

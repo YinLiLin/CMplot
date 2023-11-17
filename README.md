@@ -397,7 +397,7 @@ Yin, L. et al. [rMVP: A Memory-efficient, Visualization-enhanced, and Parallel-a
 
 <p align="center">
 <a href="https://raw.githubusercontent.com/YinLiLin/R-CMplot/master/Figure/4_2.jpg">
-<img src="Figure/4_2.jpg" height="365px" width="900px">
+<img src="Figure/4_2.jpg" height="335px" width="900px">
 </a>
 ---
 
