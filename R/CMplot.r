@@ -683,11 +683,11 @@ CMplot <- function(
 
         #scale the space parameter between chromosomes
         if(!missing(band)){
-            band <- floor(band*(sum(sapply(pvalue.pos.list, max))/100))
+            band <- floor(band*(sum(sapply(pvalue.pos.list, max)) - min(unlist(pvalue.pos.list)))/100)
         }else{
-            band <- floor((sum(sapply(pvalue.pos.list, max))/100))
+            band <- floor((sum(sapply(pvalue.pos.list, max)) - min(unlist(pvalue.pos.list)))/100)
         }
-        if(band==0) band=1
+        if(band==0) band=100
         
         if(LOG10){
             if(sum(pvalueT <= 0, na.rm=TRUE) != 0 || sum(pvalueT > 1, na.rm=TRUE) != 0) stop("p values should be at range of (0, 1).")
