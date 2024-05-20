@@ -122,7 +122,7 @@ CMplot <- function(
             return(FALSE)
         }
     
-        layout <- function(x, y, words, cex=1, xlim=c(-Inf, Inf), ylim=c(-Inf, Inf), tstep = .1, rstep = .1) {
+        layout <- function(x, y, words, cex=1, xlim=c(-Inf, Inf), ylim=c(-Inf, Inf)) {
             sdx <- sd(x, na.rm=TRUE)
             sdy <- sd(y, na.rm=TRUE)
             if (sdx == 0) sdx <- 1
@@ -151,9 +151,9 @@ CMplot <- function(
                             boxes[[length(boxes) + 1]] <- c(xupdt-0.5*wid, yupdt-0.5*ht, wid, ht)
                             isOverlaped <- FALSE
                         }else{
-                            theta <- theta + tstep
-                            r <- r + rstep * tstep / (2 * base::pi)
-                            xupdt <- xrot + sdx * r * cos(theta)
+                            theta <- theta + 0.1
+                            r <- r + 0.001 / (2 * base::pi)
+                            xupdt <- xrot + 0.1 * sdx * r * cos(theta)
                             yupdt <- yrot + sdy * r * sin(theta)
                         }
                     }
@@ -200,8 +200,12 @@ CMplot <- function(
 
             x1 <- x
             y1 <- y
-            xadj <- rep(c(1.5, 0, -0.5), length=length(x))
-            yadj <- rep(c(1.5, 0, -0.5), length=length(x))
+            xadj <- sample(c(1.5, 0, -0.5), size=length(x), rep=TRUE)
+            # xadj <- rep(c(1.5, 0, -0.5), length=max(3, length(x)))
+            # xadj <- sort(xadj)[1:length(x)]
+            # xadj[order(x)] <- xadj
+            yadj <- rep(c(1.5, 0, -0.5), length=max(3, length(x)))
+            yadj <- sort(yadj)[1:length(x)]
             for(i in 1:length(x)){
                 if(xadj[i] == 0){
                     if(yadj[i] == -0.5){
