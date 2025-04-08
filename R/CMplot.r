@@ -744,7 +744,7 @@ CMplot <- function(
                 if (i==0){
                     #pvalue <- append(pvalue,rep(Inf,band),after=0)
                     pvalue.posN <- pvalue.pos.list[[i+1]] + band
-                    ticks[i+1] <- max_no_na(pvalue.posN)-floor(max_no_na(pvalue.pos.list[[i+1]])/2)
+                    ticks[i+1] <- floor((max_no_na(pvalue.posN)+min_no_na(pvalue.pos.list[[i+1]])+band)/2)
                     chr.border.pos[i+1] <- max_no_na(pvalue.posN) + 0.5 * band
                 }else{
                     #pvalue <- append(pvalue,rep(Inf,band),after=sum(Num[1:i])+i*band)
@@ -1144,7 +1144,7 @@ CMplot <- function(
                                     }
                                 }
                         }else{
-                            polygon.index <- seq(1+round(band/2)+max_no_na(pvalue.posN.list[[k-1]]),-round(band/2)-circleMin+max_no_na(pvalue.posN.list[[k]]), length=polygon.num)
+                            polygon.index <- seq(1+round(band/2)+max_no_na(pvalue.posN.list[[k-1]])-circleMin,-round(band/2)-circleMin+max_no_na(pvalue.posN.list[[k]]), length=polygon.num)
                             X1chr=(RR)*sin(2*base::pi*(polygon.index)/TotalN)
                             Y1chr=(RR)*cos(2*base::pi*(polygon.index)/TotalN)
                             X2chr=(RR+cir.chr.h)*sin(2*base::pi*(polygon.index)/TotalN)
@@ -1977,6 +1977,7 @@ CMplot <- function(
                                 #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
                             }
                         }else{
+                            points(c(0,ticks[1]), c(10,10), col="red")
                             axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c("Chr",chr.ori))
                             #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
                         }
