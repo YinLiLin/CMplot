@@ -1977,7 +1977,6 @@ CMplot <- function(
                                 #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
                             }
                         }else{
-                            points(c(0,ticks[1]), c(10,10), col="red")
                             axis(1, mgp=c(3,xticks.pos,0), at=c(min_no_na(pvalue.posN)-band,ticks), lwd=axis.lwd, cex.axis=axis.cex,font=lab.font,labels=c("Chr",chr.ori))
                             #axis(1, at=c(ticks[length(ticks)], max_no_na(pvalue.posN)), labels=c("",""), tcl=0, lwd=axis.lwd)
                         }
