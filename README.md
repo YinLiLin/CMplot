@@ -1,5 +1,5 @@
 # CMplot 
-[![GitHub issues](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=green)](https://github.com/YinLiLin/CMplot/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-4.6.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <a><img alt="Hits" src="https://hits.sh/github.com/YinLiLin/CMplot.svg?view=today-total&label=Today%2FTotal%20Visitors&extraCount=105563"/></a>
+[![GitHub issues](https://img.shields.io/github/issues/YinLiLin/R-CMplot?color=green)](https://github.com/YinLiLin/CMplot/issues/new) [![CRAN Version](https://www.r-pkg.org/badges/version/CMplot?color=yellow)](https://CRAN.R-project.org/package=CMplot) [![](https://img.shields.io/badge/GitHub-4.6.0-blueviolet.svg)]() ![](http://cranlogs.r-pkg.org/badges/grand-total/CMplot?color=red) [![](https://cranlogs.r-pkg.org/badges/last-month/CMplot)](https://CRAN.R-project.org/package=CMplot) <img alt="Hits" src="https://hits.sh/github.com/YinLiLin/CMplot.svg?view=today-total&label=Today%2FTotal%20Visitors&extraCount=105563"/>
 
 ## A high-quality drawing tool designed for Manhattan plot of genomic analysis
 
