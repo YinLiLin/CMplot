@@ -373,8 +373,10 @@ CMplot <- function(
         x_max <- max(x, na.rm=TRUE)
         y_min <- min(y, na.rm=TRUE)
         y_max <- max(y, na.rm=TRUE)
-        x_scaled <- ceiling((x - x_min) / (x_max - x_min) * w * dpi / scale)
-        y_scaled <- ceiling((y - y_min) / (y_max - y_min) * h * dpi / scale)
+        x_range <- x_max - x_min
+        y_range <- y_max - y_min
+        if(x_range == 0) x_scaled <- rep(0L, length(x)) else x_scaled <- ceiling((x - x_min) / x_range * w * dpi / scale)
+        if(y_range == 0) y_scaled <- rep(0L, length(y)) else y_scaled <- ceiling((y - y_min) / y_range * h * dpi / scale)
         key <- x_scaled * 1000000L + y_scaled
         !duplicated(key)
     }
@@ -1631,7 +1633,7 @@ CMplot <- function(
                     }
                     if(!is.null(main) & R == 1)  title(main=main[1], cex.main=main.cex, font.main= main.font)
                     if(box) box(lwd=axis.lwd)
-                    #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
+                    if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold[[i]]))],col="grey",lty=2,lwd=signal.line)
                 }
                 if(file.output) dev.off()
             }
