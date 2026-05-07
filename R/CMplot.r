@@ -1454,6 +1454,22 @@ CMplot <- function(
                     if(file=="png") png(paste("Multi-tracks_Manhtn.",ifelse(is.null(file.name),taxa,file.name[1]),".png",sep=""), width=wh*dpi,height=ht*dpi*R,res=dpi,bg=NA)
                     par(mfcol=c(R,1), xaxs="i")
                 }
+                signal.line.index <- NULL
+                if(!is.null(threshold)){
+                    if(!is.null(signal.line)){
+                        for(l in 1:R){
+                            if(!is.null(threshold[[l]])){
+                                if(LOG10){
+                                    signal.line.index <- c(signal.line.index,which(pvalueT[,l] < min_no_na(threshold[[l]])))
+                                }else{
+                                    signal.line.index <- c(signal.line.index,which(pvalueT[,l] > max_no_na(threshold[[l]])))
+                                }
+                            }
+                        }
+                        signal.line.index <- unique(signal.line.index)
+                    }
+                    signal.line.index <- pvalue.posN[signal.line.index]
+                }
                 if(!file.output){
                     ht=ifelse(is.null(height), 6, height)
                     wh=ifelse(is.null(width), 14, width)
@@ -1633,7 +1649,7 @@ CMplot <- function(
                     }
                     if(!is.null(main) & R == 1)  title(main=main[1], cex.main=main.cex, font.main= main.font)
                     if(box) box(lwd=axis.lwd)
-                    #if(!is.null(threshold) & !is.null(signal.line))    abline(v=pvalue.posN[which(pvalueT[,i] < min_no_na(threshold))],col="grey",lty=2,lwd=signal.line)
+                    if(!is.null(threshold) & !is.null(signal.line))    abline(v=signal.line.index,col="grey",lty=2,lwd=signal.line)
                 }
                 if(file.output) dev.off()
             }
