@@ -2186,18 +2186,18 @@ CMplot <- function(
                         }
                     }
 
-                    if(!is.null(threshold) & !is.null(signal.line)){
-                        if(!is.null(threshold[[i]])){
-                            if(LOG10){
-                                idx <- which(pvalueT[,i] < min_no_na(threshold[[i]]))
-                            }else{
-                                idx <- which(pvalueT[,i] > max_no_na(threshold[[i]]))
-                            }
-                            if(length(idx) > 0){
-                                segments(pvalue.posN[idx], Min, pvalue.posN[idx], Max, col="grey", lty=2, lwd=signal.line)
-                            }
-                        }
-                    }
+                    #if(!is.null(threshold) & !is.null(signal.line)){
+                    #    if(!is.null(threshold[[i]])){
+                    #        if(LOG10){
+                    #            idx <- which(pvalueT[,i] < min_no_na(threshold[[i]]))
+                    #        }else{
+                    #            idx <- which(pvalueT[,i] > max_no_na(threshold[[i]]))
+                    #        }
+                    #        if(length(idx) > 0){
+                    #            segments(pvalue.posN[idx], Min, pvalue.posN[idx], Max, col="grey", lty=2, lwd=signal.line)
+                    #        }
+                    #    }
+                    #}
             
                     if(is.null(ylim)){ymin <- Min}else{ymin <- min_no_na(ylim[[i]])}
                     if(cir.density){
