@@ -373,8 +373,10 @@ CMplot <- function(
         x_max <- max(x, na.rm=TRUE)
         y_min <- min(y, na.rm=TRUE)
         y_max <- max(y, na.rm=TRUE)
-        x_scaled <- ceiling((x - x_min) / (x_max - x_min) * w * dpi / scale)
-        y_scaled <- ceiling((y - y_min) / (y_max - y_min) * h * dpi / scale)
+        x_range <- x_max - x_min
+        y_range <- y_max - y_min
+        if(x_range == 0) x_scaled <- rep(0L, length(x)) else x_scaled <- ceiling((x - x_min) / x_range * w * dpi / scale)
+        if(y_range == 0) y_scaled <- rep(0L, length(y)) else y_scaled <- ceiling((y - y_min) / y_range * h * dpi / scale)
         key <- x_scaled * 1000000L + y_scaled
         !duplicated(key)
     }
