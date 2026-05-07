@@ -1697,7 +1697,7 @@ CMplot <- function(
                     }
                 }
 
-                pvalue <- as.vector(Pmap[,3:(R+2)])
+                pvalue <- as.vector(unlist(Pmap[,3:(R+2)]))
                 if(is.null(ylim)){
                     if(!is.null(threshold)){
                         if(LOG10){
